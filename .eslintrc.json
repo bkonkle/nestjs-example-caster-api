@@ -1,0 +1,60 @@
+{
+  "root": true,
+  "ignorePatterns": ["**/*"],
+  "plugins": ["@nrwl/nx", "@typescript-eslint", "prettier"],
+  "parser": "@typescript-eslint/parser",
+  "env": {
+    "node": true,
+    "es6": true,
+    "jest": true
+  },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "rules": {
+        "@nrwl/nx/enforce-module-boundaries": [
+          "error",
+          {
+            "enforceBuildableLibDependency": true,
+            "allow": [],
+            "depConstraints": [
+              {
+                "sourceTag": "*",
+                "onlyDependOnLibsWithTags": ["*"]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "extends": [
+        "plugin:@nrwl/nx/typescript",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended"
+      ],
+      "parserOptions": {
+        "project": "./tsconfig.*?.json"
+      },
+      "rules": {
+        "@typescript-eslint/camelcase": ["off"],
+        "@typescript-eslint/explicit-module-boundary-types": ["off"],
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          {"varsIgnorePattern": "^_", "argsIgnorePattern": "^_"}
+        ],
+        "@typescript-eslint/no-namespace": ["off"]
+      }
+    },
+    {
+      "files": ["*.js", "*.jsx"],
+      "extends": [
+        "plugin:@nrwl/nx/javascript",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended"
+      ],
+      "rules": {}
+    }
+  ]
+}

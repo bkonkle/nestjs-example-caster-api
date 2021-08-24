@@ -1,0 +1,32 @@
+{
+  "implicitDependencies": {
+    "package.json": {
+      "dependencies": "*",
+      "devDependencies": "*"
+    },
+    ".eslintrc.json": "*"
+  },
+  "affected": {
+    "defaultBase": "develop"
+  },
+  "npmScope": "caster",
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/workspace/tasks-runners/default",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "e2e", "codegen"]
+      }
+    }
+  },
+  "projects": {
+    "api": {
+      "tags": []
+    },
+    "users": {
+      "tags": []
+    },
+    "utils": {
+      "tags": []
+    }
+  }
+}
