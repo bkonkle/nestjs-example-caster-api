@@ -1,0 +1,10 @@
+{
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "**/.git": true
+  },
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "terraform-ls.rootModules": ["terraform"]
+}
