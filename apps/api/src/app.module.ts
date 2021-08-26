@@ -1,8 +1,10 @@
+import {join} from 'path'
 import {Module, Logger} from '@nestjs/common'
 import {ScheduleModule} from '@nestjs/schedule'
 import {GraphQLModule} from '@nestjs/graphql'
 
-import {ConfigModule, HealthModule, JsonScalar} from '@caster/utils'
+import {ConfigModule, HealthModule} from '@caster/utils'
+import {UsersModule, ProfilesModule} from '@caster/users'
 
 const env = process.env.NODE_ENV || 'production'
 const isDev = env === 'development'
@@ -12,12 +14,13 @@ const isDev = env === 'development'
     ScheduleModule.forRoot(),
     GraphQLModule.forRoot({
       debug: isDev,
-      typePaths: ['./**/*.graphql'],
-      resolvers: {JSON: JsonScalar},
+      autoSchemaFile: join(process.cwd(), 'schema.graphql'),
       context: ({req}) => ({req}),
     }),
     ConfigModule,
     HealthModule,
+    UsersModule,
+    ProfilesModule,
   ],
   providers: [Logger],
 })

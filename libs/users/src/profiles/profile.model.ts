@@ -1,4 +1,6 @@
+import GraphQLTypeJson from 'graphql-type-json'
 import {Field, ID, ObjectType} from '@nestjs/graphql'
+import {Prisma} from '@prisma/client'
 
 import {User} from '../users/user.model'
 
@@ -7,26 +9,26 @@ export class Profile {
   @Field(() => ID)
   id!: string
 
-  @Field({nullable: true})
-  email?: string
+  @Field(() => String, {nullable: true})
+  email?: string | null
 
-  @Field({nullable: true})
-  displayName?: string
+  @Field(() => String, {nullable: true})
+  displayName?: string | null
 
-  @Field({nullable: true})
-  picture?: string
+  @Field(() => String, {nullable: true})
+  picture?: string | null
 
-  @Field(() => Object, {nullable: true})
-  content?: Record<string, unknown>
+  @Field(() => GraphQLTypeJson, {nullable: true})
+  content?: Prisma.JsonValue | null
 
-  @Field({nullable: true})
-  city?: string
+  @Field(() => String, {nullable: true})
+  city?: string | null
 
-  @Field({nullable: true})
-  stateProvince?: string
+  @Field(() => String, {nullable: true})
+  stateProvince?: string | null
 
-  @Field({nullable: true})
-  user?: User
+  @Field(() => User, {nullable: true})
+  user?: User | null
 
   @Field()
   createdAt!: Date

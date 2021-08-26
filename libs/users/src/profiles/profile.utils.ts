@@ -1,22 +1,16 @@
 import {camelCase, curry, omit} from 'lodash'
 import {Prisma} from '@prisma/client'
 
-import {
-  ProfileCondition,
-  ProfilesOrderBy,
-  UpdateProfileInput,
-  Profile,
-  User,
-} from '@storyverse/graphql/api/Schema'
+import {Profile} from './profile.model'
+import {ProfileCondition, ProfilesOrderBy} from './profile-query.model'
+import {UpdateProfileInput} from './profile-input.model'
 
 export type IncludeAll = {
   user: true
 }
 
-export const isOwner = (
-  profile: Profile & {user?: User | null},
-  username?: string | null
-) => username && profile.user && username === profile.user?.username
+export const isOwner = (profile: Profile, username?: string) =>
+  username && profile.user && username === profile.user?.username
 
 export const censoredFields = ['email', 'userId'] as const
 export type CensoredProfile = Omit<Profile, typeof censoredFields[number]>
@@ -25,19 +19,15 @@ export type CensoredProfile = Omit<Profile, typeof censoredFields[number]>
  * If the given username isn't from the User that owns the Profile, censor it.
  */
 export const censor = curry(
-  (username: string | undefined | null, profile: Profile): CensoredProfile => {
+  (username: string | undefined, profile: Profile): CensoredProfile => {
     if (isOwner(profile, username)) {
       return profile
     }
 
-    return omit(profile, censoredFields)
+    return omit(profile, ...censoredFields)
   }
 )
 
-/**
- * These required fields cannot be set to `null`, they can only be `undefined` in order for Prisma
- * to ignore them. Force them to `undefined` if they are `null`.
- */
 const requiredFields = [
   'id',
   'createdAt',
@@ -48,13 +38,16 @@ const requiredFields = [
 ] as const
 
 export const fromProfileCondition = (
-  where?: ProfileCondition | null
+  where?: ProfileCondition
 ): Prisma.ProfileWhereInput | undefined => {
   if (!where) {
     return undefined
   }
 
-  // Convert any `null`s in required fields to `undefined`s, for compatibility with Prisma
+  /**
+   * These required fields cannot be set to `null`, they can only be `undefined` in order for Prisma
+   * to ignore them. Force them to `undefined` if they are `null`.
+   */
   return requiredFields.reduce(
     (memo, field) => ({...memo, [field]: memo[field] || undefined}),
     where as Prisma.ProfileWhereInput
@@ -80,7 +73,7 @@ export const fromProfileInput = (
 }
 
 export const fromOrderByInput = (
-  orderBy?: ProfilesOrderBy[] | null
+  orderBy?: ProfilesOrderBy[]
 ): Prisma.ProfileOrderByInput | undefined => {
   return orderBy?.reduce((memo, order) => {
     const index = order.lastIndexOf('_')

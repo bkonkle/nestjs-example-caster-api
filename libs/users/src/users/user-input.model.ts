@@ -1,42 +1,44 @@
-import {Field, ObjectType} from '@nestjs/graphql'
+import GraphqlTypeJson from 'graphql-type-json'
+import {Field, InputType, ObjectType} from '@nestjs/graphql'
+import {Prisma} from '@prisma/client'
 
 import {User} from './user.model'
 
-@ObjectType()
+@InputType()
 export class CreateUserProfileInput {
   @Field()
   email!: string
 
-  @Field({nullable: true})
-  displayName?: string
+  @Field(() => String, {nullable: true})
+  displayName?: string | null
 
-  @Field({nullable: true})
-  picture?: string
+  @Field(() => String, {nullable: true})
+  picture?: string | null
 
-  @Field(() => Object, {nullable: true})
-  content?: Record<string, unknown>
+  @Field(() => GraphqlTypeJson, {nullable: true})
+  content?: Prisma.JsonValue | null
 }
 
-@ObjectType()
+@InputType()
 export class CreateUserInput {
   @Field()
   username!: string
 
-  @Field({nullable: true})
-  profile?: CreateUserProfileInput
+  @Field(() => CreateUserProfileInput, {nullable: true})
+  profile?: CreateUserProfileInput | null
 }
 
-@ObjectType()
+@InputType()
 export class UpdateUserInput {
-  @Field({nullable: true})
-  username?: string
+  @Field(() => String, {nullable: true})
+  username?: string | null
 
-  @Field({nullable: true})
-  isActive?: boolean
+  @Field(() => Boolean, {nullable: true})
+  isActive?: boolean | null
 }
 
 @ObjectType()
 export class MutateUserResult {
-  @Field({nullable: true})
-  user?: User
+  @Field(() => User, {nullable: true})
+  user?: User | null
 }

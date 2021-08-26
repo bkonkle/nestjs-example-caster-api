@@ -60,6 +60,39 @@
             "jestConfig": "apps/api/jest.integration.config.js",
             "runInBand": true
           }
+        },
+        "db-migrate": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "command": "yarn db:migrate"
+          }
+        },
+        "db-deploy": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "cwd": "apps/api",
+            "command": "npx prisma migrate deploy --preview-feature"
+          }
+        },
+        "db-reset": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "command": "yarn db:migrate"
+          }
+        },
+        "docker.up": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "cwd": "apps/api",
+            "command": "docker-compose up -d"
+          }
+        },
+        "docker.down": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "cwd": "apps/api",
+            "command": "docker-compose down"
+          }
         }
       }
     },

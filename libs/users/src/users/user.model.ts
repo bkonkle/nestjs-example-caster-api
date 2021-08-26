@@ -13,8 +13,8 @@ export class User {
   @Field()
   isActive!: boolean
 
-  @Field({nullable: true})
-  profile?: Profile
+  @Field(() => Profile, {nullable: true})
+  profile?: Profile | null
 
   @Field()
   createdAt!: Date

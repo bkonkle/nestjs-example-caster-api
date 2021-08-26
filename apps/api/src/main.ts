@@ -1,6 +1,5 @@
 import bodyParser from 'body-parser'
 import chalk from 'chalk'
-import repeat from 'lodash/repeat'
 import {INestApplication, ValidationPipe, Logger} from '@nestjs/common'
 import {NestFactory} from '@nestjs/core'
 
@@ -38,11 +37,9 @@ async function bootstrap(): Promise<void> {
   app.startAllMicroservices()
 
   await app.listen(Number(port), () => {
-    const padding = APP_NAME.length < 9 ? 0 : APP_NAME.length - 9
-
     Logger.log(
       chalk.cyan(
-        `> Started ${chalk.blue(APP_NAME)} at:  ${chalk.green(
+        `${chalk.yellow(`[${APP_NAME}]`)} Started at: ${chalk.green(
           `http://localhost:${chalk.yellow(port)}`
         )}`
       )
@@ -50,10 +47,9 @@ async function bootstrap(): Promise<void> {
 
     Logger.log(
       chalk.cyan(
-        `> ${chalk.blue('GraphQL')} available at:  ${repeat(
-          ' ',
-          padding
-        )}${chalk.green(`http://localhost:${chalk.yellow(port)}/graphql`)}`
+        `${chalk.yellow('[GraphQL]')} available at: ${chalk.green(
+          `http://localhost:${chalk.yellow(port)}/graphql`
+        )}`
       )
     )
   })

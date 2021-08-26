@@ -8,6 +8,13 @@ import {CreateUserInput, UpdateUserInput} from './user-input.model'
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async get(id: string) {
+    return this.prisma.user.findFirst({
+      include: {profile: true},
+      where: {id},
+    })
+  }
+
   async getByUsername(username: string) {
     return this.prisma.user.findFirst({
       include: {profile: true},
