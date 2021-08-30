@@ -1,15 +1,9 @@
-import {Prisma} from '@prisma/client'
+import {Prisma, User} from '@prisma/client'
 import {INestApplication, ValidationPipe} from '@nestjs/common'
 import {Test} from '@nestjs/testing'
 
 import {PrismaService} from '@caster/utils'
-import {
-  OAuth2,
-  GraphQL,
-  Validation,
-  TestData,
-  dbCleaner,
-} from '@caster/utils/test'
+import {OAuth2, GraphQL, Validation, dbCleaner} from '@caster/utils/test'
 import {Schema} from '@caster/graphql'
 import {UserFactory} from '@caster/users/test'
 import {Query, Mutation} from '@caster/graphql/schema'
@@ -25,24 +19,25 @@ describe('Users', () => {
 
   const tables = ['User']
 
-  const createUser =
-    (input: Omit<Prisma.UserCreateInput, 'username'>) => async () => {
-      if (!credentials.username) {
-        fail('No username found')
-      }
-
-      return prisma.user.upsert({
-        where: {username: credentials.username},
-        create: {
-          ...input,
-          username: credentials.username,
-        },
-        update: {
-          ...input,
-          username: credentials.username,
-        },
-      })
+  const createUser = async (
+    input: Omit<Prisma.UserCreateInput, 'username'>
+  ) => {
+    if (!credentials.username) {
+      fail('No username found')
     }
+
+    return prisma.user.upsert({
+      where: {username: credentials.username},
+      create: {
+        ...input,
+        username: credentials.username,
+      },
+      update: {
+        ...input,
+        username: credentials.username,
+      },
+    })
+  }
 
   const deleteUser = async (id: string) => {
     const user = await prisma.user.findFirst({
@@ -194,6 +189,8 @@ describe('Users', () => {
   })
 
   describe('Query: getCurrentUser', () => {
+    let user: User
+
     const query = `
       query GetCurrentUser {
         getCurrentUser {
@@ -204,7 +201,19 @@ describe('Users', () => {
       }
     `
 
-    const user = new TestData(createUser({isActive: true}), deleteUser)
+    const userInput = {isActive: true}
+
+    beforeAll(async () => {
+      user = await createUser(userInput)
+    })
+
+    afterAll(async () => {
+      try {
+        await deleteUser(user.id)
+      } catch (_err) {
+        // pass
+      }
+    })
 
     it('retrieves the currently authenticated user', async () => {
       const {token, username} = credentials
@@ -225,7 +234,7 @@ describe('Users', () => {
     it('returns null when no user is found', async () => {
       const {token} = credentials
 
-      await user.delete()
+      await deleteUser(user.id)
 
       const {data} = await graphql.query<Pick<Query, 'getCurrentUser'>>(
         query,
@@ -234,6 +243,9 @@ describe('Users', () => {
       )
 
       expect(data.getCurrentUser).toBeFalsy()
+
+      // Restore the user for other tests
+      user = await createUser(userInput)
     })
 
     it('requires authentication', async () => {
@@ -252,6 +264,8 @@ describe('Users', () => {
   })
 
   describe('Mutation: getOrCreateCurrentUser', () => {
+    let user: User
+
     const mutation = `
       mutation GetOrCreateCurrentUser($input: CreateUserInput!) {
         getOrCreateCurrentUser(input: $input) {
@@ -269,10 +283,19 @@ describe('Users', () => {
     `
 
     const email = 'test-email'
-    const user = new TestData(
-      createUser({isActive: true, profile: {create: {email}}}),
-      deleteUser
-    )
+    const userInput = {isActive: true, profile: {create: {email}}}
+
+    beforeAll(async () => {
+      user = await createUser(userInput)
+    })
+
+    afterAll(async () => {
+      try {
+        await deleteUser(user.id)
+      } catch (_err) {
+        // pass
+      }
+    })
 
     it('retrieves the currently authenticated user', async () => {
       const {token, username} = credentials
@@ -303,7 +326,8 @@ describe('Users', () => {
         isActive: true,
       }
 
-      await user.delete()
+      // Delete the user so that no user is found
+      await deleteUser(user.id)
 
       const {data} = await graphql.mutation<
         Pick<Mutation, 'getOrCreateCurrentUser'>
@@ -314,6 +338,7 @@ describe('Users', () => {
         expect.objectContaining(expected)
       )
 
+      // Check to make sure the user was created
       const created = await prisma.user.findFirst({
         where: {
           id: data.getOrCreateCurrentUser.user?.id,
@@ -329,11 +354,15 @@ describe('Users', () => {
         id: data.getOrCreateCurrentUser.user?.id,
       })
 
+      // Delete the one-off user created in this test
       await prisma.user.delete({
         where: {
           id: created.id,
         },
       })
+
+      // Restore the original user for other tests
+      user = await createUser(userInput)
     })
 
     it('requires a username', async () => {
@@ -398,6 +427,8 @@ describe('Users', () => {
   })
 
   describe('Query: updateCurrentUser', () => {
+    let user: User
+
     const mutation = `
       mutation UpdateCurrentUser($input: UpdateUserInput!) {
         updateCurrentUser(input: $input) {
@@ -410,7 +441,19 @@ describe('Users', () => {
       }
     `
 
-    const user = new TestData(createUser({isActive: true}), deleteUser)
+    const userInput = {isActive: true}
+
+    beforeAll(async () => {
+      user = await createUser(userInput)
+    })
+
+    afterAll(async () => {
+      try {
+        await deleteUser(user.id)
+      } catch (_err) {
+        // pass
+      }
+    })
 
     it('updates the currently authenticated user', async () => {
       const {token, username} = credentials
@@ -423,8 +466,6 @@ describe('Users', () => {
         username,
         isActive: false,
       }
-
-      user.resetAfter()
 
       const {data} = await graphql.mutation<
         Pick<Mutation, 'updateCurrentUser'>
@@ -439,6 +480,9 @@ describe('Users', () => {
         where: {id: data.updateCurrentUser.user?.id},
       })
       expect(updated).toMatchObject(expected)
+
+      // Restore the user for other tests
+      user = await createUser(userInput)
     })
 
     it('requires authentication', async () => {
@@ -465,7 +509,7 @@ describe('Users', () => {
         input: {isActive: false},
       }
 
-      await user.delete()
+      await deleteUser(user.id)
 
       const body = await graphql.mutation<Pick<Mutation, 'updateCurrentUser'>>(
         mutation,
@@ -485,6 +529,9 @@ describe('Users', () => {
           },
         }),
       ])
+
+      // Restore the user for other tests
+      user = await createUser(userInput)
     })
   })
 })
