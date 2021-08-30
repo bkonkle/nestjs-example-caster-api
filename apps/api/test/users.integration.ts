@@ -46,16 +46,15 @@ describe('Users', () => {
     })
 
     if (user?.profile?.id) {
-      await prisma.profile.delete({where: {id: user.profile.id}})
+      return prisma.profile.delete({where: {id: user.profile.id}})
     }
 
-    await prisma.user.delete({where: {id}})
+    return prisma.user.delete({where: {id}})
   }
 
   beforeAll(async () => {
     await dbCleaner(prisma, tables)
 
-    // const app = App.create()
     const moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
     }).compile()

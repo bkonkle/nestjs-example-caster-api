@@ -1,5 +1,5 @@
 import {ParseUUIDPipe, UseGuards} from '@nestjs/common'
-import {Args, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
+import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {JwtGuard, paginateResponse, UserSub} from '@caster/utils'
 
 import {UsersService} from '../users/users.service'
@@ -25,7 +25,7 @@ export class ProfilesResolver {
 
   @Query(() => Profile, {nullable: true})
   async getProfile(
-    @Args('id', new ParseUUIDPipe()) id: string,
+    @Args('id', {type: () => ID}, new ParseUUIDPipe()) id: string,
     @UserSub() username?: string
   ): Promise<Profile | undefined> {
     const profile = await this.service.get(id)
@@ -76,7 +76,7 @@ export class ProfilesResolver {
 
   @Mutation(() => MutateProfileResult)
   async updateProfile(
-    @Args('id', new ParseUUIDPipe()) id: string,
+    @Args('id', {type: () => ID}, new ParseUUIDPipe()) id: string,
     @Args('input') input: CreateProfileInput,
     @UserSub({require: true}) username: string
   ) {
@@ -89,7 +89,7 @@ export class ProfilesResolver {
 
   @Mutation(() => MutateProfileResult)
   async deleteProfile(
-    @Args('id', new ParseUUIDPipe()) id: string,
+    @Args('id', {type: () => ID}, new ParseUUIDPipe()) id: string,
     @UserSub({require: true}) username: string
   ) {
     await this.authz.delete(username, id)
