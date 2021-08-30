@@ -3,5 +3,6 @@ module.exports = {
     '<rootDir>/apps/api',
     '<rootDir>/libs/utils',
     '<rootDir>/libs/users',
+    '<rootDir>/libs/graphql',
   ],
 }

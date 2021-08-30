@@ -28,6 +28,16 @@ export interface Schema {
       id: string | null
       secret: string | null
     }
+    test: {
+      user: {
+        username: string | null
+        password: string | null
+      }
+      alt: {
+        username: string | null
+        password: string | null
+      }
+    }
   }
 }
 

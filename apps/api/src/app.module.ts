@@ -3,7 +3,7 @@ import {Module, Logger} from '@nestjs/common'
 import {ScheduleModule} from '@nestjs/schedule'
 import {GraphQLModule} from '@nestjs/graphql'
 
-import {ConfigModule, HealthModule} from '@caster/utils'
+import {AuthnModule, ConfigModule, HealthModule} from '@caster/utils'
 import {UsersModule, ProfilesModule} from '@caster/users'
 
 const env = process.env.NODE_ENV || 'production'
@@ -19,6 +19,7 @@ const isDev = env === 'development'
     }),
     ConfigModule,
     HealthModule,
+    AuthnModule,
     UsersModule,
     ProfilesModule,
   ],

@@ -95,7 +95,7 @@ export const schema: convict.Schema<Schema> = {
     domain: {
       doc: 'OAuth2 domain',
       format: String,
-      default: 'caster-dev.auth0.com',
+      default: 'caster-api.us.auth0.com',
       env: 'OAUTH2_DOMAIN',
     },
     audience: {
@@ -117,6 +117,38 @@ export const schema: convict.Schema<Schema> = {
         default: null,
         env: 'OAUTH2_CLIENT_SECRET',
         sensitive: true,
+      },
+    },
+    test: {
+      user: {
+        username: {
+          doc: 'Test user username',
+          format: String,
+          default: null,
+          env: 'OAUTH2_TEST_USER',
+        },
+        password: {
+          doc: 'Test user password',
+          format: String,
+          default: null,
+          env: 'OAUTH2_TEST_PASS',
+          sensitive: true,
+        },
+      },
+      alt: {
+        username: {
+          doc: 'Alt test user username',
+          format: String,
+          default: null,
+          env: 'OAUTH2_TEST_ALT_USER',
+        },
+        password: {
+          doc: 'Alt test user password',
+          format: String,
+          default: null,
+          env: 'OAUTH2_TEST_ALT_PASS',
+          sensitive: true,
+        },
       },
     },
   },

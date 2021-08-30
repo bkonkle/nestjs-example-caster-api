@@ -1,0 +1,5 @@
+export * from './profiles.module'
+export * from './profile.model'
+export * from './profiles.resolver'
+export * from './profile-input.model'
+export * from './profile-query.model'

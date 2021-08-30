@@ -3,14 +3,14 @@ import {DynamicModule, Module} from '@nestjs/common'
 import {config} from './config.default'
 import {Config} from './config.types'
 
+const defaultProvider = {
+  provide: Config,
+  useValue: config,
+}
+
 @Module({
-  providers: [
-    {
-      provide: Config,
-      useValue: config,
-    },
-  ],
-  exports: [],
+  providers: [defaultProvider],
+  exports: [defaultProvider],
 })
 export class ConfigModule {
   static for(config: Config): DynamicModule {

@@ -1,42 +1,35 @@
-import {PrismaClient} from '@prisma/client'
+import {Test} from '@nestjs/testing'
 import {mockDeep} from 'jest-mock-extended'
-import {GraphQLResolveInfo} from 'graphql'
+
+import {UserFactory} from '../../../test/factories'
+import {UsersResolver} from '../users.resolver'
+import {UsersService} from '../users.service'
 
 describe('UsersResolver', () => {
-  let resolvers: UserResolvers
+  let resolver: UsersResolver
 
-  const prisma = mockDeep<PrismaClient>()
-
-  const parent = {}
+  const service = mockDeep<UsersService>()
 
   const username = 'test-username'
-  const context = mockDeep<Context>({
-    req: {user: {sub: username}},
-  })
 
-  const info = mockDeep<GraphQLResolveInfo>()
+  beforeAll(async () => {
+    const testModule = await Test.createTestingModule({
+      providers: [{provide: UsersService, useValue: service}, UsersResolver],
+    }).compile()
 
-  beforeAll(() => {
-    container.register(PrismaClient, {useValue: prisma})
-
-    resolvers = container.resolve(UserResolvers)
+    resolver = testModule.get(UsersResolver)
   })
 
   describe('getCurrentUser()', () => {
     const user = UserFactory.make()
 
-    it('uses Prisma to find the first matching User', async () => {
-      const args = {}
+    it('uses then UserService to find the User by username', async () => {
+      service.getByUsername.mockResolvedValueOnce(user)
 
-      prisma.user.findFirst.mockResolvedValueOnce(user)
+      const result = await resolver.getCurrentUser(username)
 
-      const result = await resolvers.getCurrentUser(parent, args, context, info)
-
-      expect(prisma.user.findFirst).toBeCalledTimes(1)
-      expect(prisma.user.findFirst).toBeCalledWith({
-        include: {profile: true},
-        where: {username},
-      })
+      expect(service.getByUsername).toBeCalledTimes(1)
+      expect(service.getByUsername).toBeCalledWith(username)
 
       expect(result).toEqual(user)
     })

@@ -12,4 +12,5 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../../coverage/libs/users',
+  setupFilesAfterEnv: ['../../jest.setup.ts'],
 }

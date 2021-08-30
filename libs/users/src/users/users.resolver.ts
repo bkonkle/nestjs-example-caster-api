@@ -1,7 +1,7 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql'
-import {ForbiddenException, NotFoundException} from '@nestjs/common'
+import {ForbiddenException, NotFoundException, UseGuards} from '@nestjs/common'
 
-import {UserSub} from '@caster/utils'
+import {JwtGuard, UserSub} from '@caster/utils'
 
 import {User} from './user.model'
 import {
@@ -12,10 +12,11 @@ import {
 import {UsersService} from './users.service'
 
 @Resolver(() => User)
+@UseGuards(JwtGuard)
 export class UsersResolver {
   constructor(private readonly service: UsersService) {}
 
-  @Query(() => User)
+  @Query(() => User, {nullable: true})
   async getCurrentUser(@UserSub({require: true}) username: string) {
     return this.service.getByUsername(username)
   }
@@ -58,13 +59,13 @@ export class UsersResolver {
     @Args('input') input: UpdateUserInput,
     @UserSub({require: true}) username: string
   ) {
-    if (input.username !== username) {
-      throw new ForbiddenException()
-    }
-
     const existing = await this.service.getByUsername(username)
     if (!existing) {
       throw new NotFoundException()
+    }
+
+    if (existing.username !== username) {
+      throw new ForbiddenException()
     }
 
     const user = await this.service.update(existing.id, input)

@@ -10,6 +10,9 @@ import {PrismaService} from '@caster/utils'
 import {User} from '../users/user.model'
 import {isOwner} from './profile.utils'
 
+/**
+ * TODO: Rip this out and use Guards instead.
+ */
 @Injectable()
 export class ProfileAuthz {
   constructor(private readonly prisma: PrismaService) {}

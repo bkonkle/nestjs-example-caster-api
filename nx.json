@@ -22,6 +22,9 @@
     "api": {
       "tags": []
     },
+    "graphql": {
+      "tags": []
+    },
     "users": {
       "tags": []
     },

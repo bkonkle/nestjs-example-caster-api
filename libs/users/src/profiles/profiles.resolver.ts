@@ -1,6 +1,6 @@
-import {ParseUUIDPipe} from '@nestjs/common'
+import {ParseUUIDPipe, UseGuards} from '@nestjs/common'
 import {Args, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
-import {paginateResponse, UserSub} from '@caster/utils'
+import {JwtGuard, paginateResponse, UserSub} from '@caster/utils'
 
 import {UsersService} from '../users/users.service'
 import {ProfileAuthz} from './profile.authz'
@@ -15,6 +15,7 @@ import {
 import {CreateProfileInput, MutateProfileResult} from './profile-input.model'
 
 @Resolver(() => Profile)
+@UseGuards(JwtGuard)
 export class ProfilesResolver {
   constructor(
     private readonly service: ProfilesService,

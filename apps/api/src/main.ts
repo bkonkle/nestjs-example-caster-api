@@ -39,7 +39,7 @@ async function bootstrap(): Promise<void> {
   await app.listen(Number(port), () => {
     Logger.log(
       chalk.cyan(
-        `${chalk.yellow(`[${APP_NAME}]`)} Started at: ${chalk.green(
+        `${chalk.yellow(`[${APP_NAME}]`)} started at: ${chalk.green(
           `http://localhost:${chalk.yellow(port)}`
         )}`
       )
