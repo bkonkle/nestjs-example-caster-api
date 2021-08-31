@@ -1,5 +1,11 @@
-import {UseGuards} from '@nestjs/common'
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+  UseGuards,
+} from '@nestjs/common'
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
+
 import {
   AllowAnonymous,
   JwtGuard,
@@ -8,10 +14,14 @@ import {
 } from '@caster/utils'
 
 import {UsersService} from '../users/users.service'
-import {ProfileAuthz} from './profile.authz'
 import {Profile} from './profile.model'
 import {ProfilesService} from './profiles.service'
-import {censor, fromOrderByInput, fromProfileCondition} from './profile.utils'
+import {
+  censor,
+  fromOrderByInput,
+  fromProfileCondition,
+  isOwner,
+} from './profile.utils'
 import {
   ProfileCondition,
   ProfilesOrderBy,
@@ -28,8 +38,7 @@ import {
 export class ProfilesResolver {
   constructor(
     private readonly service: ProfilesService,
-    private readonly users: UsersService,
-    private readonly authz: ProfileAuthz
+    private readonly users: UsersService
   ) {}
 
   @Query(() => Profile, {nullable: true})
@@ -76,11 +85,9 @@ export class ProfilesResolver {
     @Args('input') input: CreateProfileInput,
     @UserSub({require: true}) username: string
   ): Promise<MutateProfileResult> {
-    const user = await this.users
-      .get(input.userId)
-      .then(this.authz.create(username))
+    await this.canCreate(input.userId, username)
 
-    const profile = await this.service.create(user.id, input)
+    const profile = await this.service.create(input)
 
     return {profile}
   }
@@ -91,7 +98,7 @@ export class ProfilesResolver {
     @Args('input') input: UpdateProfileInput,
     @UserSub({require: true}) username: string
   ) {
-    await this.authz.update(username, id)
+    await this.canUpdate(id, username)
 
     const profile = await this.service.update(id, input)
 
@@ -103,10 +110,34 @@ export class ProfilesResolver {
     @Args('id', {type: () => ID}) id: string,
     @UserSub({require: true}) username: string
   ): Promise<boolean> {
-    await this.authz.delete(username, id)
+    await this.canUpdate(id, username)
 
     await this.service.delete(id)
 
     return true
+  }
+
+  private async canCreate(userId: string, username: string): Promise<void> {
+    const user = await this.users.get(userId)
+
+    if (!user) {
+      throw new BadRequestException('No user found with that id')
+    }
+
+    if (username !== user.username) {
+      throw new ForbiddenException()
+    }
+  }
+
+  private async canUpdate(id: string, username: string): Promise<void> {
+    const existing = await this.service.get(id)
+
+    if (!existing) {
+      throw new NotFoundException()
+    }
+
+    if (!isOwner(existing, username)) {
+      throw new ForbiddenException()
+    }
   }
 }

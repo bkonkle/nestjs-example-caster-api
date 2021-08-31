@@ -36,14 +36,14 @@ export class ProfilesService {
     return {total, profiles}
   }
 
-  async create(userId: string, input: CreateProfileInput) {
+  async create(input: CreateProfileInput) {
     return this.prisma.profile.create({
       include: {user: true},
       data: {
         ...input,
         userId: undefined,
         user: {
-          connect: {id: userId},
+          connect: {id: input.userId},
         },
       },
     })

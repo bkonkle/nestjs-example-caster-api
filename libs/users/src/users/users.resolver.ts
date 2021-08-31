@@ -26,9 +26,7 @@ export class UsersResolver {
     @Args('input') input: CreateUserInput,
     @UserSub({require: true}) username: string
   ) {
-    if (input.username !== username) {
-      throw new ForbiddenException()
-    }
+    await this.canCreate(input, username)
 
     const user = await this.service.create(input)
 
@@ -40,9 +38,7 @@ export class UsersResolver {
     @Args('input') input: CreateUserInput,
     @UserSub({require: true}) username: string
   ) {
-    if (input.username !== username) {
-      throw new ForbiddenException()
-    }
+    await this.canCreate(input, username)
 
     const existing = await this.service.getByUsername(username)
     if (existing) {
@@ -59,6 +55,23 @@ export class UsersResolver {
     @Args('input') input: UpdateUserInput,
     @UserSub({require: true}) username: string
   ) {
+    const id = await this.canUpdate(username)
+
+    const user = await this.service.update(id, input)
+
+    return {user}
+  }
+
+  private async canCreate(
+    input: CreateUserInput,
+    username: string
+  ): Promise<void> {
+    if (input.username !== username) {
+      throw new ForbiddenException()
+    }
+  }
+
+  private async canUpdate(username: string): Promise<string> {
     const existing = await this.service.getByUsername(username)
     if (!existing) {
       throw new NotFoundException()
@@ -68,8 +81,6 @@ export class UsersResolver {
       throw new ForbiddenException()
     }
 
-    const user = await this.service.update(existing.id, input)
-
-    return {user}
+    return existing.id
   }
 }
