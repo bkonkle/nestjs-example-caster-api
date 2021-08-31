@@ -4,8 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
-
-import {PrismaService} from '@caster/utils'
+import {PrismaService} from 'nestjs-prisma'
 
 import {User} from '../users/user.model'
 import {isOwner} from './profile.utils'
@@ -23,7 +22,7 @@ export class ProfileAuthz {
     }
 
     if (username !== user.username) {
-      throw new ForbiddenException('Authorization required')
+      throw new ForbiddenException()
     }
 
     return user
@@ -36,7 +35,7 @@ export class ProfileAuthz {
       return existing
     }
 
-    throw new ForbiddenException('Authorization required')
+    throw new ForbiddenException()
   }
 
   delete = this.update
@@ -48,7 +47,7 @@ export class ProfileAuthz {
     })
 
     if (!existing) {
-      throw new NotFoundException('Not found')
+      throw new NotFoundException()
     }
 
     return existing

@@ -1,7 +1,6 @@
 import {Test} from '@nestjs/testing'
 import {mockDeep} from 'jest-mock-extended'
-
-import {PrismaService} from '@caster/utils'
+import {PrismaService} from 'nestjs-prisma'
 
 import {UserFactory} from '../../../test/factories'
 import {UsersService} from '../users.service'

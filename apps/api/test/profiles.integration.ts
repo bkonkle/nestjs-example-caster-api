@@ -1,11 +1,11 @@
-import {Prisma, Profile, User} from '@prisma/client'
+import faker from 'faker'
+import {Profile, User} from '@prisma/client'
 import {INestApplication, ValidationPipe} from '@nestjs/common'
 import {Test} from '@nestjs/testing'
 import {omit, pick} from 'lodash'
+import {PrismaService} from 'nestjs-prisma'
 
-import {PrismaService} from '@caster/utils'
 import {OAuth2, GraphQL, Validation, dbCleaner} from '@caster/utils/test'
-import {Schema} from '@caster/graphql'
 import {CreateProfileInput} from '@caster/users'
 import {ProfileFactory} from '@caster/users/test'
 import {Query, Mutation} from '@caster/graphql/schema'
@@ -20,7 +20,7 @@ describe('Profiles', () => {
   let otherUser: User
 
   const {credentials, altCredentials} = OAuth2.init()
-  const prisma = PrismaService.init()
+  const prisma = new PrismaService()
 
   const tables = ['User', 'Profile']
 
@@ -37,7 +37,7 @@ describe('Profiles', () => {
   const mockCensor = (profile?: Partial<Profile>) => ({
     ...profile,
     email: null,
-    userId: null,
+    user: null,
   })
 
   beforeAll(async () => {
@@ -203,12 +203,11 @@ describe('Profiles', () => {
 
       expect(body).toHaveProperty('errors', [
         expect.objectContaining({
-          message: 'Authorization required',
+          message: 'Forbidden',
           extensions: {
             code: 'FORBIDDEN',
             response: {
-              error: 'Forbidden',
-              message: 'Authorization required',
+              message: 'Forbidden',
               statusCode: 403,
             },
           },
@@ -307,6 +306,374 @@ describe('Profiles', () => {
       )
 
       expect(data.getProfile).toEqual(mockCensor(expected))
+    })
+  })
+
+  describe('Query: getManyProfiles', () => {
+    let profile: Profile
+    let profileInput: CreateProfileInput
+
+    let otherProfile: Profile
+    let otherInput: CreateProfileInput
+
+    const query = `
+      query GetManyProfiles(
+        $where: ProfileCondition
+        $orderBy: [ProfilesOrderBy!]
+        $pageSize: Int
+        $page: Int
+      ) {
+        getManyProfiles(
+        where: $where
+        orderBy: $orderBy
+        pageSize: $pageSize
+        page: $page
+        ) {
+          data {
+            id
+            email
+            displayName
+            picture
+            user {
+              id
+            }
+          }
+          count
+          total
+          page
+          pageCount
+        }
+      }
+    `
+    const fields = ['id', 'email', 'displayName', 'picture', 'user.id']
+
+    beforeAll(async () => {
+      profileInput = ProfileFactory.makeCreateInput({userId: user.id})
+      otherInput = ProfileFactory.makeCreateInput({userId: otherUser.id})
+
+      profile = await createProfile(profileInput)
+      otherProfile = await createProfile(otherInput)
+    })
+
+    afterAll(async () => {
+      try {
+        await deleteProfile(profile.id)
+        await deleteProfile(otherProfile.id)
+      } catch (_err) {
+        // pass
+      }
+    })
+
+    it('queries existing profiles', async () => {
+      const {token} = credentials
+      const variables = {}
+
+      const {data} = await graphql.query<Pick<Query, 'getManyProfiles'>>(
+        query,
+        variables,
+        {token}
+      )
+
+      expect(data.getManyProfiles).toEqual({
+        data: expect.arrayContaining([
+          pick(profile, fields),
+          mockCensor(pick(otherProfile, fields)),
+        ]),
+        count: 2,
+        page: 1,
+        pageCount: 1,
+        total: 2,
+      })
+    })
+
+    it('censors responses for anonymous users', async () => {
+      const variables = {}
+
+      const {data} = await graphql.query<Pick<Query, 'getManyProfiles'>>(
+        query,
+        variables,
+        {}
+      )
+
+      expect(data.getManyProfiles).toEqual({
+        data: expect.arrayContaining([
+          mockCensor(pick(profile, fields)),
+          mockCensor(pick(otherProfile, fields)),
+        ]),
+        count: 2,
+        page: 1,
+        pageCount: 1,
+        total: 2,
+      })
+    })
+
+    it('censors responses for unauthorized users', async () => {
+      const {token} = altCredentials
+      const variables = {}
+
+      const {data} = await graphql.query<Pick<Query, 'getManyProfiles'>>(
+        query,
+        variables,
+        {token}
+      )
+
+      expect(data.getManyProfiles).toEqual({
+        data: expect.arrayContaining([
+          mockCensor(pick(profile, fields)),
+          pick(otherProfile, fields),
+        ]),
+        count: 2,
+        page: 1,
+        pageCount: 1,
+        total: 2,
+      })
+    })
+  })
+
+  describe('Mutation: updateProfile', () => {
+    let profile: Profile
+    let profileInput: CreateProfileInput
+
+    const mutation = `
+      mutation UpdateProfile($id: ID!, $input: UpdateProfileInput!) {
+        updateProfile(id: $id, input: $input) {
+          profile {
+            id
+            email
+            displayName
+            picture
+            user {
+              id
+            }
+          }
+        }
+      }
+    `
+    const fields = ['id', 'email', 'displayName', 'picture', 'user.id']
+
+    beforeAll(async () => {
+      profileInput = ProfileFactory.makeCreateInput({userId: user.id})
+
+      profile = await createProfile(profileInput)
+    })
+
+    afterAll(async () => {
+      try {
+        await deleteProfile(profile.id)
+      } catch (_err) {
+        // pass
+      }
+    })
+
+    it('updates an existing user profile', async () => {
+      const {token} = credentials
+      const variables = {
+        id: profile.id,
+        input: {picture: faker.internet.avatar()},
+      }
+
+      const expected = {
+        ...pick(profile, fields),
+        picture: variables.input.picture,
+      }
+
+      const {data} = await graphql.mutation<Pick<Mutation, 'updateProfile'>>(
+        mutation,
+        variables,
+        {token}
+      )
+
+      expect(data.updateProfile).toHaveProperty(
+        'profile',
+        expect.objectContaining(expected)
+      )
+
+      const updated = await prisma.profile.findFirst({
+        include: {user: true},
+        where: {id: profile.id},
+      })
+      expect(updated).toMatchObject(expected)
+
+      // Restore the profile for other tests
+      profile = await createProfile(profileInput)
+    })
+
+    it('requires authentication', async () => {
+      const variables = {
+        id: profile.id,
+        input: {picture: faker.internet.avatar()},
+      }
+
+      const body = await graphql.mutation(mutation, variables, {warn: false})
+
+      expect(body).toHaveProperty('errors', [
+        expect.objectContaining({
+          message: 'Unauthorized',
+          extensions: {
+            code: 'UNAUTHENTICATED',
+            response: {message: 'Unauthorized', statusCode: 401},
+          },
+        }),
+      ])
+    })
+
+    it('returns an error if no existing profile was found', async () => {
+      const {token} = credentials
+      const variables = {
+        id: faker.datatype.uuid(),
+        input: {picture: faker.internet.avatar()},
+      }
+
+      const body = await graphql.mutation<Pick<Mutation, 'updateProfile'>>(
+        mutation,
+        variables,
+        {token, warn: false}
+      )
+
+      expect(body).toHaveProperty('errors', [
+        expect.objectContaining({
+          message: 'Not Found',
+          extensions: {
+            code: '404',
+            response: {message: 'Not Found', statusCode: 404},
+          },
+        }),
+      ])
+    })
+
+    it('requires authorization', async () => {
+      const {token} = altCredentials
+      const variables = {
+        id: profile.id,
+        input: {picture: faker.internet.avatar()},
+      }
+
+      const body = await graphql.mutation(mutation, variables, {
+        token,
+        warn: false,
+      })
+
+      expect(body).toHaveProperty('errors', [
+        expect.objectContaining({
+          message: 'Forbidden',
+          extensions: {
+            code: 'FORBIDDEN',
+            response: {
+              message: 'Forbidden',
+              statusCode: 403,
+            },
+          },
+        }),
+      ])
+    })
+  })
+
+  describe('Mutation: deleteProfile', () => {
+    let profile: Profile
+    let profileInput: CreateProfileInput
+
+    const mutation = `
+        mutation DeleteProfile($id: ID!) {
+          deleteProfile(id: $id)
+        }
+      `
+
+    beforeAll(async () => {
+      profileInput = ProfileFactory.makeCreateInput({userId: user.id})
+
+      profile = await createProfile(profileInput)
+    })
+
+    afterAll(async () => {
+      try {
+        await deleteProfile(profile.id)
+      } catch (_err) {
+        // pass
+      }
+    })
+
+    it('deletes an existing user profile', async () => {
+      const {token} = credentials
+      const variables = {id: profile.id}
+
+      const {data} = await graphql.mutation<Pick<Mutation, 'deleteProfile'>>(
+        mutation,
+        variables,
+        {token}
+      )
+
+      expect(data.deleteProfile).toBe(true)
+
+      const deleted = await prisma.profile.findFirst({
+        where: {id: profile.id},
+      })
+      expect(deleted).toBeNull()
+
+      // Restore the profile for other tests
+      profile = await createProfile(profileInput)
+    })
+
+    it('requires authentication', async () => {
+      const variables = {id: profile.id}
+
+      const body = await graphql.mutation(mutation, variables, {warn: false})
+
+      expect(body).toHaveProperty('errors', [
+        expect.objectContaining({
+          message: 'Unauthorized',
+          extensions: {
+            code: 'UNAUTHENTICATED',
+            response: {message: 'Unauthorized', statusCode: 401},
+          },
+        }),
+      ])
+    })
+
+    it('returns an error if no existing profile was found', async () => {
+      const {token} = credentials
+      const variables = {id: faker.datatype.uuid()}
+
+      const body = await graphql.mutation<Pick<Mutation, 'deleteProfile'>>(
+        mutation,
+        variables,
+        {token, warn: false}
+      )
+
+      expect(body).toHaveProperty('errors', [
+        expect.objectContaining({
+          message: 'Not Found',
+          extensions: {
+            code: '404',
+            response: {
+              message: 'Not Found',
+              statusCode: 404,
+            },
+          },
+        }),
+      ])
+    })
+
+    it('requires authorization', async () => {
+      const {token} = altCredentials
+      const variables = {id: profile.id}
+
+      const body = await graphql.mutation(mutation, variables, {
+        token,
+        warn: false,
+      })
+
+      expect(body).toHaveProperty('errors', [
+        expect.objectContaining({
+          message: 'Forbidden',
+          extensions: {
+            code: 'FORBIDDEN',
+            response: {
+              message: 'Forbidden',
+              statusCode: 403,
+            },
+          },
+        }),
+      ])
     })
   })
 })

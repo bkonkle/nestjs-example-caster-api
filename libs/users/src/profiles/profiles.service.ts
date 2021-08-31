@@ -1,7 +1,8 @@
 import {Injectable} from '@nestjs/common'
 import {Prisma} from '@prisma/client'
+import {PrismaService} from 'nestjs-prisma'
 
-import {getOffset, PrismaService} from '@caster/utils'
+import {getOffset} from '@caster/utils'
 
 import {CreateProfileInput, UpdateProfileInput} from './profile-input.model'
 import {fromProfileInput} from './profile.utils'
@@ -52,7 +53,6 @@ export class ProfilesService {
     const data = input.userId
       ? {
           ...input,
-          userId: undefined,
           user: {
             connect: {id: input.userId},
           },

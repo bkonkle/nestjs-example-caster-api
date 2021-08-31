@@ -1,6 +1,11 @@
-import {ParseUUIDPipe, UseGuards} from '@nestjs/common'
+import {UseGuards} from '@nestjs/common'
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
-import {JwtGuard, paginateResponse, UserSub} from '@caster/utils'
+import {
+  AllowAnonymous,
+  JwtGuard,
+  paginateResponse,
+  UserSub,
+} from '@caster/utils'
 
 import {UsersService} from '../users/users.service'
 import {ProfileAuthz} from './profile.authz'
@@ -12,7 +17,11 @@ import {
   ProfilesOrderBy,
   ProfilesPage,
 } from './profile-query.model'
-import {CreateProfileInput, MutateProfileResult} from './profile-input.model'
+import {
+  CreateProfileInput,
+  UpdateProfileInput,
+  MutateProfileResult,
+} from './profile-input.model'
 
 @Resolver(() => Profile)
 @UseGuards(JwtGuard)
@@ -24,8 +33,9 @@ export class ProfilesResolver {
   ) {}
 
   @Query(() => Profile, {nullable: true})
+  @AllowAnonymous()
   async getProfile(
-    @Args('id', {type: () => ID}, new ParseUUIDPipe()) id: string,
+    @Args('id', {type: () => ID}) id: string,
     @UserSub() username?: string
   ): Promise<Profile | undefined> {
     const profile = await this.service.get(id)
@@ -38,6 +48,7 @@ export class ProfilesResolver {
   }
 
   @Query(() => ProfilesPage)
+  @AllowAnonymous()
   async getManyProfiles(
     @Args('where', {nullable: true}) where?: ProfileCondition,
     @Args('orderBy', {nullable: true, type: () => [ProfilesOrderBy]})
@@ -76,8 +87,8 @@ export class ProfilesResolver {
 
   @Mutation(() => MutateProfileResult)
   async updateProfile(
-    @Args('id', {type: () => ID}, new ParseUUIDPipe()) id: string,
-    @Args('input') input: CreateProfileInput,
+    @Args('id', {type: () => ID}) id: string,
+    @Args('input') input: UpdateProfileInput,
     @UserSub({require: true}) username: string
   ) {
     await this.authz.update(username, id)
@@ -87,15 +98,15 @@ export class ProfilesResolver {
     return {profile}
   }
 
-  @Mutation(() => MutateProfileResult)
+  @Mutation(() => Boolean)
   async deleteProfile(
-    @Args('id', {type: () => ID}, new ParseUUIDPipe()) id: string,
+    @Args('id', {type: () => ID}) id: string,
     @UserSub({require: true}) username: string
-  ) {
+  ): Promise<boolean> {
     await this.authz.delete(username, id)
 
     await this.service.delete(id)
 
-    return {}
+    return true
   }
 }

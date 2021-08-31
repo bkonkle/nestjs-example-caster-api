@@ -1,8 +1,8 @@
 import {Prisma, User} from '@prisma/client'
 import {INestApplication, ValidationPipe} from '@nestjs/common'
 import {Test} from '@nestjs/testing'
+import {PrismaService} from 'nestjs-prisma'
 
-import {PrismaService} from '@caster/utils'
 import {OAuth2, GraphQL, Validation, dbCleaner} from '@caster/utils/test'
 import {Schema} from '@caster/graphql'
 import {UserFactory} from '@caster/users/test'
@@ -15,7 +15,7 @@ describe('Users', () => {
   let graphql: GraphQL
 
   const {credentials} = OAuth2.init()
-  const prisma = PrismaService.init()
+  const prisma = new PrismaService()
 
   const tables = ['User']
 

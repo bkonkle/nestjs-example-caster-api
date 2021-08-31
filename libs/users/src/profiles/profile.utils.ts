@@ -12,7 +12,7 @@ export type IncludeAll = {
 export const isOwner = (profile: Profile, username?: string) =>
   username && profile.user && username === profile.user?.username
 
-export const censoredFields = ['email', 'userId'] as const
+export const censoredFields = ['email', 'user'] as const
 export type CensoredProfile = Omit<Profile, typeof censoredFields[number]>
 
 /**

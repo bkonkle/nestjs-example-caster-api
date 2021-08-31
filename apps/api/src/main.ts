@@ -2,8 +2,7 @@ import bodyParser from 'body-parser'
 import chalk from 'chalk'
 import {INestApplication, ValidationPipe, Logger} from '@nestjs/common'
 import {NestFactory} from '@nestjs/core'
-
-import {PrismaService} from '@caster/utils'
+import {PrismaService} from 'nestjs-prisma'
 
 import {AppModule} from './app.module'
 

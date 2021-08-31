@@ -80,14 +80,14 @@
             "command": "yarn db:migrate"
           }
         },
-        "docker.up": {
+        "docker-up": {
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "cwd": "apps/api",
             "command": "docker-compose up -d"
           }
         },
-        "docker.down": {
+        "docker-down": {
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "cwd": "apps/api",

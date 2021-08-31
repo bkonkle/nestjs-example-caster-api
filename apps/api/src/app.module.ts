@@ -2,6 +2,7 @@ import {join} from 'path'
 import {Module, Logger} from '@nestjs/common'
 import {ScheduleModule} from '@nestjs/schedule'
 import {GraphQLModule} from '@nestjs/graphql'
+import {PrismaModule} from 'nestjs-prisma'
 
 import {AuthnModule, ConfigModule, HealthModule} from '@caster/utils'
 import {UsersModule, ProfilesModule} from '@caster/users'
@@ -12,6 +13,13 @@ const isDev = env === 'development'
 @Module({
   imports: [
     ScheduleModule.forRoot(),
+    PrismaModule.forRoot({
+      isGlobal: true,
+      prismaServiceOptions: {
+        prismaOptions: {log: ['info']},
+        explicitConnect: true,
+      },
+    }),
     GraphQLModule.forRoot({
       debug: isDev,
       autoSchemaFile: join(process.cwd(), 'schema.graphql'),
