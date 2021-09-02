@@ -27,6 +27,9 @@ export class Profile {
   @Field(() => String, {nullable: true})
   stateProvince?: string | null
 
+  @Field(() => String, {nullable: true})
+  userId?: string | null
+
   @Field(() => User, {nullable: true})
   user?: User | null
 

@@ -6,12 +6,7 @@ import {
 } from '@nestjs/common'
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
 
-import {
-  AllowAnonymous,
-  JwtGuard,
-  paginateResponse,
-  UserSub,
-} from '@caster/utils'
+import {AllowAnonymous, JwtGuard, UserSub} from '@caster/utils'
 
 import {UsersService} from '../users/users.service'
 import {Profile} from './profile.model'
@@ -49,11 +44,9 @@ export class ProfilesResolver {
   ): Promise<Profile | undefined> {
     const profile = await this.service.get(id)
 
-    if (!profile) {
-      return
+    if (profile) {
+      return censor(username, profile)
     }
-
-    return censor(username, profile)
   }
 
   @Query(() => ProfilesPage)
@@ -66,18 +59,18 @@ export class ProfilesResolver {
     @Args('page', {type: () => Int, nullable: true}) page?: number,
     @UserSub() username?: string
   ): Promise<ProfilesPage> {
-    const {total, profiles} = await this.service.getMany({
+    const {data, ...rest} = await this.service.getMany({
       where: fromProfileCondition(where),
       orderBy: fromOrderByInput(orderBy),
       pageSize,
       page,
     })
 
-    return paginateResponse(profiles.map(censor(username)), {
-      total,
-      pageSize,
-      page,
-    })
+    // Censor profiles based on the caller's username
+    return {
+      ...rest,
+      data: data.map(censor(username)),
+    }
   }
 
   @Mutation(() => MutateProfileResult)

@@ -8,25 +8,21 @@ import {User} from './user.model'
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async get(id: string): Promise<User | undefined> {
-    const user = await this.prisma.user.findFirst({
+  async get(id: string): Promise<User | null> {
+    return this.prisma.user.findFirst({
       include: {profile: true},
       where: {id},
     })
-
-    return user || undefined
   }
 
-  async getByUsername(username: string): Promise<User | undefined> {
-    const user = await this.prisma.user.findFirst({
+  async getByUsername(username: string): Promise<User | null> {
+    return this.prisma.user.findFirst({
       include: {profile: true},
       where: {username},
     })
-
-    return user || undefined
   }
 
-  async create(input: CreateUserInput) {
+  async create(input: CreateUserInput): Promise<User> {
     return this.prisma.user.create({
       include: {profile: true},
       data: {
@@ -40,7 +36,7 @@ export class UsersService {
     })
   }
 
-  async update(id: string, input: UpdateUserInput) {
+  async update(id: string, input: UpdateUserInput): Promise<User> {
     return this.prisma.user.update({
       include: {profile: true},
       where: {id},

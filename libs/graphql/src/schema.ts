@@ -66,7 +66,7 @@ export type Mutation = {
   updateCurrentUser: MutateUserResult
   createProfile: MutateProfileResult
   updateProfile: MutateProfileResult
-  deleteProfile: MutateProfileResult
+  deleteProfile: Scalars['Boolean']
 }
 
 export type MutationCreateUserArgs = {
@@ -86,12 +86,12 @@ export type MutationCreateProfileArgs = {
 }
 
 export type MutationUpdateProfileArgs = {
-  input: CreateProfileInput
-  id: Scalars['String']
+  input: UpdateProfileInput
+  id: Scalars['ID']
 }
 
 export type MutationDeleteProfileArgs = {
-  id: Scalars['String']
+  id: Scalars['ID']
 }
 
 export type Profile = {
@@ -143,13 +143,13 @@ export type ProfilesPage = {
 
 export type Query = {
   __typename?: 'Query'
-  getCurrentUser: User
+  getCurrentUser?: Maybe<User>
   getProfile?: Maybe<Profile>
   getManyProfiles: ProfilesPage
 }
 
 export type QueryGetProfileArgs = {
-  id: Scalars['String']
+  id: Scalars['ID']
 }
 
 export type QueryGetManyProfilesArgs = {
@@ -157,6 +157,14 @@ export type QueryGetManyProfilesArgs = {
   pageSize?: Maybe<Scalars['Int']>
   orderBy?: Maybe<Array<ProfilesOrderBy>>
   where?: Maybe<ProfileCondition>
+}
+
+export type UpdateProfileInput = {
+  email?: Maybe<Scalars['String']>
+  displayName?: Maybe<Scalars['String']>
+  picture?: Maybe<Scalars['String']>
+  content?: Maybe<Scalars['JSON']>
+  userId?: Maybe<Scalars['String']>
 }
 
 export type UpdateUserInput = {
@@ -293,15 +301,16 @@ export type ResolversTypes = ResolversObject<{
   MutateProfileResult: ResolverTypeWrapper<MutateProfileResult>
   MutateUserResult: ResolverTypeWrapper<MutateUserResult>
   Mutation: ResolverTypeWrapper<{}>
-  Profile: ResolverTypeWrapper<Profile>
   ID: ResolverTypeWrapper<Scalars['ID']>
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>
+  Profile: ResolverTypeWrapper<Profile>
   ProfileCondition: ProfileCondition
   ProfilesOrderBy: ProfilesOrderBy
   ProfilesPage: ResolverTypeWrapper<ProfilesPage>
   Int: ResolverTypeWrapper<Scalars['Int']>
   Query: ResolverTypeWrapper<{}>
+  UpdateProfileInput: UpdateProfileInput
   UpdateUserInput: UpdateUserInput
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>
   User: ResolverTypeWrapper<User>
 }>
 
@@ -316,14 +325,15 @@ export type ResolversParentTypes = ResolversObject<{
   MutateProfileResult: MutateProfileResult
   MutateUserResult: MutateUserResult
   Mutation: {}
-  Profile: Profile
   ID: Scalars['ID']
+  Boolean: Scalars['Boolean']
+  Profile: Profile
   ProfileCondition: ProfileCondition
   ProfilesPage: ProfilesPage
   Int: Scalars['Int']
   Query: {}
+  UpdateProfileInput: UpdateProfileInput
   UpdateUserInput: UpdateUserInput
-  Boolean: Scalars['Boolean']
   User: User
 }>
 
@@ -388,7 +398,7 @@ export type MutationResolvers<
     RequireFields<MutationUpdateProfileArgs, 'input' | 'id'>
   >
   deleteProfile?: Resolver<
-    ResolversTypes['MutateProfileResult'],
+    ResolversTypes['Boolean'],
     ParentType,
     ContextType,
     RequireFields<MutationDeleteProfileArgs, 'id'>
@@ -436,7 +446,11 @@ export type QueryResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
 > = ResolversObject<{
-  getCurrentUser?: Resolver<ResolversTypes['User'], ParentType, ContextType>
+  getCurrentUser?: Resolver<
+    Maybe<ResolversTypes['User']>,
+    ParentType,
+    ContextType
+  >
   getProfile?: Resolver<
     Maybe<ResolversTypes['Profile']>,
     ParentType,

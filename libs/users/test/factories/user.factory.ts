@@ -14,6 +14,7 @@ export const make = (overrides?: Partial<User> | null): User => ({
   createdAt: faker.date.recent(),
   updatedAt: faker.date.recent(),
   isActive: true,
+  profile: null,
   ...makeCreateInput(overrides),
   ...overrides,
 })

@@ -13,6 +13,9 @@ export class User {
   @Field()
   isActive!: boolean
 
+  @Field(() => String, {nullable: true})
+  profileId?: string | null
+
   @Field(() => Profile, {nullable: true})
   profile?: Profile | null
 

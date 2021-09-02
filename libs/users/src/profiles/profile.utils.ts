@@ -12,7 +12,7 @@ export type IncludeAll = {
 export const isOwner = (profile: Profile, username?: string) =>
   username && profile.user && username === profile.user?.username
 
-export const censoredFields = ['email', 'user'] as const
+export const censoredFields = ['email', 'userId', 'user'] as const
 export type CensoredProfile = Omit<Profile, typeof censoredFields[number]>
 
 /**
@@ -79,7 +79,7 @@ export const fromOrderByInput = (
     const index = order.lastIndexOf('_')
     const [field, direction] = [
       camelCase(order.substr(0, index)),
-      order.substr(index + 1),
+      order.substr(index + 1).toLowerCase(),
     ]
 
     return {...memo, [field]: direction}

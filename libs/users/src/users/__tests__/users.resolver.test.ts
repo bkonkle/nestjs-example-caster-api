@@ -11,6 +11,7 @@ describe('UsersResolver', () => {
   const service = mockDeep<UsersService>()
 
   const username = 'test-username'
+  const user = UserFactory.make({username})
 
   beforeAll(async () => {
     const testModule = await Test.createTestingModule({
@@ -20,10 +21,12 @@ describe('UsersResolver', () => {
     resolver = testModule.get(UsersResolver)
   })
 
-  describe('getCurrentUser()', () => {
-    const user = UserFactory.make()
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
 
-    it('uses then UserService to find the User by username', async () => {
+  describe('getCurrentUser()', () => {
+    it('uses the UsersService to find the User by username', async () => {
       service.getByUsername.mockResolvedValueOnce(user)
 
       const result = await resolver.getCurrentUser(username)
@@ -32,6 +35,70 @@ describe('UsersResolver', () => {
       expect(service.getByUsername).toBeCalledWith(username)
 
       expect(result).toEqual(user)
+    })
+  })
+
+  describe('createUser()', () => {
+    it('uses the UsersService to create a User', async () => {
+      const input = {username}
+
+      service.create.mockResolvedValueOnce(user)
+
+      const result = await resolver.createUser(input, username)
+
+      expect(service.create).toBeCalledTimes(1)
+      expect(service.create).toBeCalledWith(input)
+
+      expect(result).toEqual({user})
+    })
+  })
+
+  describe('getOrCreateCurrentUser()', () => {
+    it('uses the UsersService to get a User if one is found for the given username', async () => {
+      const input = {username}
+
+      service.getByUsername.mockResolvedValueOnce(user)
+
+      const result = await resolver.getOrCreateCurrentUser(input, username)
+
+      expect(service.getByUsername).toBeCalledTimes(1)
+      expect(service.getByUsername).toBeCalledWith(username)
+
+      expect(service.create).not.toBeCalled()
+
+      expect(result).toEqual({user})
+    })
+
+    it('uses the UsersService to create a User if none is found for the given username', async () => {
+      const input = {username}
+
+      service.create.mockResolvedValueOnce(user)
+
+      await resolver.getOrCreateCurrentUser(input, username)
+
+      expect(service.getByUsername).toBeCalledTimes(1)
+
+      expect(service.create).toBeCalledTimes(1)
+      expect(service.create).toBeCalledWith(input)
+    })
+  })
+
+  describe('updateCurrentUser()', () => {
+    it('uses the UsersService to update an existing User', async () => {
+      const input = {isActive: false}
+
+      service.getByUsername.mockResolvedValueOnce(user)
+      service.update.mockResolvedValueOnce(user)
+
+      const result = await resolver.updateCurrentUser(input, username)
+
+      expect(service.getByUsername).toBeCalledTimes(1)
+      expect(service.getByUsername).toBeCalledWith(username)
+
+      expect(service.update).toBeCalledTimes(1)
+      expect(service.update).toBeCalledWith(user.id, input)
+
+      expect(result).toEqual({user})
     })
   })
 })
