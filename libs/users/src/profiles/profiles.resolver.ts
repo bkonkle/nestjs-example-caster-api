@@ -6,17 +6,17 @@ import {
 } from '@nestjs/common'
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
 
-import {AllowAnonymous, JwtGuard, UserSub} from '@caster/utils'
+import {
+  AllowAnonymous,
+  JwtGuard,
+  UserSub,
+  fromOrderByInput,
+} from '@caster/utils'
 
 import {UsersService} from '../users/users.service'
 import {Profile} from './profile.model'
 import {ProfilesService} from './profiles.service'
-import {
-  censor,
-  fromOrderByInput,
-  fromProfileCondition,
-  isOwner,
-} from './profile.utils'
+import {censor, fromProfileCondition, isOwner} from './profile.utils'
 import {
   ProfileCondition,
   ProfilesOrderBy,

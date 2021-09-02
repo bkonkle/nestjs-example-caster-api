@@ -30,6 +30,7 @@
     "paths": {
       "@caster/graphql": ["libs/graphql/src/index.ts"],
       "@caster/graphql/*": ["libs/graphql/src/*"],
+      "@caster/shows": ["libs/shows/src/index.ts"],
       "@caster/users": ["libs/users/src/index.ts"],
       "@caster/users/*": ["libs/users/src/*"],
       "@caster/users/test": ["libs/users/test/index.ts"],

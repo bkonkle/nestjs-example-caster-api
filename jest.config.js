@@ -4,5 +4,6 @@ module.exports = {
     '<rootDir>/libs/utils',
     '<rootDir>/libs/users',
     '<rootDir>/libs/graphql',
+    '<rootDir>/libs/shows',
   ],
 }

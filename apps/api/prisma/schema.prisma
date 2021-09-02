@@ -29,3 +29,13 @@ model Profile {
   user          User?    @relation(fields: [userId], references: [id])
   userId        String?  @unique
 }
+
+model Show {
+  id        String   @id @default(dbgenerated("ulid_generate()"))
+  title     String
+  summary   String?
+  picture   String?
+  content   Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -103,6 +103,7 @@ export type Profile = {
   content?: Maybe<Scalars['JSON']>
   city?: Maybe<Scalars['String']>
   stateProvince?: Maybe<Scalars['String']>
+  userId?: Maybe<Scalars['String']>
   user?: Maybe<User>
   createdAt: Scalars['DateTime']
   updatedAt: Scalars['DateTime']
@@ -177,6 +178,7 @@ export type User = {
   id: Scalars['ID']
   username: Scalars['String']
   isActive: Scalars['Boolean']
+  profileId?: Maybe<Scalars['String']>
   profile?: Maybe<Profile>
   createdAt: Scalars['DateTime']
   updatedAt: Scalars['DateTime']
@@ -424,6 +426,7 @@ export type ProfileResolvers<
     ParentType,
     ContextType
   >
+  userId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
@@ -472,6 +475,7 @@ export type UserResolvers<
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   isActive?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+  profileId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   profile?: Resolver<Maybe<ResolversTypes['Profile']>, ParentType, ContextType>
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>

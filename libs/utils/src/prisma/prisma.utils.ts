@@ -1,6 +1,7 @@
 import {SelectionSetNode} from 'graphql'
 import {JsonObject} from 'type-fest'
 import get from 'lodash/get'
+import camelCase from 'lodash/camelCase'
 
 /**
  * Return an object indicating possibly nested relationships that should be included in a Prisma
@@ -60,4 +61,24 @@ export const includeFromSelections = (
   const prismaPath = `${path.split('.').join('.include.')}.include`
 
   return get(include, prismaPath)
+}
+
+/**
+ * Given a GraphQL order by input like "DISPLAY_NAME_ASC", return Prisma orderBy input
+ */
+export const fromOrderByInput = <
+  T extends Record<string, unknown>,
+  K extends string
+>(
+  orderBy?: K[]
+): T | undefined => {
+  return orderBy?.reduce((memo, order) => {
+    const index = order.lastIndexOf('_')
+    const [field, direction] = [
+      camelCase(order.substr(0, index)),
+      order.substr(index + 1).toLowerCase(),
+    ]
+
+    return {...memo, [field]: direction}
+  }, {} as T)
 }

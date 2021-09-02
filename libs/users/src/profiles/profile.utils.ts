@@ -1,8 +1,8 @@
-import {camelCase, curry, omit} from 'lodash'
+import {curry, omit} from 'lodash'
 import {Prisma} from '@prisma/client'
 
 import {Profile} from './profile.model'
-import {ProfileCondition, ProfilesOrderBy} from './profile-query.model'
+import {ProfileCondition} from './profile-query.model'
 import {UpdateProfileInput} from './profile-input.model'
 
 export type IncludeAll = {
@@ -45,8 +45,8 @@ export const fromProfileCondition = (
   }
 
   /**
-   * These required fields cannot be set to `null`, they can only be `undefined` in order for Prisma
-   * to ignore them. Force them to `undefined` if they are `null`.
+   * These required fields cannot be set to `null`, they can only be `undefined` in order for
+   * Prisma to ignore them. Force them to `undefined` if they are `null`.
    */
   return requiredFields.reduce(
     (memo, field) => ({...memo, [field]: memo[field] || undefined}),
@@ -54,13 +54,17 @@ export const fromProfileCondition = (
   )
 }
 
+/**
+ * Convert any `null`s in required fields to `undefined`s for compatibility with Prisma, and
+ * connect the related user.
+ */
 export const fromProfileInput = (
   input: UpdateProfileInput
 ): Prisma.ProfileUpdateInput => {
-  // Convert any `null`s in required fields to `undefined`s, for compatibility with Prisma
   return requiredFields.reduce((memo, field) => {
     if (field === 'userId') {
       const id = (memo as UpdateProfileInput).userId || undefined
+
       if (id) {
         return {...memo, user: {connect: {id}}}
       }
@@ -70,18 +74,4 @@ export const fromProfileInput = (
 
     return {...memo, [field]: memo[field] || undefined}
   }, input as Prisma.ProfileUpdateInput)
-}
-
-export const fromOrderByInput = (
-  orderBy?: ProfilesOrderBy[]
-): Prisma.ProfileOrderByInput | undefined => {
-  return orderBy?.reduce((memo, order) => {
-    const index = order.lastIndexOf('_')
-    const [field, direction] = [
-      camelCase(order.substr(0, index)),
-      order.substr(index + 1).toLowerCase(),
-    ]
-
-    return {...memo, [field]: direction}
-  }, {})
 }
