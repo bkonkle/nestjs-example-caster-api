@@ -1,15 +1,10 @@
-import {
-  Ability,
-  AbilityBuilder,
-  AbilityClass,
-  ExtractSubjectType,
-} from '@casl/ability'
+import {Ability, AbilityBuilder, AbilityClass} from '@casl/ability'
 import {Injectable} from '@nestjs/common'
 
 import {User} from '@caster/users'
 
 import {RulesExplorer} from './rules.explorer'
-import {AppAbility, Subjects} from './ability.types'
+import {AppAbility} from './ability.types'
 
 @Injectable()
 export class AbilityFactory {
@@ -26,9 +21,6 @@ export class AbilityFactory {
       enhancer.forUser(user, {can, cannot})
     })
 
-    return build({
-      detectSubjectType: (item) =>
-        item.constructor as ExtractSubjectType<Subjects>,
-    })
+    return build()
   }
 }

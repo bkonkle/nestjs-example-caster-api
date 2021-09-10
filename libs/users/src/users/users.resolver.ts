@@ -1,9 +1,7 @@
-import {subject} from '@casl/ability'
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {ForbiddenException, NotFoundException, UseGuards} from '@nestjs/common'
 
 import {JwtGuard, UserSub} from '@caster/authn'
-import {AbilityFactory} from '@caster/authz'
 
 import {User} from './user.model'
 import {
@@ -16,10 +14,7 @@ import {UsersService} from './users.service'
 @Resolver(() => User)
 @UseGuards(JwtGuard)
 export class UsersResolver {
-  constructor(
-    private readonly service: UsersService,
-    private readonly ability: AbilityFactory
-  ) {}
+  constructor(private readonly service: UsersService) {}
 
   @Query(() => User, {nullable: true})
   async getCurrentUser(@UserSub({require: true}) username: string) {
@@ -27,34 +22,17 @@ export class UsersResolver {
   }
 
   @Mutation(() => MutateUserResult)
-  async createUser(
-    @Args('input') input: CreateUserInput,
-    @UserSub({require: true}) username: string
-  ) {
-    await this.canCreate(input, username)
-
-    const user = await this.service.create(input)
-
-    return {user}
-  }
-
-  @Mutation(() => MutateUserResult)
   async getOrCreateCurrentUser(
     @Args('input') input: CreateUserInput,
     @UserSub({require: true}) username: string
   ) {
-    await this.canCreate(input, username)
+    if (input.username !== username) {
+      throw new ForbiddenException()
+    }
 
     const existing = await this.service.getByUsername(username)
 
     if (existing) {
-      const ability = this.ability.createForUser(existing)
-
-      console.log(
-        `>- authorized ->`,
-        ability.can('read', subject('User', existing))
-      )
-
       return {user: existing}
     }
 
@@ -68,32 +46,14 @@ export class UsersResolver {
     @Args('input') input: UpdateUserInput,
     @UserSub({require: true}) username: string
   ) {
-    const id = await this.canUpdate(username)
-
-    const user = await this.service.update(id, input)
-
-    return {user}
-  }
-
-  private async canCreate(
-    input: CreateUserInput,
-    username: string
-  ): Promise<void> {
-    if (input.username !== username) {
-      throw new ForbiddenException()
-    }
-  }
-
-  private async canUpdate(username: string): Promise<string> {
+    // TODO: Instead of @UserSub above, create a @User decorator that retrieves the existing instance
     const existing = await this.service.getByUsername(username)
     if (!existing) {
       throw new NotFoundException()
     }
 
-    if (existing.username !== username) {
-      throw new ForbiddenException()
-    }
+    const user = await this.service.update(existing.id, input)
 
-    return existing.id
+    return {user}
   }
 }

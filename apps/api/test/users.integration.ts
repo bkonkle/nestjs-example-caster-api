@@ -4,7 +4,6 @@ import {Test} from '@nestjs/testing'
 import {PrismaService} from 'nestjs-prisma'
 
 import {OAuth2, GraphQL, Validation, dbCleaner} from '@caster/utils/test'
-import {Schema} from '@caster/graphql'
 import {UserFactory} from '@caster/users/test'
 import {Query, Mutation} from '@caster/graphql/schema'
 
@@ -69,122 +68,6 @@ describe('Users', () => {
 
   afterEach(async () => {
     jest.resetAllMocks()
-  })
-
-  describe('Mutation: createUser', () => {
-    const mutation = `
-      mutation CreateUser($input: CreateUserInput!) {
-        createUser(input: $input) {
-          user {
-            id
-            username
-            isActive
-          }
-        }
-      }
-    `
-
-    it('creates a new user', async () => {
-      const {token, username} = credentials
-      const variables = {input: {username}}
-
-      const expected = {
-        id: expect.stringMatching(Validation.uuidRegex),
-        username,
-        isActive: true,
-      }
-
-      const {data} = await graphql.mutation<
-        Pick<Schema.Mutation, 'createUser'>
-      >(mutation, variables, {token})
-
-      expect(data.createUser).toHaveProperty(
-        'user',
-        expect.objectContaining(expected)
-      )
-
-      const user = await prisma.user.findFirst({
-        where: {
-          id: data.createUser.user?.id,
-        },
-      })
-
-      if (!user) {
-        fail('No user created.')
-      }
-
-      expect(user).toMatchObject({
-        ...expected,
-        id: data.createUser.user?.id,
-      })
-
-      await prisma.user.delete({
-        where: {
-          id: user.id,
-        },
-      })
-    })
-
-    it('requires a username', async () => {
-      const {token} = credentials
-      const variables = {input: {}}
-
-      const body = await graphql.mutation(mutation, variables, {
-        token,
-        statusCode: 400,
-        warn: false,
-      })
-
-      expect(body).toHaveProperty('errors', [
-        expect.objectContaining({
-          message: expect.stringContaining(
-            'Field "username" of required type "String!" was not provided.'
-          ),
-        }),
-      ])
-    })
-
-    it('requires authentication', async () => {
-      const {username} = credentials
-      const variables = {input: {username}}
-
-      const body = await graphql.mutation(mutation, variables, {warn: false})
-
-      expect(body).toHaveProperty('errors', [
-        expect.objectContaining({
-          message: 'Unauthorized',
-          extensions: {
-            code: 'UNAUTHENTICATED',
-            response: {
-              message: 'Unauthorized',
-              statusCode: 401,
-            },
-          },
-        }),
-      ])
-    })
-
-    it('requires authorization', async () => {
-      const {token} = credentials
-      const otherUser = UserFactory.make()
-
-      const variables = {input: {username: otherUser.username}}
-
-      const body = await graphql.mutation(mutation, variables, {
-        token,
-        warn: false,
-      })
-
-      expect(body).toHaveProperty('errors', [
-        expect.objectContaining({
-          message: 'Forbidden',
-          extensions: {
-            code: 'FORBIDDEN',
-            response: {message: 'Forbidden', statusCode: 403},
-          },
-        }),
-      ])
-    })
   })
 
   describe('Query: getCurrentUser', () => {

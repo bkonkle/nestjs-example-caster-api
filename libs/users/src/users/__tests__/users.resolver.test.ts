@@ -38,21 +38,6 @@ describe('UsersResolver', () => {
     })
   })
 
-  describe('createUser()', () => {
-    it('uses the UsersService to create a User', async () => {
-      const input = {username}
-
-      service.create.mockResolvedValueOnce(user)
-
-      const result = await resolver.createUser(input, username)
-
-      expect(service.create).toBeCalledTimes(1)
-      expect(service.create).toBeCalledWith(input)
-
-      expect(result).toEqual({user})
-    })
-  })
-
   describe('getOrCreateCurrentUser()', () => {
     it('uses the UsersService to get a User if one is found for the given username', async () => {
       const input = {username}

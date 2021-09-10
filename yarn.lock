@@ -690,6 +690,14 @@
   dependencies:
     "@ucast/mongo2js" "^1.3.0"
 
+"@casl/prisma@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@casl/prisma/-/prisma-1.0.0.tgz#836c7004bce04fec4e56ee524b499c2ce611a7bd"
+  integrity sha512-4bT93uBTmeHZZ6S93QPlA6z3h9kICyqpLsC1xA+QSAh+KNQvci/I8prFEYweyId1cKxWtu4q0DwHQ0xxnzpDzw==
+  dependencies:
+    "@ucast/core" "^1.10.0"
+    "@ucast/js" "^3.0.1"
+
 "@cspotcode/source-map-consumer@0.8.0":
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@cspotcode/source-map-consumer/-/source-map-consumer-0.8.0.tgz#33bf4b7b39c178821606f669bbc447a6a629786b"
@@ -2412,12 +2420,12 @@
     "@typescript-eslint/types" "4.29.3"
     eslint-visitor-keys "^2.0.0"
 
-"@ucast/core@^1.0.0", "@ucast/core@^1.4.1", "@ucast/core@^1.6.1":
+"@ucast/core@^1.0.0", "@ucast/core@^1.10.0", "@ucast/core@^1.4.1", "@ucast/core@^1.6.1":
   version "1.10.1"
   resolved "https://registry.yarnpkg.com/@ucast/core/-/core-1.10.1.tgz#03a77a7804bcb5002a5cad3681e86cd1897e2e1f"
   integrity sha512-sXKbvQiagjFh2JCpaHUa64P4UdJbOxYeC5xiZFn8y6iYdb0WkismduE+RmiJrIjw/eLDYmIEXiQeIYYowmkcAw==
 
-"@ucast/js@^3.0.0":
+"@ucast/js@^3.0.0", "@ucast/js@^3.0.1":
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@ucast/js/-/js-3.0.2.tgz#862838ee68112c6c262d4f4693cc592ba83157e0"
   integrity sha512-zxNkdIPVvqJjHI7D/iK8Aai1+59yqU+N7bpHFodVmiTN7ukeNiGGpNmmSjQgsUw7eNcEBnPrZHNzp5UBxwmaPw==
