@@ -1,9 +1,9 @@
-import {UsersService} from '@caster/users/users/users.service'
 import {Test} from '@nestjs/testing'
 import {mockDeep} from 'jest-mock-extended'
 import omit from 'lodash/omit'
 
 import {ProfileFactory, UserFactory} from '../../../test/factories'
+import {UsersService} from '../../users/users.service'
 import {CreateProfileInput, UpdateProfileInput} from '../profile-input.model'
 import {ProfileCondition, ProfilesOrderBy} from '../profile-query.model'
 import {ProfilesResolver} from '../profiles.resolver'

@@ -2,7 +2,6 @@ import bodyParser from 'body-parser'
 import chalk from 'chalk'
 import {INestApplication, ValidationPipe, Logger} from '@nestjs/common'
 import {NestFactory} from '@nestjs/core'
-import {PrismaService} from 'nestjs-prisma'
 
 import {AppModule} from './app.module'
 
@@ -19,9 +18,6 @@ export async function init(): Promise<INestApplication> {
   app.use(bodyParser.json({limit: '50mb'}))
   app.enableCors()
   app.useGlobalPipes(new ValidationPipe({disableErrorMessages: !isDev}))
-
-  const prismaService: PrismaService = app.get(PrismaService)
-  prismaService.enableShutdownHooks(app)
 
   return app
 }

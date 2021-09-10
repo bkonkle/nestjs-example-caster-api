@@ -37,6 +37,13 @@ export type CreateProfileInput = {
   userId: Scalars['String']
 }
 
+export type CreateShowInput = {
+  title: Scalars['String']
+  summary?: Maybe<Scalars['String']>
+  picture?: Maybe<Scalars['String']>
+  content?: Maybe<Scalars['JSON']>
+}
+
 export type CreateUserInput = {
   username: Scalars['String']
   profile?: Maybe<CreateUserProfileInput>
@@ -54,6 +61,11 @@ export type MutateProfileResult = {
   profile?: Maybe<Profile>
 }
 
+export type MutateShowResult = {
+  __typename?: 'MutateShowResult'
+  show?: Maybe<Show>
+}
+
 export type MutateUserResult = {
   __typename?: 'MutateUserResult'
   user?: Maybe<User>
@@ -67,6 +79,9 @@ export type Mutation = {
   createProfile: MutateProfileResult
   updateProfile: MutateProfileResult
   deleteProfile: Scalars['Boolean']
+  createShow: MutateShowResult
+  updateShow: MutateShowResult
+  deleteShow: Scalars['Boolean']
 }
 
 export type MutationCreateUserArgs = {
@@ -91,6 +106,19 @@ export type MutationUpdateProfileArgs = {
 }
 
 export type MutationDeleteProfileArgs = {
+  id: Scalars['ID']
+}
+
+export type MutationCreateShowArgs = {
+  input: CreateShowInput
+}
+
+export type MutationUpdateShowArgs = {
+  input: UpdateShowInput
+  id: Scalars['ID']
+}
+
+export type MutationDeleteShowArgs = {
   id: Scalars['ID']
 }
 
@@ -147,6 +175,8 @@ export type Query = {
   getCurrentUser?: Maybe<User>
   getProfile?: Maybe<Profile>
   getManyProfiles: ProfilesPage
+  getShow?: Maybe<Show>
+  getManyShows: ShowsPage
 }
 
 export type QueryGetProfileArgs = {
@@ -160,12 +190,73 @@ export type QueryGetManyProfilesArgs = {
   where?: Maybe<ProfileCondition>
 }
 
+export type QueryGetShowArgs = {
+  id: Scalars['ID']
+}
+
+export type QueryGetManyShowsArgs = {
+  page?: Maybe<Scalars['Int']>
+  pageSize?: Maybe<Scalars['Int']>
+  orderBy?: Maybe<Array<ShowsOrderBy>>
+  where?: Maybe<ShowCondition>
+}
+
+export type Show = {
+  __typename?: 'Show'
+  id: Scalars['ID']
+  title: Scalars['String']
+  summary?: Maybe<Scalars['String']>
+  picture?: Maybe<Scalars['String']>
+  content?: Maybe<Scalars['JSON']>
+  createdAt: Scalars['DateTime']
+  updatedAt: Scalars['DateTime']
+}
+
+export type ShowCondition = {
+  id?: Maybe<Scalars['ID']>
+  title?: Maybe<Scalars['String']>
+  summary?: Maybe<Scalars['String']>
+  picture?: Maybe<Scalars['String']>
+  content?: Maybe<Scalars['JSON']>
+  createdAt?: Maybe<Scalars['DateTime']>
+  updatedAt?: Maybe<Scalars['DateTime']>
+}
+
+export enum ShowsOrderBy {
+  IdAsc = 'ID_ASC',
+  IdDesc = 'ID_DESC',
+  TitleAsc = 'TITLE_ASC',
+  TitleDesc = 'TITLE_DESC',
+  SummaryAsc = 'SUMMARY_ASC',
+  SummaryDesc = 'SUMMARY_DESC',
+  CreatedAtAsc = 'CREATED_AT_ASC',
+  CreatedAtDesc = 'CREATED_AT_DESC',
+  UpdatedAtAsc = 'UPDATED_AT_ASC',
+  UpdatedAtDesc = 'UPDATED_AT_DESC',
+}
+
+export type ShowsPage = {
+  __typename?: 'ShowsPage'
+  data: Array<Show>
+  count: Scalars['Int']
+  total: Scalars['Int']
+  page: Scalars['Int']
+  pageCount: Scalars['Int']
+}
+
 export type UpdateProfileInput = {
   email?: Maybe<Scalars['String']>
   displayName?: Maybe<Scalars['String']>
   picture?: Maybe<Scalars['String']>
   content?: Maybe<Scalars['JSON']>
   userId?: Maybe<Scalars['String']>
+}
+
+export type UpdateShowInput = {
+  title?: Maybe<Scalars['String']>
+  summary?: Maybe<Scalars['String']>
+  picture?: Maybe<Scalars['String']>
+  content?: Maybe<Scalars['JSON']>
 }
 
 export type UpdateUserInput = {
@@ -296,11 +387,13 @@ export type DirectiveResolverFn<
 export type ResolversTypes = ResolversObject<{
   CreateProfileInput: CreateProfileInput
   String: ResolverTypeWrapper<Scalars['String']>
+  CreateShowInput: CreateShowInput
   CreateUserInput: CreateUserInput
   CreateUserProfileInput: CreateUserProfileInput
   DateTime: ResolverTypeWrapper<Scalars['DateTime']>
   JSON: ResolverTypeWrapper<Scalars['JSON']>
   MutateProfileResult: ResolverTypeWrapper<MutateProfileResult>
+  MutateShowResult: ResolverTypeWrapper<MutateShowResult>
   MutateUserResult: ResolverTypeWrapper<MutateUserResult>
   Mutation: ResolverTypeWrapper<{}>
   ID: ResolverTypeWrapper<Scalars['ID']>
@@ -311,7 +404,12 @@ export type ResolversTypes = ResolversObject<{
   ProfilesPage: ResolverTypeWrapper<ProfilesPage>
   Int: ResolverTypeWrapper<Scalars['Int']>
   Query: ResolverTypeWrapper<{}>
+  Show: ResolverTypeWrapper<Show>
+  ShowCondition: ShowCondition
+  ShowsOrderBy: ShowsOrderBy
+  ShowsPage: ResolverTypeWrapper<ShowsPage>
   UpdateProfileInput: UpdateProfileInput
+  UpdateShowInput: UpdateShowInput
   UpdateUserInput: UpdateUserInput
   User: ResolverTypeWrapper<User>
 }>
@@ -320,11 +418,13 @@ export type ResolversTypes = ResolversObject<{
 export type ResolversParentTypes = ResolversObject<{
   CreateProfileInput: CreateProfileInput
   String: Scalars['String']
+  CreateShowInput: CreateShowInput
   CreateUserInput: CreateUserInput
   CreateUserProfileInput: CreateUserProfileInput
   DateTime: Scalars['DateTime']
   JSON: Scalars['JSON']
   MutateProfileResult: MutateProfileResult
+  MutateShowResult: MutateShowResult
   MutateUserResult: MutateUserResult
   Mutation: {}
   ID: Scalars['ID']
@@ -334,7 +434,11 @@ export type ResolversParentTypes = ResolversObject<{
   ProfilesPage: ProfilesPage
   Int: Scalars['Int']
   Query: {}
+  Show: Show
+  ShowCondition: ShowCondition
+  ShowsPage: ShowsPage
   UpdateProfileInput: UpdateProfileInput
+  UpdateShowInput: UpdateShowInput
   UpdateUserInput: UpdateUserInput
   User: User
 }>
@@ -354,6 +458,14 @@ export type MutateProfileResultResolvers<
   ParentType extends ResolversParentTypes['MutateProfileResult'] = ResolversParentTypes['MutateProfileResult']
 > = ResolversObject<{
   profile?: Resolver<Maybe<ResolversTypes['Profile']>, ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}>
+
+export type MutateShowResultResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MutateShowResult'] = ResolversParentTypes['MutateShowResult']
+> = ResolversObject<{
+  show?: Resolver<Maybe<ResolversTypes['Show']>, ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }>
 
@@ -404,6 +516,24 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationDeleteProfileArgs, 'id'>
+  >
+  createShow?: Resolver<
+    ResolversTypes['MutateShowResult'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreateShowArgs, 'input'>
+  >
+  updateShow?: Resolver<
+    ResolversTypes['MutateShowResult'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationUpdateShowArgs, 'input' | 'id'>
+  >
+  deleteShow?: Resolver<
+    ResolversTypes['Boolean'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteShowArgs, 'id'>
   >
 }>
 
@@ -466,6 +596,44 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryGetManyProfilesArgs, never>
   >
+  getShow?: Resolver<
+    Maybe<ResolversTypes['Show']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryGetShowArgs, 'id'>
+  >
+  getManyShows?: Resolver<
+    ResolversTypes['ShowsPage'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryGetManyShowsArgs, never>
+  >
+}>
+
+export type ShowResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['Show'] = ResolversParentTypes['Show']
+> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  summary?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  picture?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  content?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}>
+
+export type ShowsPageResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['ShowsPage'] = ResolversParentTypes['ShowsPage']
+> = ResolversObject<{
+  data?: Resolver<Array<ResolversTypes['Show']>, ParentType, ContextType>
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  page?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  pageCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }>
 
 export type UserResolvers<
@@ -486,10 +654,13 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   DateTime?: GraphQLScalarType
   JSON?: GraphQLScalarType
   MutateProfileResult?: MutateProfileResultResolvers<ContextType>
+  MutateShowResult?: MutateShowResultResolvers<ContextType>
   MutateUserResult?: MutateUserResultResolvers<ContextType>
   Mutation?: MutationResolvers<ContextType>
   Profile?: ProfileResolvers<ContextType>
   ProfilesPage?: ProfilesPageResolvers<ContextType>
   Query?: QueryResolvers<ContextType>
+  Show?: ShowResolvers<ContextType>
+  ShowsPage?: ShowsPageResolvers<ContextType>
   User?: UserResolvers<ContextType>
 }>

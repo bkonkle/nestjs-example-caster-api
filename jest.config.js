@@ -5,5 +5,7 @@ module.exports = {
     '<rootDir>/libs/users',
     '<rootDir>/libs/graphql',
     '<rootDir>/libs/shows',
+    '<rootDir>/libs/authz',
+    '<rootDir>/libs/authn',
   ],
 }

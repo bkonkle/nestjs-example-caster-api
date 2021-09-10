@@ -22,6 +22,12 @@
     "api": {
       "tags": []
     },
+    "authn": {
+      "tags": []
+    },
+    "authz": {
+      "tags": []
+    },
     "graphql": {
       "tags": []
     },

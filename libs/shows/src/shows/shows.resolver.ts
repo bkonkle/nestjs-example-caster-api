@@ -1,12 +1,8 @@
 import {NotFoundException, UseGuards} from '@nestjs/common'
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
 
-import {
-  AllowAnonymous,
-  JwtGuard,
-  UserSub,
-  fromOrderByInput,
-} from '@caster/utils'
+import {AllowAnonymous, JwtGuard, UserSub} from '@caster/authn'
+import {fromOrderByInput} from '@caster/utils'
 
 import {Show} from './show.model'
 import {ShowsService} from './shows.service'

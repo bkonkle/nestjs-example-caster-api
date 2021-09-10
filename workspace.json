@@ -77,7 +77,7 @@
         "db-reset": {
           "executor": "@nrwl/workspace:run-commands",
           "options": {
-            "command": "yarn db:migrate"
+            "command": "yarn db:reset"
           }
         },
         "docker-up": {
@@ -92,6 +92,48 @@
           "options": {
             "cwd": "apps/api",
             "command": "docker-compose down"
+          }
+        }
+      }
+    },
+    "authn": {
+      "root": "libs/authn",
+      "sourceRoot": "libs/authn/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/authn/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/authn"],
+          "options": {
+            "jestConfig": "libs/authn/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "authz": {
+      "root": "libs/authz",
+      "sourceRoot": "libs/authz/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/authz/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/authz"],
+          "options": {
+            "jestConfig": "libs/authz/jest.config.js",
+            "passWithNoTests": true
           }
         }
       }

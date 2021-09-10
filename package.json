@@ -38,6 +38,7 @@
   },
   "private": true,
   "dependencies": {
+    "@casl/ability": "^5.4.3",
     "@nestjs/common": "8.0.6",
     "@nestjs/core": "8.0.6",
     "@nestjs/graphql": "8.0.2",

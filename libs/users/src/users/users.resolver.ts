@@ -1,7 +1,8 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {ForbiddenException, NotFoundException, UseGuards} from '@nestjs/common'
 
-import {JwtGuard, UserSub} from '@caster/utils'
+import {JwtGuard, UserSub} from '@caster/authn'
+import {AbilityFactory} from '@caster/authz'
 
 import {User} from './user.model'
 import {
@@ -14,7 +15,10 @@ import {UsersService} from './users.service'
 @Resolver(() => User)
 @UseGuards(JwtGuard)
 export class UsersResolver {
-  constructor(private readonly service: UsersService) {}
+  constructor(
+    private readonly service: UsersService,
+    private readonly ability: AbilityFactory
+  ) {}
 
   @Query(() => User, {nullable: true})
   async getCurrentUser(@UserSub({require: true}) username: string) {
@@ -41,7 +45,10 @@ export class UsersResolver {
     await this.canCreate(input, username)
 
     const existing = await this.service.getByUsername(username)
+
     if (existing) {
+      console.log(`>- ability ->`, this.ability.createForUser(existing))
+
       return {user: existing}
     }
 
