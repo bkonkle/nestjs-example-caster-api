@@ -1,10 +1,11 @@
 import {Module} from '@nestjs/common'
+import {MetadataScanner} from '@nestjs/core/metadata-scanner'
 
-import {AbilitiesExplorer} from './abilities.explorer'
+import {RulesExplorer} from './rules.explorer'
 import {AbilityFactory} from './ability.factory'
 
 @Module({
-  providers: [AbilitiesExplorer, AbilityFactory],
+  providers: [MetadataScanner, RulesExplorer, AbilityFactory],
   exports: [AbilityFactory],
 })
 export class AbilityModule {}

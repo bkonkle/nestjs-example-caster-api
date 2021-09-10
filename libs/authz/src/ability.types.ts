@@ -1,9 +1,4 @@
-import {
-  Ability,
-  AbilityBuilder,
-  InferSubjects,
-  createAliasResolver,
-} from '@casl/ability'
+import {Ability, AbilityBuilder, InferSubjects} from '@casl/ability'
 import {User, Profile} from '@caster/users'
 
 export const Action = {
@@ -21,10 +16,12 @@ export type AppAbility = Ability<[Action, Subjects]>
 
 export type RuleBuilder = Pick<AbilityBuilder<AppAbility>, 'can' | 'cannot'>
 
-export interface RuleFactory {
-  createForUser(user: User, builder: RuleBuilder): void
+export interface RuleEnhancer {
+  forUser(user: User, builder: RuleBuilder): void
 }
 
-export const resolveAction = createAliasResolver({
-  [Action.Manage]: [Action.Create, Action.Read, Action.Update, Action.Delete],
-})
+export const RULES_METADATA = 'casl:rule-enhancer'
+
+export interface RulesMetadata {
+  ruleEnhancer: true
+}
