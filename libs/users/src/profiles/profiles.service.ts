@@ -2,17 +2,16 @@ import {Injectable} from '@nestjs/common'
 import {Prisma} from '@prisma/client'
 import {PrismaService} from 'nestjs-prisma'
 
-import {getOffset, ManyResponse, paginateResponse} from '@caster/utils'
+import {getOffset, paginateResponse} from '@caster/utils'
 
 import {CreateProfileInput, UpdateProfileInput} from './profile-input.model'
 import {fromProfileInput} from './profile.utils'
-import {Profile} from './profile.model'
 
 @Injectable()
 export class ProfilesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async get(id: string): Promise<Profile | null> {
+  async get(id: string) {
     return this.prisma.profile.findFirst({
       include: {user: true},
       where: {id},
@@ -24,7 +23,7 @@ export class ProfilesService {
     orderBy: Prisma.ProfileOrderByInput | undefined
     pageSize?: number
     page?: number
-  }): Promise<ManyResponse<Profile>> {
+  }) {
     const {pageSize, page, ...rest} = options
 
     const total = await this.prisma.profile.count(rest)
@@ -41,7 +40,7 @@ export class ProfilesService {
     })
   }
 
-  async create(input: CreateProfileInput): Promise<Profile> {
+  async create(input: CreateProfileInput) {
     return this.prisma.profile.create({
       include: {user: true},
       data: {
@@ -54,7 +53,7 @@ export class ProfilesService {
     })
   }
 
-  async update(id: string, input: UpdateProfileInput): Promise<Profile> {
+  async update(id: string, input: UpdateProfileInput) {
     const data = input.userId
       ? {
           ...input,
@@ -71,7 +70,7 @@ export class ProfilesService {
     })
   }
 
-  async delete(id: string): Promise<Profile> {
+  async delete(id: string) {
     return this.prisma.profile.delete({
       include: {user: true},
       where: {id},

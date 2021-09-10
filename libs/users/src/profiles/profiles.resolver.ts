@@ -2,17 +2,19 @@ import {
   BadRequestException,
   ForbiddenException,
   NotFoundException,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common'
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
 
 import {AllowAnonymous, JwtGuard, UserSub} from '@caster/authn'
+import {AbilityFactory} from '@caster/authz'
 import {fromOrderByInput} from '@caster/utils'
 
 import {UsersService} from '../users/users.service'
 import {Profile} from './profile.model'
 import {ProfilesService} from './profiles.service'
-import {censor, fromProfileCondition, isOwner} from './profile.utils'
+import {censor, fromProfileCondition} from './profile.utils'
 import {
   ProfileCondition,
   ProfilesOrderBy,
@@ -23,13 +25,15 @@ import {
   UpdateProfileInput,
   MutateProfileResult,
 } from './profile-input.model'
+import {subject} from '@casl/ability'
 
 @Resolver(() => Profile)
 @UseGuards(JwtGuard)
 export class ProfilesResolver {
   constructor(
     private readonly service: ProfilesService,
-    private readonly users: UsersService
+    private readonly users: UsersService,
+    private readonly ability: AbilityFactory
   ) {}
 
   @Query(() => Profile, {nullable: true})
@@ -87,7 +91,12 @@ export class ProfilesResolver {
     @Args('input') input: UpdateProfileInput,
     @UserSub({require: true}) username: string
   ) {
-    await this.canUpdate(id, username)
+    const ability = await this.getAbility(username)
+    const existing = await this.getExisting(id)
+
+    if (!ability.can('update', subject('Profile', existing))) {
+      throw new ForbiddenException()
+    }
 
     const profile = await this.service.update(id, input)
 
@@ -99,7 +108,12 @@ export class ProfilesResolver {
     @Args('id', {type: () => ID}) id: string,
     @UserSub({require: true}) username: string
   ): Promise<boolean> {
-    await this.canUpdate(id, username)
+    const ability = await this.getAbility(username)
+    const existing = await this.getExisting(id)
+
+    if (!ability.can('delete', subject('Profile', existing))) {
+      throw new ForbiddenException()
+    }
 
     await this.service.delete(id)
 
@@ -118,15 +132,21 @@ export class ProfilesResolver {
     }
   }
 
-  private async canUpdate(id: string, username: string): Promise<void> {
-    const existing = await this.service.get(id)
+  private getAbility = async (username: string) => {
+    const user = await this.users.getByUsername(username)
+    if (!user) {
+      throw new UnauthorizedException()
+    }
 
+    return this.ability.createForUser(user)
+  }
+
+  private getExisting = async (id: string) => {
+    const existing = await this.service.get(id)
     if (!existing) {
       throw new NotFoundException()
     }
 
-    if (!isOwner(existing, username)) {
-      throw new ForbiddenException()
-    }
+    return existing
   }
 }
