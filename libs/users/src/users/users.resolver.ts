@@ -1,3 +1,4 @@
+import {subject} from '@casl/ability'
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {ForbiddenException, NotFoundException, UseGuards} from '@nestjs/common'
 
@@ -47,7 +48,12 @@ export class UsersResolver {
     const existing = await this.service.getByUsername(username)
 
     if (existing) {
-      console.log(`>- ability ->`, this.ability.createForUser(existing))
+      const ability = this.ability.createForUser(existing)
+
+      console.log(
+        `>- authorized ->`,
+        ability.can('read', subject('User', existing))
+      )
 
       return {user: existing}
     }

@@ -262,7 +262,7 @@ describe('Users', () => {
     })
   })
 
-  describe.only('Mutation: getOrCreateCurrentUser', () => {
+  describe('Mutation: getOrCreateCurrentUser', () => {
     let user: User
 
     const mutation = `
