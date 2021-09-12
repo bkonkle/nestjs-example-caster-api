@@ -1,7 +1,7 @@
 import {NotFoundException, UseGuards} from '@nestjs/common'
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
 
-import {AllowAnonymous, JwtGuard, UserSub} from '@caster/authn'
+import {AllowAnonymous, JwtGuard, Username} from '@caster/authn'
 import {fromOrderByInput} from '@caster/utils'
 
 import {Show} from './show.model'
@@ -51,7 +51,7 @@ export class ShowsResolver {
   @Mutation(() => MutateShowResult)
   async createShow(
     @Args('input') input: CreateShowInput,
-    @UserSub({require: true}) username: string
+    @Username({require: true}) username: string
   ): Promise<MutateShowResult> {
     await this.canCreate(input, username)
 
@@ -64,7 +64,7 @@ export class ShowsResolver {
   async updateShow(
     @Args('id', {type: () => ID}) id: string,
     @Args('input') input: UpdateShowInput,
-    @UserSub({require: true}) username: string
+    @Username({require: true}) username: string
   ) {
     await this.canUpdate(id, username)
 
@@ -76,7 +76,7 @@ export class ShowsResolver {
   @Mutation(() => Boolean)
   async deleteShow(
     @Args('id', {type: () => ID}) id: string,
-    @UserSub({require: true}) username: string
+    @Username({require: true}) username: string
   ): Promise<boolean> {
     await this.canUpdate(id, username)
 

@@ -4,7 +4,7 @@ import {PrismaService} from 'nestjs-prisma'
 
 import {getOffset, paginateResponse} from '@caster/utils'
 
-import {CreateProfileInput, UpdateProfileInput} from './profile-input.model'
+import {CreateProfileInput, UpdateProfileInput} from './profile-mutations.model'
 import {fromProfileInput} from './profile.utils'
 
 @Injectable()

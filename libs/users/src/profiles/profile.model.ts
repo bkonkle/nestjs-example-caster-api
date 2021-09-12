@@ -9,8 +9,8 @@ export class Profile {
   @Field(() => ID)
   id!: string
 
-  @Field(() => String, {nullable: true})
-  email?: string | null
+  @Field(() => String)
+  email!: string
 
   @Field(() => String, {nullable: true})
   displayName?: string | null

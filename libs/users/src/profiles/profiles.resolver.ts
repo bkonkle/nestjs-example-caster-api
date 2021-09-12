@@ -1,63 +1,59 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  NotFoundException,
-  UnauthorizedException,
-  UseGuards,
-} from '@nestjs/common'
+import {Profile} from '@prisma/client'
+import {ForbiddenException, NotFoundException, UseGuards} from '@nestjs/common'
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
+import {subject} from '@casl/ability'
 
-import {AllowAnonymous, JwtGuard, UserSub} from '@caster/authn'
-import {AbilityFactory} from '@caster/authz'
+import {AllowAnonymous} from '@caster/authn'
+import {AppAbility, censorFields} from '@caster/authz'
 import {fromOrderByInput} from '@caster/utils'
 
-import {UsersService} from '../users/users.service'
-import {Profile} from './profile.model'
+import {Ability} from '../users/user.decorators'
+import {UserGuard} from '../users/user.guard'
+import {Profile as ProfileModel} from './profile.model'
 import {ProfilesService} from './profiles.service'
-import {censor, fromProfileCondition} from './profile.utils'
+import {fieldOptions, fromProfileCondition} from './profile.utils'
 import {
   ProfileCondition,
   ProfilesOrderBy,
   ProfilesPage,
-} from './profile-query.model'
+} from './profile-queries.model'
 import {
   CreateProfileInput,
   UpdateProfileInput,
   MutateProfileResult,
-} from './profile-input.model'
-import {subject} from '@casl/ability'
+} from './profile-mutations.model'
 
-@Resolver(() => Profile)
-@UseGuards(JwtGuard)
+@Resolver(() => ProfileModel)
+@UseGuards(UserGuard)
 export class ProfilesResolver {
-  constructor(
-    private readonly service: ProfilesService,
-    private readonly users: UsersService,
-    private readonly ability: AbilityFactory
-  ) {}
+  constructor(private readonly service: ProfilesService) {}
 
-  @Query(() => Profile, {nullable: true})
+  @Query(() => ProfileModel, {nullable: true})
   @AllowAnonymous()
   async getProfile(
     @Args('id', {type: () => ID}) id: string,
-    @UserSub() username?: string
-  ): Promise<Profile | undefined> {
+    @Ability() ability: AppAbility
+  ): Promise<ProfileModel | undefined> {
     const profile = await this.service.get(id)
 
     if (profile) {
-      return censor(username, profile)
+      return censorFields(profile, {
+        ability,
+        subject: subject('Profile', profile),
+        fieldOptions,
+      })
     }
   }
 
   @Query(() => ProfilesPage)
   @AllowAnonymous()
   async getManyProfiles(
+    @Ability() ability: AppAbility,
     @Args('where', {nullable: true}) where?: ProfileCondition,
     @Args('orderBy', {nullable: true, type: () => [ProfilesOrderBy]})
     orderBy?: ProfilesOrderBy[],
     @Args('pageSize', {type: () => Int, nullable: true}) pageSize?: number,
-    @Args('page', {type: () => Int, nullable: true}) page?: number,
-    @UserSub() username?: string
+    @Args('page', {type: () => Int, nullable: true}) page?: number
   ): Promise<ProfilesPage> {
     const {data, ...rest} = await this.service.getMany({
       where: fromProfileCondition(where),
@@ -66,19 +62,25 @@ export class ProfilesResolver {
       page,
     })
 
-    // Censor profiles based on the caller's username
-    return {
-      ...rest,
-      data: data.map(censor(username)),
-    }
+    const permitted = data.map((profile) =>
+      censorFields(profile, {
+        ability,
+        subject: subject('Profile', profile),
+        fieldOptions,
+      })
+    )
+
+    return {...rest, data: permitted}
   }
 
   @Mutation(() => MutateProfileResult)
   async createProfile(
     @Args('input') input: CreateProfileInput,
-    @UserSub({require: true}) username: string
+    @Ability() ability: AppAbility
   ): Promise<MutateProfileResult> {
-    await this.canCreate(input.userId, username)
+    if (!ability.can('create', subject('Profile', input as Profile))) {
+      throw new ForbiddenException()
+    }
 
     const profile = await this.service.create(input)
 
@@ -89,9 +91,8 @@ export class ProfilesResolver {
   async updateProfile(
     @Args('id', {type: () => ID}) id: string,
     @Args('input') input: UpdateProfileInput,
-    @UserSub({require: true}) username: string
-  ) {
-    const ability = await this.getAbility(username)
+    @Ability() ability: AppAbility
+  ): Promise<MutateProfileResult> {
     const existing = await this.getExisting(id)
 
     if (!ability.can('update', subject('Profile', existing))) {
@@ -106,9 +107,8 @@ export class ProfilesResolver {
   @Mutation(() => Boolean)
   async deleteProfile(
     @Args('id', {type: () => ID}) id: string,
-    @UserSub({require: true}) username: string
+    @Ability() ability: AppAbility
   ): Promise<boolean> {
-    const ability = await this.getAbility(username)
     const existing = await this.getExisting(id)
 
     if (!ability.can('delete', subject('Profile', existing))) {
@@ -118,27 +118,6 @@ export class ProfilesResolver {
     await this.service.delete(id)
 
     return true
-  }
-
-  private async canCreate(userId: string, username: string): Promise<void> {
-    const user = await this.users.get(userId)
-
-    if (!user) {
-      throw new BadRequestException('No user found with that id')
-    }
-
-    if (username !== user.username) {
-      throw new ForbiddenException()
-    }
-  }
-
-  private getAbility = async (username: string) => {
-    const user = await this.users.getByUsername(username)
-    if (!user) {
-      throw new UnauthorizedException()
-    }
-
-    return this.ability.createForUser(user)
   }
 
   private getExisting = async (id: string) => {

@@ -6,14 +6,28 @@ import {
 } from '@nestjs/common'
 import {GqlExecutionContext} from '@nestjs/graphql'
 
-import {JwtContext, JwtRequest} from './jwt.types'
-import {getUser, getUserSub, isAuthenticated} from './jwt.utils'
+import {JWT, JwtContext, JwtRequest} from './jwt.types'
 
 const getRequest = (ctx: ExecutionContext): JwtRequest => {
   const context = GqlExecutionContext.create(ctx)
 
   return context.getContext<JwtContext>().req
 }
+
+/**
+ * Return a boolean indicating whether a user is present on the request.
+ */
+export const isAuthenticated = (req: JwtRequest): boolean => Boolean(req.jwt)
+
+/**
+ * Return the user parameter on requests if present.
+ */
+export const getJwt = (req: JwtRequest): JWT | undefined => req.jwt
+
+/**
+ * Return the user sub parameter on requests if present.
+ */
+export const getUsername = (req: JwtRequest): string | undefined => req.jwt?.sub
 
 /**
  * Return a boolean indicating whether a user is present on the request.
@@ -27,34 +41,34 @@ export const IsAuthenticated = createParamDecorator(
 )
 
 /**
- * Require and return the user parameter on requests.
+ * Return the jwt object if present, optionally requiring it.
  */
-export const User = createParamDecorator(
+export const Jwt = createParamDecorator(
   (options: {require?: true}, ctx: ExecutionContext) => {
     const req = getRequest(ctx)
-    const user = getUser(req)
+    const jwt = getJwt(req)
 
-    if (options.require && !user) {
+    if (options.require && !jwt) {
       throw new UnauthorizedException()
     }
 
-    return user
+    return jwt
   }
 )
 
 /**
  * Require and return the user sub parameter on requests.
  */
-export const UserSub = createParamDecorator(
+export const Username = createParamDecorator(
   (options: {require?: true} | undefined, ctx: ExecutionContext) => {
     const req = getRequest(ctx)
-    const sub = getUserSub(req)
+    const username = getUsername(req)
 
-    if (options?.require && !sub) {
+    if (options?.require && !username) {
       throw new UnauthorizedException()
     }
 
-    return sub
+    return username
   }
 )
 

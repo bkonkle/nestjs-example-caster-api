@@ -1,7 +1,7 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {ForbiddenException, NotFoundException, UseGuards} from '@nestjs/common'
 
-import {JwtGuard, UserSub} from '@caster/authn'
+import {JwtGuard, Username} from '@caster/authn'
 
 import {User} from './user.model'
 import {
@@ -17,14 +17,14 @@ export class UsersResolver {
   constructor(private readonly service: UsersService) {}
 
   @Query(() => User, {nullable: true})
-  async getCurrentUser(@UserSub({require: true}) username: string) {
+  async getCurrentUser(@Username({require: true}) username: string) {
     return this.service.getByUsername(username)
   }
 
   @Mutation(() => MutateUserResult)
   async getOrCreateCurrentUser(
     @Args('input') input: CreateUserInput,
-    @UserSub({require: true}) username: string
+    @Username({require: true}) username: string
   ) {
     if (input.username !== username) {
       throw new ForbiddenException()
@@ -44,9 +44,9 @@ export class UsersResolver {
   @Mutation(() => MutateUserResult)
   async updateCurrentUser(
     @Args('input') input: UpdateUserInput,
-    @UserSub({require: true}) username: string
+    @Username({require: true}) username: string
   ) {
-    // TODO: Instead of @UserSub above, create a @User decorator that retrieves the existing instance
+    // TODO: Instead of @Username above, create a @User decorator that retrieves the existing instance
     const existing = await this.service.getByUsername(username)
     if (!existing) {
       throw new NotFoundException()

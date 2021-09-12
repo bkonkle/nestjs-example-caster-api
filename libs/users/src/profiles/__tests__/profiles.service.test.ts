@@ -4,7 +4,10 @@ import {mockDeep} from 'jest-mock-extended'
 import {PrismaService} from 'nestjs-prisma'
 
 import {UserFactory, ProfileFactory} from '../../../test/factories'
-import {CreateProfileInput, UpdateProfileInput} from '../profile-input.model'
+import {
+  CreateProfileInput,
+  UpdateProfileInput,
+} from '../profile-mutations.model'
 import {ProfilesService} from '../profiles.service'
 
 describe('ProfilesService', () => {

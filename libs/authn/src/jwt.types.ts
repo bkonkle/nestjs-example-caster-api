@@ -12,7 +12,7 @@ export interface JWT {
 }
 
 export interface JwtRequest extends Request {
-  user?: JWT
+  jwt?: JWT
 }
 
 export interface JwtContext {

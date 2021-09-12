@@ -1,41 +1,38 @@
-import {curry, omit} from 'lodash'
-import {Prisma} from '@prisma/client'
+import {Prisma, Profile, User} from '@prisma/client'
+import {PermittedFieldsOptions} from '@casl/ability/extra'
 
-import {Profile} from './profile.model'
-import {ProfileCondition} from './profile-query.model'
-import {UpdateProfileInput} from './profile-input.model'
+import {ProfileCondition} from './profile-queries.model'
+import {UpdateProfileInput} from './profile-mutations.model'
+import {AppAbility} from '@caster/authz'
 
-export type IncludeAll = {
-  user: true
-}
+export type ProfileWithUser = Profile & {user: User | null}
 
-export const isOwner = (profile: Profile, username?: string) =>
-  username && profile.user && username === profile.user?.username
+export const isOwner = (profile: ProfileWithUser, username?: string) =>
+  username && profile.user && username === profile.user.username
 
 export const censoredFields = ['email', 'userId', 'user'] as const
 export type CensoredProfile = Omit<Profile, typeof censoredFields[number]>
-
-/**
- * If the given username isn't from the User that owns the Profile, censor it.
- */
-export const censor = curry(
-  (username: string | undefined, profile: Profile): CensoredProfile => {
-    if (isOwner(profile, username)) {
-      return profile
-    }
-
-    return omit(profile, ...censoredFields)
-  }
-)
 
 const requiredFields = [
   'id',
   'createdAt',
   'updatedAt',
   'email',
-  'content',
   'userId',
 ] as const
+
+const fields = [
+  ...requiredFields,
+  'displayName',
+  'picture',
+  'city',
+  'stateProvince',
+  'user',
+] as const
+
+export const fieldOptions: PermittedFieldsOptions<AppAbility> = {
+  fieldsFrom: (rule) => rule.fields || [...fields],
+}
 
 export const fromProfileCondition = (
   where?: ProfileCondition

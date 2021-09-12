@@ -1,7 +1,6 @@
+import {User} from '@prisma/client'
 import {Ability, AbilityBuilder, AbilityClass} from '@casl/ability'
 import {Injectable} from '@nestjs/common'
-
-import {User} from '@caster/users'
 
 import {RulesExplorer} from './rules.explorer'
 import {AppAbility} from './ability.types'
@@ -10,7 +9,7 @@ import {AppAbility} from './ability.types'
 export class AbilityFactory {
   constructor(private readonly rules: RulesExplorer) {}
 
-  createForUser(user: User): AppAbility {
+  createForUser(user?: User): AppAbility {
     const {can, cannot, build} = new AbilityBuilder<AppAbility>(
       Ability as AbilityClass<AppAbility>
     )

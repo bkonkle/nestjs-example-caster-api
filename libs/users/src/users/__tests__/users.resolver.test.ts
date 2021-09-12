@@ -4,6 +4,7 @@ import {mockDeep} from 'jest-mock-extended'
 import {UserFactory} from '../../../test/factories'
 import {UsersResolver} from '../users.resolver'
 import {UsersService} from '../users.service'
+import {UserWithProfile} from '../user.types'
 
 describe('UsersResolver', () => {
   let resolver: UsersResolver
@@ -11,7 +12,7 @@ describe('UsersResolver', () => {
   const service = mockDeep<UsersService>()
 
   const username = 'test-username'
-  const user = UserFactory.make({username})
+  const user = UserFactory.make({username}) as UserWithProfile
 
   beforeAll(async () => {
     const testModule = await Test.createTestingModule({

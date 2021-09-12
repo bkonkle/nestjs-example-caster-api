@@ -1,46 +1,76 @@
+import faker from 'faker'
 import {Test} from '@nestjs/testing'
 import {mockDeep} from 'jest-mock-extended'
 import omit from 'lodash/omit'
 
+import {AbilityFactory, AbilityModule, AppAbility} from '@caster/authz'
+
 import {ProfileFactory, UserFactory} from '../../../test/factories'
-import {UsersService} from '../../users/users.service'
-import {CreateProfileInput, UpdateProfileInput} from '../profile-input.model'
-import {ProfileCondition, ProfilesOrderBy} from '../profile-query.model'
+import {UserWithProfile} from '../../users/user.types'
+import {
+  CreateProfileInput,
+  UpdateProfileInput,
+} from '../profile-mutations.model'
+import {ProfileCondition, ProfilesOrderBy} from '../profile-queries.model'
 import {ProfilesResolver} from '../profiles.resolver'
 import {ProfilesService} from '../profiles.service'
+import {ProfileWithUser} from '../profile.utils'
+import {ProfileRules} from '../profile.rules'
 
 describe('ProfilesResolver', () => {
   let resolver: ProfilesResolver
+  let ability: AppAbility
+  let otherAbility: AppAbility
 
   const service = mockDeep<ProfilesService>()
-  const users = mockDeep<UsersService>()
 
   const username = 'test-username'
   const email = 'test@email.com'
-  const user = UserFactory.make({username})
-  const profile = ProfileFactory.make({user, userId: user.id, email})
+
+  const user = UserFactory.make({username}) as UserWithProfile
+
+  const otherUser = {
+    ...user,
+    id: faker.datatype.uuid(),
+    username: 'other-username',
+  }
+
+  const profile = ProfileFactory.make({
+    user,
+    userId: user.id,
+    email,
+  }) as ProfileWithUser
 
   beforeAll(async () => {
     const testModule = await Test.createTestingModule({
+      imports: [AbilityModule],
       providers: [
         {provide: ProfilesService, useValue: service},
-        {provide: UsersService, useValue: users},
+        ProfileRules,
         ProfilesResolver,
       ],
     }).compile()
 
     resolver = testModule.get(ProfilesResolver)
+
+    const abilityFactory = testModule.get(AbilityFactory)
+
+    ability = abilityFactory.createForUser(user)
+    otherAbility = abilityFactory.createForUser(otherUser)
+
+    jest.spyOn(ability, 'can')
+    jest.spyOn(ability, 'cannot')
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    jest.clearAllMocks()
   })
 
   describe('getProfile()', () => {
     it('uses the ProfilesService to find the Profiles by username', async () => {
       service.get.mockResolvedValueOnce(profile)
 
-      const result = await resolver.getProfile(profile.id, username)
+      const result = await resolver.getProfile(profile.id, ability)
 
       expect(service.get).toBeCalledTimes(1)
       expect(service.get).toBeCalledWith(profile.id)
@@ -51,7 +81,7 @@ describe('ProfilesResolver', () => {
     it('censors the results for unauthorized users', async () => {
       service.get.mockResolvedValueOnce(profile)
 
-      const result = await resolver.getProfile(profile.id, 'other-username')
+      const result = await resolver.getProfile(profile.id, otherAbility)
 
       expect(service.get).toBeCalledTimes(1)
       expect(service.get).toBeCalledWith(profile.id)
@@ -76,11 +106,11 @@ describe('ProfilesResolver', () => {
       service.getMany.mockResolvedValueOnce(expected)
 
       const result = await resolver.getManyProfiles(
+        ability,
         where,
         orderBy,
         undefined,
-        undefined,
-        username
+        undefined
       )
 
       expect(service.getMany).toBeCalledTimes(1)
@@ -114,11 +144,11 @@ describe('ProfilesResolver', () => {
       service.getMany.mockResolvedValueOnce(profiles)
 
       const result = await resolver.getManyProfiles(
+        otherAbility,
         where,
         orderBy,
         undefined,
-        undefined,
-        'other-username'
+        undefined
       )
 
       expect(service.getMany).toBeCalledTimes(1)
@@ -131,13 +161,12 @@ describe('ProfilesResolver', () => {
     it('uses the ProfilesService to create a Profile', async () => {
       const input: CreateProfileInput = {email, userId: user.id}
 
-      users.get.mockResolvedValueOnce(user)
       service.create.mockResolvedValueOnce(profile)
 
-      const result = await resolver.createProfile(input, username)
+      const result = await resolver.createProfile(input, ability)
 
-      expect(users.get).toBeCalledTimes(1)
-      expect(users.get).toBeCalledWith(user.id)
+      expect(ability.can).toBeCalledTimes(1)
+      expect(ability.can).toBeCalledWith('create', input)
 
       expect(service.create).toBeCalledTimes(1)
       expect(service.create).toBeCalledWith(input)
@@ -145,29 +174,14 @@ describe('ProfilesResolver', () => {
       expect(result).toEqual({profile})
     })
 
-    it('throws an error if no User is found for the given userId', async () => {
-      const input: CreateProfileInput = {email, userId: user.id}
+    it('requires authorization', async () => {
+      const input: CreateProfileInput = {email, userId: otherUser.id}
 
-      await expect(
-        resolver.createProfile(input, username)
-      ).rejects.toThrowError()
+      await expect(resolver.createProfile(input, ability)).rejects.toThrowError(
+        'Forbidden'
+      )
 
-      expect(users.get).toBeCalledTimes(1)
-
-      expect(service.create).not.toBeCalled()
-    })
-
-    it('throws an error if a different username is found for the User with the given userId', async () => {
-      const input: CreateProfileInput = {email, userId: user.id}
-
-      users.get.mockResolvedValueOnce({...user, username: 'other-username'})
-
-      await expect(
-        resolver.createProfile(input, username)
-      ).rejects.toThrowError()
-
-      expect(users.get).toBeCalledTimes(1)
-
+      expect(ability.can).toBeCalledTimes(1)
       expect(service.create).not.toBeCalled()
     })
   })
@@ -179,7 +193,10 @@ describe('ProfilesResolver', () => {
       service.get.mockResolvedValueOnce(profile)
       service.update.mockResolvedValueOnce(profile)
 
-      const result = await resolver.updateProfile(profile.id, input, username)
+      const result = await resolver.updateProfile(profile.id, input, ability)
+
+      expect(ability.can).toBeCalledTimes(1)
+      expect(ability.can).toBeCalledWith('update', profile)
 
       expect(service.get).toBeCalledTimes(1)
       expect(service.get).toBeCalledWith(profile.id)
@@ -190,20 +207,21 @@ describe('ProfilesResolver', () => {
       expect(result).toEqual({profile})
     })
 
-    it("throws an error if the User on the requested Profile doesn't match", async () => {
+    it('requires authorization', async () => {
       const input: UpdateProfileInput = {displayName: 'Test Display Name'}
 
       service.get.mockResolvedValueOnce({
         ...profile,
-        user: {...user, username: 'other-username'},
+        userId: otherUser.id,
+        user: otherUser,
       })
 
       await expect(
-        resolver.updateProfile(profile.id, input, username)
-      ).rejects.toThrowError('')
+        resolver.updateProfile(profile.id, input, ability)
+      ).rejects.toThrowError('Forbidden')
 
+      expect(ability.can).toBeCalledTimes(1)
       expect(service.get).toBeCalledTimes(1)
-
       expect(service.update).not.toBeCalled()
     })
   })
@@ -212,7 +230,10 @@ describe('ProfilesResolver', () => {
     it('uses the ProfilesService to remove an existing Profile', async () => {
       service.get.mockResolvedValueOnce(profile)
 
-      const result = await resolver.deleteProfile(profile.id, username)
+      const result = await resolver.deleteProfile(profile.id, ability)
+
+      expect(ability.can).toBeCalledTimes(1)
+      expect(ability.can).toBeCalledWith('delete', profile)
 
       expect(service.get).toBeCalledTimes(1)
       expect(service.get).toBeCalledWith(profile.id)
@@ -223,18 +244,19 @@ describe('ProfilesResolver', () => {
       expect(result).toBe(true)
     })
 
-    it("throws an error if the User on the requested Profile doesn't match", async () => {
+    it('requires authorization', async () => {
       service.get.mockResolvedValueOnce({
         ...profile,
-        user: {...user, username: 'other-username'},
+        userId: otherUser.id,
+        user: otherUser,
       })
 
       await expect(
-        resolver.deleteProfile(profile.id, username)
-      ).rejects.toThrowError()
+        resolver.deleteProfile(profile.id, ability)
+      ).rejects.toThrowError('Forbidden')
 
+      expect(ability.can).toBeCalledTimes(1)
       expect(service.get).toBeCalledTimes(1)
-
       expect(service.delete).not.toBeCalled()
     })
   })

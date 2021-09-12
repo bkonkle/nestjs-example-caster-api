@@ -2,27 +2,26 @@ import {Injectable} from '@nestjs/common'
 import {PrismaService} from 'nestjs-prisma'
 
 import {CreateUserInput, UpdateUserInput} from './user-input.model'
-import {User} from './user.model'
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async get(id: string): Promise<User | null> {
+  async get(id: string) {
     return this.prisma.user.findFirst({
       include: {profile: true},
       where: {id},
     })
   }
 
-  async getByUsername(username: string): Promise<User | null> {
+  async getByUsername(username: string) {
     return this.prisma.user.findFirst({
       include: {profile: true},
       where: {username},
     })
   }
 
-  async create(input: CreateUserInput): Promise<User> {
+  async create(input: CreateUserInput) {
     return this.prisma.user.create({
       include: {profile: true},
       data: {
@@ -36,7 +35,7 @@ export class UsersService {
     })
   }
 
-  async update(id: string, input: UpdateUserInput): Promise<User> {
+  async update(id: string, input: UpdateUserInput) {
     return this.prisma.user.update({
       include: {profile: true},
       where: {id},
