@@ -31,7 +31,7 @@ export const getAbility = (req: UserRequest): AppAbility | undefined =>
  * Return the User object if present, optionally requiring it.
  */
 export const RequestUser = createParamDecorator(
-  (options: {require?: true}, ctx: ExecutionContext) => {
+  (options: {require?: true} = {}, ctx: ExecutionContext) => {
     const req = getRequest(ctx)
     const user = getUser(req)
 

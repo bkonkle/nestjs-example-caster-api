@@ -33,7 +33,7 @@ export const getUsername = (req: JwtRequest): string | undefined => req.jwt?.sub
  * Return a boolean indicating whether a user is present on the request.
  */
 export const IsAuthenticated = createParamDecorator(
-  (_data: unknown, ctx: ExecutionContext) => {
+  (_options: unknown, ctx: ExecutionContext) => {
     const req = getRequest(ctx)
 
     return isAuthenticated(req)
@@ -44,7 +44,7 @@ export const IsAuthenticated = createParamDecorator(
  * Return the jwt object if present, optionally requiring it.
  */
 export const Jwt = createParamDecorator(
-  (options: {require?: true}, ctx: ExecutionContext) => {
+  (options: {require?: true} = {}, ctx: ExecutionContext) => {
     const req = getRequest(ctx)
     const jwt = getJwt(req)
 
@@ -60,11 +60,11 @@ export const Jwt = createParamDecorator(
  * Require and return the user sub parameter on requests.
  */
 export const Username = createParamDecorator(
-  (options: {require?: true} | undefined, ctx: ExecutionContext) => {
+  (options: {require?: true} = {}, ctx: ExecutionContext) => {
     const req = getRequest(ctx)
     const username = getUsername(req)
 
-    if (options?.require && !username) {
+    if (options.require && !username) {
       throw new UnauthorizedException()
     }
 

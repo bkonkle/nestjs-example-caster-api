@@ -385,12 +385,13 @@ describe('Users', () => {
       ])
     })
 
-    it('returns an error if no user is found', async () => {
+    it('requires authorization', async () => {
       const {token} = credentials
       const variables = {
         input: {isActive: false},
       }
 
+      // Delete the user so that no user is found
       await deleteUser(user.id)
 
       const body = await graphql.mutation<Pick<Mutation, 'updateCurrentUser'>>(
@@ -401,12 +402,13 @@ describe('Users', () => {
 
       expect(body).toHaveProperty('errors', [
         expect.objectContaining({
-          message: 'Not Found',
+          message: 'Forbidden resource',
           extensions: {
-            code: '404',
+            code: 'FORBIDDEN',
             response: {
-              message: 'Not Found',
-              statusCode: 404,
+              error: 'Forbidden',
+              message: 'Forbidden resource',
+              statusCode: 403,
             },
           },
         }),
