@@ -6,16 +6,16 @@ import {Action, AppAbility, AppSubjects} from './ability.types'
 export interface CensorFieldsOptions {
   ability: AppAbility
   action?: Action
-  subject: AppSubjects
+  // subject: AppSubjects
   fieldOptions: PermittedFieldsOptions<AppAbility>
 }
 
-export const censorFields = <T, Result = T>(
-  record: T,
+export const censorFields = <T extends AppSubjects>(
+  subject: T,
   options: CensorFieldsOptions
 ) => {
-  const {ability, action = 'read', subject, fieldOptions} = options
+  const {ability, action = 'read', fieldOptions} = options
   const fields = permittedFieldsOf(ability, action, subject, fieldOptions)
 
-  return pick(record, fields) as Result
+  return pick(subject, fields) as T
 }

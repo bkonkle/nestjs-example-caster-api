@@ -24,7 +24,6 @@ export class JwtGuard extends AuthGuard('jwt') {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const canActivate = super.canActivate(context)
-    const request = this.getRequest(context)
 
     const allowAnonymous =
       this.reflector.getAllAndOverride<AllowAnonymousMetadata>(
@@ -47,18 +46,16 @@ export class JwtGuard extends AuthGuard('jwt') {
       throw error
     }
 
-    if (allowAnonymous) {
-      return true
+    if (!success) {
+      return allowAnonymous
     }
 
-    if (success) {
-      // Move the `user` property to the `jwt` property, because we want to populate the User object later
-      request.jwt = request.user as JWT
-      delete request.user
+    const request = this.getRequest(context)
 
-      return true
-    }
+    // Move the `user` property to the `jwt` property, because we want to populate the User object later
+    request.jwt = request.user as JWT
+    delete request.user
 
-    return false
+    return true
   }
 }

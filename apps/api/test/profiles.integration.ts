@@ -75,8 +75,8 @@ describe('Profiles', () => {
     otherUser = await prisma.user.create({data: {username, isActive: true}})
   })
 
-  afterEach(async () => {
-    jest.resetAllMocks()
+  afterAll(async () => {
+    await prisma.$disconnect()
   })
 
   describe('Mutation: createProfile', () => {
@@ -281,7 +281,7 @@ describe('Profiles', () => {
       profile = await createProfile(profileInput)
     })
 
-    it.skip('censors responses for anonymous users', async () => {
+    it('censors responses for anonymous users', async () => {
       const variables = {id: profile.id}
       const expected = pick(profile, fields)
 
@@ -294,7 +294,7 @@ describe('Profiles', () => {
       expect(data.getProfile).toEqual(mockCensor(expected))
     })
 
-    it.skip('censors responses for unauthorized users', async () => {
+    it('censors responses for unauthorized users', async () => {
       const {token} = altCredentials
       const variables = {id: profile.id}
       const expected = pick(profile, fields)
@@ -377,9 +377,7 @@ describe('Profiles', () => {
       expect(data.getManyProfiles).toEqual({
         data: expect.arrayContaining([
           pick(profile, fields),
-          // TODO: Restore this censorship check
-          // mockCensor(pick(otherProfile, fields)),
-          pick(otherProfile, fields),
+          mockCensor(pick(otherProfile, fields)),
         ]),
         count: 2,
         page: 1,
@@ -388,7 +386,7 @@ describe('Profiles', () => {
       })
     })
 
-    it.skip('censors responses for anonymous users', async () => {
+    it('censors responses for anonymous users', async () => {
       const variables = {}
 
       const {data} = await graphql.query<Pick<Query, 'getManyProfiles'>>(
@@ -409,7 +407,7 @@ describe('Profiles', () => {
       })
     })
 
-    it.skip('censors responses for unauthorized users', async () => {
+    it('censors responses for unauthorized users', async () => {
       const {token} = altCredentials
       const variables = {}
 

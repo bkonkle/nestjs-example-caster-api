@@ -37,9 +37,8 @@ export class ProfilesResolver {
     const profile = await this.service.get(id)
 
     if (profile) {
-      return censorFields(profile, {
+      return censorFields(subject('Profile', profile), {
         ability,
-        subject: subject('Profile', profile),
         fieldOptions,
       })
     }
@@ -63,9 +62,8 @@ export class ProfilesResolver {
     })
 
     const permitted = data.map((profile) =>
-      censorFields(profile, {
+      censorFields(subject('Profile', profile), {
         ability,
-        subject: subject('Profile', profile),
         fieldOptions,
       })
     )

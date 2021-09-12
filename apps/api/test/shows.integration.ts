@@ -64,8 +64,8 @@ describe('Shows', () => {
     }
   })
 
-  afterEach(async () => {
-    jest.resetAllMocks()
+  afterAll(async () => {
+    await prisma.$disconnect()
   })
 
   describe('Mutation: createShow', () => {

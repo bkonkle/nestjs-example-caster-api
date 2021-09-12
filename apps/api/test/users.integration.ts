@@ -66,8 +66,8 @@ describe('Users', () => {
     graphql = new GraphQL(app.getHttpServer())
   })
 
-  afterEach(async () => {
-    jest.resetAllMocks()
+  afterAll(async () => {
+    await prisma.$disconnect()
   })
 
   describe('Query: getCurrentUser', () => {

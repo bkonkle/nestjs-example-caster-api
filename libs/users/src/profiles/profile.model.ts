@@ -9,8 +9,9 @@ export class Profile {
   @Field(() => ID)
   id!: string
 
-  @Field(() => String)
-  email!: string
+  // Nullable because this field may be censored for unauthorized users
+  @Field(() => String, {nullable: true})
+  email?: string | null
 
   @Field(() => String, {nullable: true})
   displayName?: string | null

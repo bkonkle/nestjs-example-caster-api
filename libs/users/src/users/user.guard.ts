@@ -11,7 +11,8 @@ import {
 import {AbilityFactory} from '@caster/authz'
 
 import {UsersService} from './users.service'
-import {UserRequest} from './user.types'
+import {UserContext} from './user.types'
+import {GqlExecutionContext} from '@nestjs/graphql'
 
 export class UserGuard extends JwtGuard {
   constructor(
@@ -23,9 +24,14 @@ export class UserGuard extends JwtGuard {
     super(reflector, options)
   }
 
+  getRequest(context: ExecutionContext) {
+    const ctx = GqlExecutionContext.create(context)
+
+    return ctx.getContext<UserContext>().req
+  }
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const canActivate = super.canActivate(context)
-    const request = this.getRequest(context) as UserRequest
 
     const allowAnonymous =
       this.reflector.getAllAndOverride<AllowAnonymousMetadata>(
@@ -33,19 +39,34 @@ export class UserGuard extends JwtGuard {
         [context.getHandler(), context.getClass()]
       )
 
-    // Should annotate the `jwt` if available
-    if (!(await canActivate)) {
+    const handleAnonymous = () => {
+      if (allowAnonymous) {
+        // Annotate an anonymous ability on the request
+        request.ability = this.ability.createForUser()
+
+        return true
+      }
+
       return false
     }
 
+    // Should annotate the `jwt` on the request if available
+    const success = await canActivate
+
+    if (!success) {
+      return false
+    }
+
+    const request = this.getRequest(context)
+
     const username = getUsername(request)
     if (!username) {
-      return allowAnonymous
+      return handleAnonymous()
     }
 
     const user = await this.users.getByUsername(username)
     if (!user) {
-      return allowAnonymous
+      return handleAnonymous()
     }
 
     // Annotate the user object and the user's abilities on the request
