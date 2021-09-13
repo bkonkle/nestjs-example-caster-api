@@ -6,8 +6,15 @@ import {PrismaModule} from 'nestjs-prisma'
 
 import {AuthnModule} from '@caster/authn'
 import {ConfigModule, HealthModule} from '@caster/utils'
-import {UsersModule, ProfilesModule} from '@caster/users'
-import {ShowsModule} from '@caster/shows'
+import {
+  UsersModule,
+  ProfilesModule,
+  UserRules,
+  ProfileRules,
+} from '@caster/users'
+import {ShowsModule, ShowRules, ShowRoles} from '@caster/shows'
+import {AbilityModule} from '@caster/authz'
+import {RolesModule} from '@caster/roles'
 
 const env = process.env.NODE_ENV || 'production'
 const isDev = env === 'development'
@@ -15,6 +22,9 @@ const isTest = env === 'test'
 
 @Module({
   imports: [
+    AuthnModule,
+    ConfigModule,
+    HealthModule,
     ScheduleModule.forRoot(),
     PrismaModule.forRoot({
       isGlobal: true,
@@ -28,12 +38,16 @@ const isTest = env === 'test'
       autoSchemaFile: join(process.cwd(), 'schema.graphql'),
       context: ({req}) => ({req}),
     }),
-    ConfigModule,
-    HealthModule,
-    AuthnModule,
     UsersModule,
     ProfilesModule,
     ShowsModule,
+    AbilityModule.forRoot({
+      rules: [UserRules, ProfileRules, ShowRules],
+    }),
+    RolesModule.forRoot({
+      roles: [...ShowRoles.roles],
+      permissions: [...ShowRoles.permissions],
+    }),
   ],
   providers: [Logger],
 })

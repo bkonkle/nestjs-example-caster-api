@@ -1,24 +1,23 @@
-import {User} from '@prisma/client'
+import {User, Profile} from '@prisma/client'
 import {Ability, AbilityBuilder, AbilityClass} from '@casl/ability'
-import {Injectable} from '@nestjs/common'
+import {Inject, Injectable} from '@nestjs/common'
 
-import {RulesExplorer} from './rules.explorer'
-import {AppAbility} from './ability.types'
+import {AppAbility, Rules, RuleEnhancer} from './ability.types'
 
 @Injectable()
 export class AbilityFactory {
-  constructor(private readonly rules: RulesExplorer) {}
+  constructor(@Inject(Rules) private readonly enhancers: RuleEnhancer[]) {}
 
-  createForUser(user?: User): AppAbility {
+  async createForUser(
+    user?: User & {profile: Profile | null}
+  ): Promise<AppAbility> {
     const {can, cannot, build} = new AbilityBuilder<AppAbility>(
       Ability as AbilityClass<AppAbility>
     )
 
-    const enhancers = this.rules.explore()
-
-    enhancers.forEach(({enhancer}) => {
-      enhancer.forUser(user, {can, cannot})
-    })
+    await Promise.all(
+      this.enhancers.map((enhancer) => enhancer.forUser(user, {can, cannot}))
+    )
 
     return build()
   }

@@ -1,10 +1,12 @@
-import {User} from '@prisma/client'
+import {Injectable} from '@nestjs/common'
 
-import {Action, RuleBuilder, RuleEnhancer, Rules} from '@caster/authz'
+import {Action, RuleBuilder, RuleEnhancer} from '@caster/authz'
 
-@Rules()
+import {UserWithProfile} from '../users/user.types'
+
+@Injectable()
 export class ProfileRules implements RuleEnhancer {
-  forUser(user: User | undefined, {can, cannot}: RuleBuilder): void {
+  async forUser(user: UserWithProfile | undefined, {can, cannot}: RuleBuilder) {
     // Anonymous
     can(Action.Read, 'Profile')
     cannot(Action.Read, 'Profile', ['email', 'userId', 'user'])

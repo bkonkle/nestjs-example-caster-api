@@ -3,8 +3,10 @@ import {mockDeep} from 'jest-mock-extended'
 
 import {UserFactory} from '../../../test/factories'
 import {UsersResolver} from '../users.resolver'
+import {UserRules} from '../user.rules'
 import {UsersService} from '../users.service'
 import {UserWithProfile} from '../user.types'
+import {AbilityModule} from '@caster/authz'
 
 describe('UsersResolver', () => {
   let resolver: UsersResolver
@@ -16,6 +18,7 @@ describe('UsersResolver', () => {
 
   beforeAll(async () => {
     const testModule = await Test.createTestingModule({
+      imports: [AbilityModule.forRoot({rules: [UserRules]})],
       providers: [{provide: UsersService, useValue: service}, UsersResolver],
     }).compile()
 
@@ -27,28 +30,22 @@ describe('UsersResolver', () => {
   })
 
   describe('getCurrentUser()', () => {
-    it('uses the UsersService to find the User by username', async () => {
-      service.getByUsername.mockResolvedValueOnce(user)
-
-      const result = await resolver.getCurrentUser(username)
-
-      expect(service.getByUsername).toBeCalledTimes(1)
-      expect(service.getByUsername).toBeCalledWith(username)
+    it('uses the RequestUser decorator to find the User by username', async () => {
+      const result = await resolver.getCurrentUser(username, user)
 
       expect(result).toEqual(user)
     })
   })
 
   describe('getOrCreateCurrentUser()', () => {
-    it('uses the UsersService to get a User if one is found for the given username', async () => {
+    it('uses the RequestUsers decorator to get a User if one is found for the given username', async () => {
       const input = {username}
 
-      service.getByUsername.mockResolvedValueOnce(user)
-
-      const result = await resolver.getOrCreateCurrentUser(input, username)
-
-      expect(service.getByUsername).toBeCalledTimes(1)
-      expect(service.getByUsername).toBeCalledWith(username)
+      const result = await resolver.getOrCreateCurrentUser(
+        input,
+        username,
+        user
+      )
 
       expect(service.create).not.toBeCalled()
 
@@ -62,8 +59,6 @@ describe('UsersResolver', () => {
 
       await resolver.getOrCreateCurrentUser(input, username)
 
-      expect(service.getByUsername).toBeCalledTimes(1)
-
       expect(service.create).toBeCalledTimes(1)
       expect(service.create).toBeCalledWith(input)
     })
@@ -73,13 +68,9 @@ describe('UsersResolver', () => {
     it('uses the UsersService to update an existing User', async () => {
       const input = {isActive: false}
 
-      service.getByUsername.mockResolvedValueOnce(user)
       service.update.mockResolvedValueOnce(user)
 
-      const result = await resolver.updateCurrentUser(input, username)
-
-      expect(service.getByUsername).toBeCalledTimes(1)
-      expect(service.getByUsername).toBeCalledWith(username)
+      const result = await resolver.updateCurrentUser(input, user)
 
       expect(service.update).toBeCalledTimes(1)
       expect(service.update).toBeCalledWith(user.id, input)

@@ -34,6 +34,8 @@
       "@caster/authz/*": ["libs/authz/src/*"],
       "@caster/graphql": ["libs/graphql/src/index.ts"],
       "@caster/graphql/*": ["libs/graphql/src/*"],
+      "@caster/roles": ["libs/roles/src/index.ts"],
+      "@caster/roles/*": ["libs/roles/src/*"],
       "@caster/shows": ["libs/shows/src/index.ts"],
       "@caster/shows/*": ["libs/shows/src/*"],
       "@caster/shows/test": ["libs/shows/test/index.ts"],

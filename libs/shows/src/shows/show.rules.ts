@@ -1,0 +1,60 @@
+import {Injectable} from '@nestjs/common'
+
+import {Action, RuleBuilder, RuleEnhancer} from '@caster/authz'
+import {RolesService} from '@caster/roles'
+import {UserWithProfile} from '@caster/users'
+
+import {Update, Delete, Manage, ManageEpisodes, ManageRoles} from './show.roles'
+
+@Injectable()
+export class ShowRules implements RuleEnhancer {
+  constructor(private readonly roles: RolesService) {}
+
+  async forUser(
+    user: UserWithProfile | undefined,
+    {can}: RuleBuilder
+  ): Promise<void> {
+    // Anonymous
+    can(Action.Read, 'Show')
+
+    if (!user) {
+      return
+    }
+
+    // Authenticated
+    can(Action.Create, 'Show')
+
+    const profileId = user.profile?.id
+    if (!profileId) {
+      return
+    }
+
+    // Pull all the Permissions for this Profile in the Show table
+    const showPermissions = await this.roles.getPermissionsForTable(
+      profileId,
+      'Show'
+    )
+
+    // Iterate over the showIds returned and build rules for each Show
+    Object.keys(showPermissions).forEach((showId) => {
+      showPermissions[showId].forEach((permission) => {
+        switch (permission.key) {
+          case Update.key:
+            return can(Action.Update, 'Show', {id: showId})
+          case Delete.key:
+            return can(Action.Delete, 'Show', {id: showId})
+          case Manage.key:
+            return can(Action.Manage, 'Show', {id: showId})
+          case ManageEpisodes.key:
+            // TODO: return can(Action.Manage, 'Episode', {showId})
+            return
+          case ManageRoles.key:
+            return can(Action.Manage, 'RoleGrant', {
+              subjectTable: 'Show',
+              subjectId: showId,
+            })
+        }
+      })
+    })
+  }
+}

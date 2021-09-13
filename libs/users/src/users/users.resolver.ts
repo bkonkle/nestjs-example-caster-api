@@ -9,7 +9,7 @@ import {
 } from './user-input.model'
 import {UsersService} from './users.service'
 import {UserGuard} from './user.guard'
-import {Username} from '@caster/authn'
+import {AllowAnonymous, Username} from '@caster/authn'
 import {RequestUser} from './user.decorators'
 
 @Resolver(() => User)
@@ -18,11 +18,16 @@ export class UsersResolver {
   constructor(private readonly service: UsersService) {}
 
   @Query(() => User, {nullable: true})
-  async getCurrentUser(@RequestUser() user?: User) {
+  @AllowAnonymous()
+  async getCurrentUser(
+    @Username({require: true}) _username: string,
+    @RequestUser() user?: User
+  ) {
     return user
   }
 
   @Mutation(() => MutateUserResult)
+  @AllowAnonymous()
   async getOrCreateCurrentUser(
     @Args('input') input: CreateUserInput,
     @Username({require: true}) username: string,

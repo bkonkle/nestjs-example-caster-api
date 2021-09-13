@@ -7,6 +7,7 @@ import {AbilityFactory, AbilityModule, AppAbility} from '@caster/authz'
 
 import {ProfileFactory, UserFactory} from '../../../test/factories'
 import {UserWithProfile} from '../../users/user.types'
+import {UserRules} from '../../users/user.rules'
 import {
   CreateProfileInput,
   UpdateProfileInput,
@@ -43,10 +44,9 @@ describe('ProfilesResolver', () => {
 
   beforeAll(async () => {
     const testModule = await Test.createTestingModule({
-      imports: [AbilityModule],
+      imports: [AbilityModule.forRoot({rules: [UserRules, ProfileRules]})],
       providers: [
         {provide: ProfilesService, useValue: service},
-        ProfileRules,
         ProfilesResolver,
       ],
     }).compile()
@@ -55,8 +55,8 @@ describe('ProfilesResolver', () => {
 
     const abilityFactory = testModule.get(AbilityFactory)
 
-    ability = abilityFactory.createForUser(user)
-    otherAbility = abilityFactory.createForUser(otherUser)
+    ability = await abilityFactory.createForUser(user)
+    otherAbility = await abilityFactory.createForUser(otherUser)
 
     jest.spyOn(ability, 'can')
     jest.spyOn(ability, 'cannot')

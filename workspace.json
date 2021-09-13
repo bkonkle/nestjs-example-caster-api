@@ -165,6 +165,27 @@
         }
       }
     },
+    "roles": {
+      "root": "libs/roles",
+      "sourceRoot": "libs/roles/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/roles/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/roles"],
+          "options": {
+            "jestConfig": "libs/roles/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "shows": {
       "root": "libs/shows",
       "sourceRoot": "libs/shows/src",

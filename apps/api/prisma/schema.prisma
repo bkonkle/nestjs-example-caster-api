@@ -17,17 +17,29 @@ model User {
 }
 
 model Profile {
-  id            String   @id @default(dbgenerated("ulid_generate()"))
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id            String      @id @default(dbgenerated("ulid_generate()"))
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
   email         String
   displayName   String?
   picture       String?
   content       Json?
   city          String?
   stateProvince String?
-  user          User?    @relation(fields: [userId], references: [id])
-  userId        String?  @unique
+  user          User?       @relation(fields: [userId], references: [id])
+  userId        String?     @unique
+  roleGrants    RoleGrant[]
+}
+
+model RoleGrant {
+  id           String   @id @default(dbgenerated("ulid_generate()"))
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  roleKey      String
+  profile      Profile  @relation(fields: [profileId], references: [id])
+  profileId    String
+  subjectTable String
+  subjectId    String
 }
 
 model Show {

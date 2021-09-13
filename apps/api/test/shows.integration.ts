@@ -1,16 +1,17 @@
 import faker from 'faker'
-import {Show} from '@prisma/client'
+import {Profile, User, Show} from '@prisma/client'
 import {INestApplication, ValidationPipe} from '@nestjs/common'
 import {Test} from '@nestjs/testing'
 import {omit, pick} from 'lodash'
 import {PrismaService} from 'nestjs-prisma'
 
 import {OAuth2, GraphQL, Validation, dbCleaner} from '@caster/utils/test'
-import {CreateShowInput} from '@caster/shows'
+import {Admin, CreateShowInput} from '@caster/shows'
 import {ShowFactory} from '@caster/shows/test'
 import {Query, Mutation} from '@caster/graphql/schema'
 
 import {AppModule} from '../src/app.module'
+import {ProfileFactory} from '@caster/users/test'
 
 // Fields that should be selected in successful responses
 const fields = ['id', 'title', 'summary', 'picture', 'content'] as const
@@ -21,10 +22,18 @@ describe('Shows', () => {
   let app: INestApplication
   let graphql: GraphQL
 
+  let user: User
+  let otherUser: User
+
+  let profile: Profile
+
+  // @ts-expect-error - Needs to exist, but isn't used
+  let _otherProfile: Profile
+
   const {credentials, altCredentials} = OAuth2.init()
   const prisma = new PrismaService()
 
-  const tables = ['Show']
+  const tables = ['User', 'Profile', 'Show']
 
   const createShow = (input: CreateShowInput) =>
     prisma.show.create({
@@ -54,6 +63,13 @@ describe('Shows', () => {
     if (!username) {
       throw new Error('No username found in OAuth2 credentials')
     }
+
+    user = await prisma.user.create({data: {username, isActive: true}})
+
+    profile = await prisma.profile.create({
+      include: {user: true},
+      data: ProfileFactory.makeCreateInput({userId: user.id}),
+    })
   })
 
   beforeAll(async () => {
@@ -62,6 +78,13 @@ describe('Shows', () => {
     if (!username) {
       throw new Error('No username found in OAuth2 credentials')
     }
+
+    otherUser = await prisma.user.create({data: {username, isActive: true}})
+
+    _otherProfile = await prisma.profile.create({
+      include: {user: true},
+      data: ProfileFactory.makeCreateInput({userId: otherUser.id}),
+    })
   })
 
   afterAll(async () => {
@@ -117,6 +140,14 @@ describe('Shows', () => {
         id: data.createShow.show?.id,
       })
 
+      // Expect the creator to now have the Admin RoleGrant
+      const roleGrants = await prisma.roleGrant.findMany({
+        where: {profileId: profile.id},
+      })
+      expect(roleGrants).toEqual(
+        expect.arrayContaining([expect.objectContaining({roleKey: Admin.key})])
+      )
+
       await prisma.show.delete({
         where: {id: created.id},
       })
@@ -145,9 +176,22 @@ describe('Shows', () => {
       )
     })
 
-    it.todo('requires authentication')
+    it('requires authentication', async () => {
+      const show = ShowFactory.makeCreateInput()
+      const variables = {input: show}
 
-    it.todo('requires authorization')
+      const body = await graphql.mutation(mutation, variables, {warn: false})
+
+      expect(body).toHaveProperty('errors', [
+        expect.objectContaining({
+          message: 'Unauthorized',
+          extensions: {
+            code: 'UNAUTHENTICATED',
+            response: {message: 'Unauthorized', statusCode: 401},
+          },
+        }),
+      ])
+    })
   })
 
   describe('Query: getShow', () => {
@@ -314,6 +358,16 @@ describe('Shows', () => {
 
       show = await createShow(showInput)
 
+      // Grant the "user" Admin permissions, but don't give that "otherUser" anything
+      await prisma.roleGrant.create({
+        data: {
+          profileId: profile.id,
+          roleKey: Admin.key,
+          subjectTable: 'Show',
+          subjectId: show.id,
+        },
+      })
+
       expected = pick(show, fields)
     })
 
@@ -382,9 +436,52 @@ describe('Shows', () => {
       ])
     })
 
-    it.todo('requires authentication')
+    it('requires authentication', async () => {
+      const variables = {
+        id: faker.datatype.uuid(),
+        input: {picture: faker.internet.avatar()},
+      }
 
-    it.todo('requires authorization')
+      const body = await graphql.mutation<Pick<Mutation, 'updateShow'>>(
+        mutation,
+        variables,
+        {warn: false}
+      )
+
+      expect(body).toHaveProperty('errors', [
+        expect.objectContaining({
+          message: 'Unauthorized',
+          extensions: {
+            code: 'UNAUTHENTICATED',
+            response: {message: 'Unauthorized', statusCode: 401},
+          },
+        }),
+      ])
+    })
+
+    it('requires authorization', async () => {
+      const {token} = altCredentials
+      const variables = {
+        id: show.id,
+        input: {picture: faker.internet.avatar()},
+      }
+
+      const body = await graphql.mutation<Pick<Mutation, 'updateShow'>>(
+        mutation,
+        variables,
+        {token, warn: false}
+      )
+
+      expect(body).toHaveProperty('errors', [
+        expect.objectContaining({
+          message: 'Forbidden',
+          extensions: {
+            code: 'FORBIDDEN',
+            response: {message: 'Forbidden', statusCode: 403},
+          },
+        }),
+      ])
+    })
   })
 
   describe('Mutation: deleteShow', () => {
@@ -401,6 +498,16 @@ describe('Shows', () => {
       showInput = ShowFactory.makeCreateInput()
 
       show = await createShow(showInput)
+
+      // Grant the "user" Admin permissions, but don't give that "otherUser" anything
+      await prisma.roleGrant.create({
+        data: {
+          profileId: profile.id,
+          roleKey: Admin.key,
+          subjectTable: 'Show',
+          subjectId: show.id,
+        },
+      })
     })
 
     afterAll(async () => {
@@ -456,8 +563,48 @@ describe('Shows', () => {
       ])
     })
 
-    it.todo('requires authentication')
+    it('requires authentication', async () => {
+      const variables = {id: faker.datatype.uuid()}
 
-    it.todo('requires authorization')
+      const body = await graphql.mutation<Pick<Mutation, 'deleteShow'>>(
+        mutation,
+        variables,
+        {warn: false}
+      )
+
+      expect(body).toHaveProperty('errors', [
+        expect.objectContaining({
+          message: 'Unauthorized',
+          extensions: {
+            code: 'UNAUTHENTICATED',
+            response: {
+              message: 'Unauthorized',
+              statusCode: 401,
+            },
+          },
+        }),
+      ])
+    })
+
+    it('requires authorization', async () => {
+      const {token} = altCredentials
+      const variables = {id: show.id}
+
+      const body = await graphql.mutation<Pick<Mutation, 'deleteShow'>>(
+        mutation,
+        variables,
+        {token, warn: false}
+      )
+
+      expect(body).toHaveProperty('errors', [
+        expect.objectContaining({
+          message: 'Forbidden',
+          extensions: {
+            code: 'FORBIDDEN',
+            response: {message: 'Forbidden', statusCode: 403},
+          },
+        }),
+      ])
+    })
   })
 })

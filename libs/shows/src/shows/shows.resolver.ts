@@ -1,11 +1,20 @@
-import {NotFoundException, UseGuards} from '@nestjs/common'
+import {Show} from '@prisma/client'
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+  UseGuards,
+} from '@nestjs/common'
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
 
-import {AllowAnonymous, JwtGuard, Username} from '@caster/authn'
+import {AllowAnonymous} from '@caster/authn'
+import {RolesService} from '@caster/roles'
+import {Ability, RequestUser, UserWithProfile, UserGuard} from '@caster/users'
 import {fromOrderByInput} from '@caster/utils'
 
-import {Show} from './show.model'
+import {Show as ShowModel} from './show.model'
 import {ShowsService} from './shows.service'
+import {Admin} from './show.roles'
 import {fromShowCondition} from './show.utils'
 import {ShowCondition, ShowsOrderBy, ShowsPage} from './show-query.model'
 import {
@@ -13,17 +22,22 @@ import {
   UpdateShowInput,
   MutateShowResult,
 } from './show-input.model'
+import {AppAbility} from '@caster/authz'
+import {subject} from '@casl/ability'
 
-@Resolver(() => Show)
-@UseGuards(JwtGuard)
+@Resolver(() => ShowModel)
+@UseGuards(UserGuard)
 export class ShowsResolver {
-  constructor(private readonly service: ShowsService) {}
+  constructor(
+    private readonly service: ShowsService,
+    private readonly roles: RolesService
+  ) {}
 
-  @Query(() => Show, {nullable: true})
+  @Query(() => ShowModel, {nullable: true})
   @AllowAnonymous()
   async getShow(
     @Args('id', {type: () => ID}) id: string
-  ): Promise<Show | undefined> {
+  ): Promise<ShowModel | undefined> {
     const show = await this.service.get(id)
 
     if (show) {
@@ -51,11 +65,25 @@ export class ShowsResolver {
   @Mutation(() => MutateShowResult)
   async createShow(
     @Args('input') input: CreateShowInput,
-    @Username({require: true}) username: string
+    @RequestUser({require: true}) user: UserWithProfile,
+    @Ability() ability: AppAbility
   ): Promise<MutateShowResult> {
-    await this.canCreate(input, username)
+    if (!user.profile?.id) {
+      throw new BadRequestException('User object did not come with a Profile')
+    }
+
+    if (!ability.can('create', subject('Show', input as Show))) {
+      throw new ForbiddenException()
+    }
 
     const show = await this.service.create(input)
+
+    // Grant the Admin role to the creator
+    await this.roles.grantRoles(
+      user.profile?.id,
+      {table: 'Show', id: show.id},
+      [Admin.key]
+    )
 
     return {show}
   }
@@ -64,9 +92,13 @@ export class ShowsResolver {
   async updateShow(
     @Args('id', {type: () => ID}) id: string,
     @Args('input') input: UpdateShowInput,
-    @Username({require: true}) username: string
-  ) {
-    await this.canUpdate(id, username)
+    @Ability() ability: AppAbility
+  ): Promise<MutateShowResult> {
+    const existing = await this.getExisting(id)
+
+    if (!ability.can('update', subject('Show', existing))) {
+      throw new ForbiddenException()
+    }
 
     const show = await this.service.update(id, input)
 
@@ -76,29 +108,25 @@ export class ShowsResolver {
   @Mutation(() => Boolean)
   async deleteShow(
     @Args('id', {type: () => ID}) id: string,
-    @Username({require: true}) username: string
+    @Ability() ability: AppAbility
   ): Promise<boolean> {
-    await this.canUpdate(id, username)
+    const existing = await this.getExisting(id)
+
+    if (!ability.can('delete', subject('Show', existing))) {
+      throw new ForbiddenException()
+    }
 
     await this.service.delete(id)
 
     return true
   }
 
-  private async canCreate(
-    _input: CreateShowInput,
-    _username: string
-  ): Promise<void> {
-    // TODO
-  }
-
-  private async canUpdate(id: string, _username: string): Promise<void> {
+  private getExisting = async (id: string) => {
     const existing = await this.service.get(id)
-
     if (!existing) {
       throw new NotFoundException()
     }
 
-    // TODO
+    return existing
   }
 }

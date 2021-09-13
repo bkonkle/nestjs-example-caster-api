@@ -1,12 +1,11 @@
 import {Injectable} from '@nestjs/common'
-import {Prisma} from '@prisma/client'
+import {Prisma, Show} from '@prisma/client'
 import {PrismaService} from 'nestjs-prisma'
 
 import {getOffset, ManyResponse, paginateResponse} from '@caster/utils'
 
 import {CreateShowInput, UpdateShowInput} from './show-input.model'
 import {fromShowInput} from './show.utils'
-import {Show} from './show.model'
 
 @Injectable()
 export class ShowsService {

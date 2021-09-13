@@ -39,10 +39,10 @@ export class UserGuard extends JwtGuard {
         [context.getHandler(), context.getClass()]
       )
 
-    const handleAnonymous = () => {
+    const handleAnonymous = async () => {
       if (allowAnonymous) {
         // Annotate an anonymous ability on the request
-        request.ability = this.ability.createForUser()
+        request.ability = await this.ability.createForUser()
 
         return true
       }
@@ -71,7 +71,7 @@ export class UserGuard extends JwtGuard {
 
     // Annotate the user object and the user's abilities on the request
     request.user = user
-    request.ability = this.ability.createForUser(user)
+    request.ability = await this.ability.createForUser(user)
 
     return true
   }
