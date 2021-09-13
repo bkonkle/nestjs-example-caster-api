@@ -1,5 +1,5 @@
-export * from './show-input.model'
-export * from './show-query.model'
+export * from './show-mutations.model'
+export * from './show-queries.model'
 export * from './show.model'
 export * from './show.roles'
 export * from './show.rules'

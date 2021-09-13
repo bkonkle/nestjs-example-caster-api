@@ -1,7 +1,7 @@
 import {Prisma} from '@prisma/client'
 
-import {ShowCondition} from './show-query.model'
-import {UpdateShowInput} from './show-input.model'
+import {ShowCondition} from './show-queries.model'
+import {UpdateShowInput} from './show-mutations.model'
 
 const requiredFields = ['id', 'createdAt', 'updatedAt', 'title'] as const
 

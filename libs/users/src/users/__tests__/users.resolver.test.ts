@@ -3,23 +3,30 @@ import {mockDeep} from 'jest-mock-extended'
 
 import {UserFactory} from '../../../test/factories'
 import {UsersResolver} from '../users.resolver'
-import {UserRules} from '../user.rules'
 import {UsersService} from '../users.service'
 import {UserWithProfile} from '../user.types'
-import {AbilityModule} from '@caster/authz'
+import {AbilityFactory, AppAbility} from '@caster/authz'
 
 describe('UsersResolver', () => {
   let resolver: UsersResolver
 
   const service = mockDeep<UsersService>()
+  const abilityFactory = mockDeep<AbilityFactory>()
+  const ability = mockDeep<AppAbility>()
+
+  // Default to "true"
+  ability.can.mockReturnValue(true)
 
   const username = 'test-username'
   const user = UserFactory.make({username}) as UserWithProfile
 
   beforeAll(async () => {
     const testModule = await Test.createTestingModule({
-      imports: [AbilityModule.forRoot({rules: [UserRules]})],
-      providers: [{provide: UsersService, useValue: service}, UsersResolver],
+      providers: [
+        {provide: UsersService, useValue: service},
+        {provide: AbilityFactory, useValue: abilityFactory},
+        UsersResolver,
+      ],
     }).compile()
 
     resolver = testModule.get(UsersResolver)

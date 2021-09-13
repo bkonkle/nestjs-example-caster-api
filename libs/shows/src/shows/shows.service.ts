@@ -4,7 +4,7 @@ import {PrismaService} from 'nestjs-prisma'
 
 import {getOffset, ManyResponse, paginateResponse} from '@caster/utils'
 
-import {CreateShowInput, UpdateShowInput} from './show-input.model'
+import {CreateShowInput, UpdateShowInput} from './show-mutations.model'
 import {fromShowInput} from './show.utils'
 
 @Injectable()

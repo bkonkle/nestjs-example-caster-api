@@ -16,12 +16,12 @@ import {Show as ShowModel} from './show.model'
 import {ShowsService} from './shows.service'
 import {Admin} from './show.roles'
 import {fromShowCondition} from './show.utils'
-import {ShowCondition, ShowsOrderBy, ShowsPage} from './show-query.model'
+import {ShowCondition, ShowsOrderBy, ShowsPage} from './show-queries.model'
 import {
   CreateShowInput,
   UpdateShowInput,
   MutateShowResult,
-} from './show-input.model'
+} from './show-mutations.model'
 import {AppAbility} from '@caster/authz'
 import {subject} from '@casl/ability'
 
