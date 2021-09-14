@@ -124,6 +124,23 @@ describe('Episodes', () => {
       }
     `
 
+    let roleGrant: RoleGrant
+
+    beforeAll(async () => {
+      roleGrant = await prisma.roleGrant.create({
+        data: {
+          roleKey: Manager.key,
+          profileId: profile.id,
+          subjectTable: 'Show',
+          subjectId: show.id,
+        },
+      })
+    })
+
+    afterAll(async () => {
+      await prisma.roleGrant.delete({where: {id: roleGrant.id}})
+    })
+
     it('creates a new episode', async () => {
       const {token} = credentials
       const episode = EpisodeFactory.makeCreateInput({showId: show.id})
@@ -133,15 +150,6 @@ describe('Episodes', () => {
         ...episode,
         id: expect.stringMatching(Validation.uuidRegex),
       }
-
-      const roleGrant = await prisma.roleGrant.create({
-        data: {
-          roleKey: Manager.key,
-          profileId: profile.id,
-          subjectTable: 'Show',
-          subjectId: show.id,
-        },
-      })
 
       const {data} = await graphql.mutation<Pick<Mutation, 'createEpisode'>>(
         mutation,
@@ -169,11 +177,6 @@ describe('Episodes', () => {
 
       await prisma.episode.delete({
         where: {id: created.id},
-      })
-      await prisma.roleGrant.delete({
-        where: {
-          id: roleGrant.id,
-        },
       })
     })
 
@@ -217,6 +220,45 @@ describe('Episodes', () => {
           },
         }),
       ])
+    })
+
+    it('requires authorization', async () => {
+      const {token} = credentials
+      const episode = EpisodeFactory.makeCreateInput({showId: show.id})
+      const variables = {input: episode}
+
+      const expected = {
+        ...episode,
+        id: expect.stringMatching(Validation.uuidRegex),
+      }
+
+      const {data} = await graphql.mutation<Pick<Mutation, 'createEpisode'>>(
+        mutation,
+        variables,
+        {token}
+      )
+
+      expect(data.createEpisode).toHaveProperty(
+        'episode',
+        expect.objectContaining(expected)
+      )
+
+      const created = await prisma.episode.findFirst({
+        where: {id: data.createEpisode.episode?.id},
+      })
+
+      if (!created) {
+        fail('No episode created.')
+      }
+
+      expect(created).toMatchObject({
+        ...expected,
+        id: data.createEpisode.episode?.id,
+      })
+
+      await prisma.episode.delete({
+        where: {id: created.id},
+      })
     })
   })
 
