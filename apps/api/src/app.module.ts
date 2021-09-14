@@ -12,7 +12,13 @@ import {
   UserRules,
   ProfileRules,
 } from '@caster/users'
-import {ShowsModule, ShowRules, ShowRoles} from '@caster/shows'
+import {
+  ShowsModule,
+  ShowRules,
+  ShowRoles,
+  EpisodesModule,
+  EpisodeRules,
+} from '@caster/shows'
 import {AbilityModule} from '@caster/authz'
 import {RolesModule} from '@caster/roles'
 
@@ -41,8 +47,9 @@ const isTest = env === 'test'
     UsersModule,
     ProfilesModule,
     ShowsModule,
+    EpisodesModule,
     AbilityModule.forRoot({
-      rules: [UserRules, ProfileRules, ShowRules],
+      rules: [UserRules, ProfileRules, ShowRules, EpisodeRules],
     }),
     RolesModule.forRoot({
       roles: [...ShowRoles.roles],

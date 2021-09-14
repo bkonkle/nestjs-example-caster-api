@@ -4,7 +4,7 @@ import {Action, RuleBuilder, RuleEnhancer} from '@caster/authz'
 import {RolesService} from '@caster/roles'
 import {UserWithProfile} from '@caster/users'
 
-import {Update, Delete, Manage, ManageEpisodes, ManageRoles} from './show.roles'
+import {Update, Delete, ManageEpisodes, ManageRoles} from './show.roles'
 
 @Injectable()
 export class ShowRules implements RuleEnhancer {
@@ -43,11 +43,8 @@ export class ShowRules implements RuleEnhancer {
             return can(Action.Update, 'Show', {id: showId})
           case Delete.key:
             return can(Action.Delete, 'Show', {id: showId})
-          case Manage.key:
-            return can(Action.Manage, 'Show', {id: showId})
           case ManageEpisodes.key:
-            // TODO: return can(Action.Manage, 'Episode', {showId})
-            return
+            return can(Action.Manage, 'Episode', {showId})
           case ManageRoles.key:
             return can(Action.Manage, 'RoleGrant', {
               subjectTable: 'Show',

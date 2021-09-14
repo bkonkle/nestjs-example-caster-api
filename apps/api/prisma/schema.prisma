@@ -43,11 +43,24 @@ model RoleGrant {
 }
 
 model Show {
-  id        String   @id @default(dbgenerated("ulid_generate()"))
+  id        String    @id @default(dbgenerated("ulid_generate()"))
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   title     String
   summary   String?
   picture   String?
   content   Json?
+  episodes  Episode[]
+}
+
+model Episode {
+  id        String   @id @default(dbgenerated("ulid_generate()"))
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  show      Show     @relation(fields: [showId], references: [id])
+  showId    String
+  title     String
+  summary   String?
+  picture   String?
+  content   Json?
 }

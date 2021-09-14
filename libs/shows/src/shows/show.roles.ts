@@ -16,16 +16,10 @@ export const Delete: Permission = {
   description: 'Delete a particular Show',
 }
 
-export const Manage: Permission = {
-  key: 'SHOW_MANAGE',
-  name: 'Manage Show',
-  description: 'Manage a particular Show',
-}
-
 export const ManageEpisodes: Permission = {
   key: 'SHOW_MANAGE_EPISODES',
   name: 'Manage Show Episodes',
-  description: 'Create, update, or delete an Episode for particular Show',
+  description: 'Create, update, and delete any Episodes for this Show',
 }
 
 export const ManageRoles: Permission = {
@@ -34,7 +28,7 @@ export const ManageRoles: Permission = {
   description: 'Grant or revoke User Roles for a particular Show',
 }
 
-export const permissions = [Update, Delete, Manage, ManageEpisodes, ManageRoles]
+export const permissions = [Update, Delete, ManageEpisodes, ManageRoles]
 
 /**
  * Roles
@@ -43,8 +37,7 @@ export const permissions = [Update, Delete, Manage, ManageEpisodes, ManageRoles]
 export const Manager: Role = {
   key: 'SHOW_MANAGER',
   name: 'Show Manager',
-  description:
-    'Able to manage Episodes and update details for a particular Show',
+  description: 'Able to update existing Shows and manage Episodes',
   permissions: [Update, ManageEpisodes],
 }
 
@@ -52,7 +45,7 @@ export const Admin: Role = {
   key: 'SHOW_ADMIN',
   name: 'Show Admin',
   description: 'Able to fully control a particular Show',
-  permissions: [Manage, ManageEpisodes, ManageRoles],
+  permissions: [...Manager.permissions, Delete, ManageRoles],
 }
 
 export const roles = [Manager, Admin]

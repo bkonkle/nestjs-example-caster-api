@@ -1,4 +1,4 @@
-import {User, Profile, RoleGrant, Show} from '@prisma/client'
+import {User, Profile, RoleGrant, Show, Episode} from '@prisma/client'
 import {AbilityBuilder, AbilityClass} from '@casl/ability'
 import {PrismaAbility, Subjects} from '@casl/prisma'
 
@@ -18,6 +18,7 @@ export type AppSubjects = Subjects<{
   Profile: Profile
   RoleGrant: RoleGrant
   Show: Show
+  Episode: Episode
 }>
 
 export type AppAbility = PrismaAbility<[string, AppSubjects]>

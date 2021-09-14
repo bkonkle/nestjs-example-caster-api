@@ -1,46 +1,59 @@
 import faker from 'faker'
-import {Profile, User, Show, RoleGrant} from '@prisma/client'
+import {Profile, User, Show, Episode, RoleGrant} from '@prisma/client'
 import {INestApplication, ValidationPipe} from '@nestjs/common'
 import {Test} from '@nestjs/testing'
 import {omit, pick} from 'lodash'
 import {PrismaService} from 'nestjs-prisma'
 
 import {OAuth2, GraphQL, Validation, dbCleaner} from '@caster/utils/test'
-import {Admin, CreateShowInput} from '@caster/shows'
-import {ShowFactory} from '@caster/shows/test'
+import {Admin, CreateEpisodeInput, Manager} from '@caster/shows'
+import {EpisodeFactory, ShowFactory} from '@caster/shows/test'
 import {Query, Mutation} from '@caster/graphql/schema'
-
-import {AppModule} from '../src/app.module'
 import {ProfileFactory} from '@caster/users/test'
 
+import {AppModule} from '../src/app.module'
+
 // Fields that should be selected in successful responses
-const fields = ['id', 'title', 'summary', 'picture', 'content'] as const
+const fields = [
+  'id',
+  'title',
+  'summary',
+  'picture',
+  'content',
+  'showId',
+] as const
 
-type PartialShow = Pick<Show, typeof fields[number]>
+type PartialEpisode = Pick<Episode, typeof fields[number]>
 
-describe('Shows', () => {
+describe('Episodes', () => {
   let app: INestApplication
   let graphql: GraphQL
 
   let user: User
   let otherUser: User
+  let show: Show
 
   let profile: Profile
-
   // @ts-expect-error - Needs to exist, but isn't used
   let _otherProfile: Profile
 
   const {credentials, altCredentials} = OAuth2.init()
   const prisma = new PrismaService()
 
-  const tables = ['User', 'Profile', 'Show']
+  const tables = ['User', 'Profile', 'Episode']
 
-  const createShow = (input: CreateShowInput) =>
-    prisma.show.create({
-      data: input,
+  const createEpisode = (input: CreateEpisodeInput) =>
+    prisma.episode.create({
+      data: {
+        ...input,
+        showId: undefined,
+        show: {
+          connect: {id: show.id},
+        },
+      },
     })
 
-  const deleteShow = (id: string) => prisma.show.delete({where: {id}})
+  const deleteEpisode = (id: string) => prisma.episode.delete({where: {id}})
 
   beforeAll(async () => {
     await dbCleaner(prisma, tables)
@@ -70,6 +83,10 @@ describe('Shows', () => {
       include: {user: true},
       data: ProfileFactory.makeCreateInput({userId: user.id}),
     })
+
+    show = await prisma.show.create({
+      data: ShowFactory.makeCreateInput(),
+    })
   })
 
   beforeAll(async () => {
@@ -91,72 +108,81 @@ describe('Shows', () => {
     await prisma.$disconnect()
   })
 
-  describe('Mutation: createShow', () => {
+  describe('Mutation: createEpisode', () => {
     const mutation = `
-      mutation CreateShow($input: CreateShowInput!) {
-        createShow(input: $input) {
-          show {
+      mutation CreateEpisode($input: CreateEpisodeInput!) {
+        createEpisode(input: $input) {
+          episode {
             id
             title
             summary
             picture
             content
+            showId
           }
         }
       }
     `
 
-    it('creates a new show', async () => {
+    it('creates a new episode', async () => {
       const {token} = credentials
-      const show = ShowFactory.makeCreateInput()
-      const variables = {input: show}
+      const episode = EpisodeFactory.makeCreateInput({showId: show.id})
+      const variables = {input: episode}
 
       const expected = {
-        ...show,
+        ...episode,
         id: expect.stringMatching(Validation.uuidRegex),
       }
 
-      const {data} = await graphql.mutation<Pick<Mutation, 'createShow'>>(
+      const roleGrant = await prisma.roleGrant.create({
+        data: {
+          roleKey: Manager.key,
+          profileId: profile.id,
+          subjectTable: 'Show',
+          subjectId: show.id,
+        },
+      })
+
+      const {data} = await graphql.mutation<Pick<Mutation, 'createEpisode'>>(
         mutation,
         variables,
         {token}
       )
 
-      expect(data.createShow).toHaveProperty(
-        'show',
+      expect(data.createEpisode).toHaveProperty(
+        'episode',
         expect.objectContaining(expected)
       )
 
-      const created = await prisma.show.findFirst({
-        where: {id: data.createShow.show?.id},
+      const created = await prisma.episode.findFirst({
+        where: {id: data.createEpisode.episode?.id},
       })
 
       if (!created) {
-        fail('No show created.')
+        fail('No episode created.')
       }
 
       expect(created).toMatchObject({
         ...expected,
-        id: data.createShow.show?.id,
+        id: data.createEpisode.episode?.id,
       })
 
-      // Expect the creator to now have the Admin RoleGrant
-      const roleGrants = await prisma.roleGrant.findMany({
-        where: {profileId: profile.id},
-      })
-      expect(roleGrants).toEqual(
-        expect.arrayContaining([expect.objectContaining({roleKey: Admin.key})])
-      )
-
-      await prisma.show.delete({
+      await prisma.episode.delete({
         where: {id: created.id},
+      })
+      await prisma.roleGrant.delete({
+        where: {
+          id: roleGrant.id,
+        },
       })
     })
 
     it('requires a title', async () => {
       const {token} = credentials
-      const show = omit(ShowFactory.makeCreateInput(), ['title'])
-      const variables = {input: show}
+      const episode = omit(EpisodeFactory.makeCreateInput({showId: show.id}), [
+        'title',
+      ])
+      const variables = {input: episode}
 
       const body = await graphql.mutation(mutation, variables, {
         token,
@@ -177,8 +203,8 @@ describe('Shows', () => {
     })
 
     it('requires authentication', async () => {
-      const show = ShowFactory.makeCreateInput()
-      const variables = {input: show}
+      const episode = EpisodeFactory.makeCreateInput({showId: show.id})
+      const variables = {input: episode}
 
       const body = await graphql.mutation(mutation, variables, {warn: false})
 
@@ -194,86 +220,87 @@ describe('Shows', () => {
     })
   })
 
-  describe('Query: getShow', () => {
-    let show: Show
-    let showInput: CreateShowInput
-    let expected: PartialShow
+  describe('Query: getEpisode', () => {
+    let episode: Episode
+    let episodeInput: CreateEpisodeInput
+    let expected: PartialEpisode
 
     const query = `
-      query GetShow($id: ID!) {
-        getShow(id: $id) {
+      query GetEpisode($id: ID!) {
+        getEpisode(id: $id) {
           id
           title
           summary
           picture
           content
+          showId
         }
       }
     `
 
     beforeAll(async () => {
-      showInput = ShowFactory.makeCreateInput()
+      episodeInput = EpisodeFactory.makeCreateInput({showId: show.id})
 
-      show = await createShow(showInput)
+      episode = await createEpisode(episodeInput)
 
-      expected = pick(show, fields)
+      expected = pick(episode, fields)
     })
 
     afterAll(async () => {
       try {
-        await deleteShow(show.id)
+        await deleteEpisode(episode.id)
       } catch (_err) {
         // pass
       }
     })
 
-    it('retrieves an existing show', async () => {
+    it('retrieves an existing episode', async () => {
       const {token} = credentials
-      const variables = {id: show.id}
+      const variables = {id: episode.id}
 
-      const {data} = await graphql.query<Pick<Query, 'getShow'>>(
+      const {data} = await graphql.query<Pick<Query, 'getEpisode'>>(
         query,
         variables,
         {token}
       )
 
-      expect(data.getShow).toEqual(expected)
+      expect(data.getEpisode).toEqual(expected)
     })
 
-    it('returns nothing when no show is found', async () => {
+    it('returns nothing when no episode is found', async () => {
       const {token} = credentials
-      const variables = {id: show.id}
+      const variables = {id: episode.id}
 
-      await deleteShow(show.id)
+      await deleteEpisode(episode.id)
 
-      const {data} = await graphql.query<Pick<Query, 'getShow'>>(
+      const {data} = await graphql.query<Pick<Query, 'getEpisode'>>(
         query,
         variables,
         {token}
       )
 
-      expect(data.getShow).toBeFalsy()
+      expect(data.getEpisode).toBeFalsy()
 
-      // Restore the show for other tests
-      show = await createShow(showInput)
+      // Restore the episode for other tests
+      episode = await createEpisode(episodeInput)
     })
   })
 
-  describe('Query: getManyShows', () => {
-    let show: Show
-    let showInput: CreateShowInput
+  describe('Query: getManyEpisodes', () => {
+    let episode: Episode
+    let episodeInput: CreateEpisodeInput
 
-    let otherShow: Show
-    let otherInput: CreateShowInput
+    let otherEpisode: Episode
+    let otherInput: CreateEpisodeInput
 
     const query = `
-      query GetManyShows(
-        $where: ShowCondition
-        $orderBy: [ShowsOrderBy!]
+      query GetManyEpisodes(
+        $where: EpisodeCondition
+        $orderBy: [EpisodesOrderBy!]
         $pageSize: Int
         $page: Int
       ) {
-        getManyShows(
+        getManyEpisodes(
         where: $where
         orderBy: $orderBy
         pageSize: $pageSize
@@ -285,6 +312,7 @@ describe('Shows', () => {
             summary
             picture
             content
+            showId
           }
           count
           total
@@ -295,35 +323,35 @@ describe('Shows', () => {
     `
 
     beforeAll(async () => {
-      showInput = ShowFactory.makeCreateInput()
-      otherInput = ShowFactory.makeCreateInput()
+      episodeInput = EpisodeFactory.makeCreateInput({showId: show.id})
+      otherInput = EpisodeFactory.makeCreateInput({showId: show.id})
 
-      show = await createShow(showInput)
-      otherShow = await createShow(otherInput)
+      episode = await createEpisode(episodeInput)
+      otherEpisode = await createEpisode(otherInput)
     })
 
     afterAll(async () => {
       try {
-        await deleteShow(show.id)
-        await deleteShow(otherShow.id)
+        await deleteEpisode(episode.id)
+        await deleteEpisode(otherEpisode.id)
       } catch (_err) {
         // pass
       }
     })
 
-    it('queries existing shows', async () => {
+    it('queries existing episodes', async () => {
       const {token} = credentials
       const variables = {}
 
-      const {data} = await graphql.query<Pick<Query, 'getManyShows'>>(
+      const {data} = await graphql.query<Pick<Query, 'getManyEpisodes'>>(
         query,
         variables,
         {token}
       )
-      expect(data.getManyShows).toEqual({
+      expect(data.getManyEpisodes).toEqual({
         data: expect.arrayContaining([
-          pick(show, fields),
-          pick(otherShow, fields),
+          pick(episode, fields),
+          pick(otherEpisode, fields),
         ]),
         count: 2,
         page: 1,
@@ -333,31 +361,32 @@ describe('Shows', () => {
     })
   })
 
-  describe('Mutation: updateShow', () => {
-    let show: Show
-    let showInput: CreateShowInput
+  describe('Mutation: updateEpisode', () => {
+    let episode: Episode
+    let episodeInput: CreateEpisodeInput
     let roleGrant: RoleGrant
 
-    let expected: PartialShow
+    let expected: PartialEpisode
 
     const mutation = `
-      mutation UpdateShow($id: ID!, $input: UpdateShowInput!) {
-        updateShow(id: $id, input: $input) {
-          show {
+      mutation UpdateEpisode($id: ID!, $input: UpdateEpisodeInput!) {
+        updateEpisode(id: $id, input: $input) {
+          episode {
             id
             title
             summary
             picture
             content
+            showId
           }
         }
       }
     `
 
     beforeAll(async () => {
-      showInput = ShowFactory.makeCreateInput()
+      episodeInput = EpisodeFactory.makeCreateInput({showId: show.id})
 
-      show = await createShow(showInput)
+      episode = await createEpisode(episodeInput)
 
       // Grant the "user" Admin permissions, but don't give that "otherUser" anything
       roleGrant = await prisma.roleGrant.create({
@@ -369,59 +398,59 @@ describe('Shows', () => {
         },
       })
 
-      expected = pick(show, fields)
+      expected = pick(episode, fields)
     })
 
     afterAll(async () => {
       try {
-        await deleteShow(show.id)
+        await deleteEpisode(episode.id)
         await prisma.roleGrant.delete({where: {id: roleGrant.id}})
       } catch (_err) {
         // pass
       }
     })
 
-    it('updates an existing show', async () => {
+    it('updates an existing show episode', async () => {
       const {token} = credentials
       const variables = {
-        id: show.id,
+        id: episode.id,
         input: {picture: faker.internet.avatar()},
       }
 
-      const {data} = await graphql.mutation<Pick<Mutation, 'updateShow'>>(
+      const {data} = await graphql.mutation<Pick<Mutation, 'updateEpisode'>>(
         mutation,
         variables,
         {token}
       )
 
-      expect(data.updateShow).toHaveProperty(
-        'show',
+      expect(data.updateEpisode).toHaveProperty(
+        'episode',
         expect.objectContaining({
           ...expected,
           picture: variables.input.picture,
         })
       )
 
-      const updated = await prisma.show.findFirst({
-        where: {id: show.id},
+      const updated = await prisma.episode.findFirst({
+        where: {id: episode.id},
       })
       expect(updated).toMatchObject({
         ...expected,
         picture: variables.input.picture,
       })
 
-      // Restore the show for other tests
-      show = await createShow(showInput)
+      // Restore the episode for other tests
+      episode = await createEpisode(episodeInput)
     })
 
-    it('returns an error if no existing show was found', async () => {
+    it('returns an error if no existing episode was found', async () => {
       const {token} = credentials
       const variables = {
         id: faker.datatype.uuid(),
         input: {picture: faker.internet.avatar()},
       }
 
-      const body = await graphql.mutation<Pick<Mutation, 'updateShow'>>(
+      const body = await graphql.mutation<Pick<Mutation, 'updateEpisode'>>(
         mutation,
         variables,
         {token, warn: false}
@@ -444,7 +473,7 @@ describe('Shows', () => {
         input: {picture: faker.internet.avatar()},
       }
 
-      const body = await graphql.mutation<Pick<Mutation, 'updateShow'>>(
+      const body = await graphql.mutation<Pick<Mutation, 'updateEpisode'>>(
         mutation,
         variables,
         {warn: false}
@@ -464,11 +493,11 @@ describe('Shows', () => {
     it('requires authorization', async () => {
       const {token} = altCredentials
       const variables = {
-        id: show.id,
+        id: episode.id,
         input: {picture: faker.internet.avatar()},
       }
 
-      const body = await graphql.mutation<Pick<Mutation, 'updateShow'>>(
+      const body = await graphql.mutation<Pick<Mutation, 'updateEpisode'>>(
         mutation,
         variables,
         {token, warn: false}
@@ -486,24 +515,24 @@ describe('Shows', () => {
     })
   })
 
-  describe('Mutation: deleteShow', () => {
-    let show: Show
-    let showInput: CreateShowInput
+  describe('Mutation: deleteEpisode', () => {
+    let episode: Episode
+    let episodeInput: CreateEpisodeInput
     let roleGrant: RoleGrant
 
     const mutation = `
-        mutation DeleteShow($id: ID!) {
-          deleteShow(id: $id)
+        mutation DeleteEpisode($id: ID!) {
+          deleteEpisode(id: $id)
         }
       `
 
     beforeAll(async () => {
-      showInput = ShowFactory.makeCreateInput()
+      episodeInput = EpisodeFactory.makeCreateInput({showId: show.id})
 
-      show = await createShow(showInput)
+      episode = await createEpisode(episodeInput)
 
       // Grant the "user" Admin permissions, but don't give that "otherUser" anything
-      roleGrant = await prisma.roleGrant.create({
+      await prisma.roleGrant.create({
         data: {
           profileId: profile.id,
           roleKey: Admin.key,
@@ -515,39 +544,39 @@ describe('Shows', () => {
 
     afterAll(async () => {
       try {
-        await deleteShow(show.id)
+        await deleteEpisode(episode.id)
         await prisma.roleGrant.delete({where: {id: roleGrant.id}})
       } catch (_err) {
         // pass
       }
     })
 
-    it('deletes an existing show', async () => {
+    it('deletes an existing user episode', async () => {
       const {token} = credentials
-      const variables = {id: show.id}
+      const variables = {id: episode.id}
 
-      const {data} = await graphql.mutation<Pick<Mutation, 'deleteShow'>>(
+      const {data} = await graphql.mutation<Pick<Mutation, 'deleteEpisode'>>(
         mutation,
         variables,
         {token}
       )
 
-      expect(data.deleteShow).toBe(true)
+      expect(data.deleteEpisode).toBe(true)
 
-      const deleted = await prisma.show.findFirst({
-        where: {id: show.id},
+      const deleted = await prisma.episode.findFirst({
+        where: {id: episode.id},
       })
       expect(deleted).toBeNull()
 
-      // Restore the show for other tests
-      show = await createShow(showInput)
+      // Restore the episode for other tests
+      episode = await createEpisode(episodeInput)
     })
 
-    it('returns an error if no existing show was found', async () => {
+    it('returns an error if no existing episode was found', async () => {
       const {token} = credentials
       const variables = {id: faker.datatype.uuid()}
 
-      const body = await graphql.mutation<Pick<Mutation, 'deleteShow'>>(
+      const body = await graphql.mutation<Pick<Mutation, 'deleteEpisode'>>(
         mutation,
         variables,
         {token, warn: false}
@@ -570,7 +599,7 @@ describe('Shows', () => {
     it('requires authentication', async () => {
       const variables = {id: faker.datatype.uuid()}
 
-      const body = await graphql.mutation<Pick<Mutation, 'deleteShow'>>(
+      const body = await graphql.mutation<Pick<Mutation, 'deleteEpisode'>>(
         mutation,
         variables,
         {warn: false}
@@ -592,9 +621,9 @@ describe('Shows', () => {
 
     it('requires authorization', async () => {
       const {token} = altCredentials
-      const variables = {id: show.id}
+      const variables = {id: episode.id}
 
-      const body = await graphql.mutation<Pick<Mutation, 'deleteShow'>>(
+      const body = await graphql.mutation<Pick<Mutation, 'deleteEpisode'>>(
         mutation,
         variables,
         {token, warn: false}

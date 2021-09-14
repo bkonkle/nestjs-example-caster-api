@@ -6,7 +6,7 @@ import {RolesService} from '@caster/roles'
 import {UserWithProfile} from '@caster/users'
 import {ProfileFactory, UserFactory} from '@caster/users/test'
 
-import {Manage} from '../show.roles'
+import {Update, Delete, ManageEpisodes, ManageRoles} from '../show.roles'
 import {ShowRules} from '../show.rules'
 
 describe('ShowRules', () => {
@@ -56,19 +56,45 @@ describe('ShowRules', () => {
       expect(builder.can).toBeCalledWith(Action.Create, 'Show')
     })
 
-    it('allows users with a profile to manage shows they are authorized to', async () => {
+    it('supports the Admin role', async () => {
       const showId = 'test-show-id'
 
       roles.getPermissionsForTable.mockResolvedValueOnce({
-        [showId]: [Manage],
+        [showId]: [Update, Delete, ManageEpisodes, ManageRoles],
       })
 
       await rules.forUser(user, builder)
 
       expect(roles.getPermissionsForTable).toBeCalledTimes(1)
 
-      expect(builder.can).toBeCalledTimes(3)
-      expect(builder.can).toBeCalledWith(Action.Manage, 'Show', {id: showId})
+      expect(builder.can).toBeCalledTimes(6)
+      expect(builder.can).toBeCalledWith(Action.Update, 'Show', {id: showId})
+      expect(builder.can).toBeCalledWith(Action.Delete, 'Show', {id: showId})
+      expect(builder.can).toBeCalledWith(Action.Manage, 'Episode', {
+        showId: showId,
+      })
+      expect(builder.can).toBeCalledWith(Action.Manage, 'RoleGrant', {
+        subjectTable: 'Show',
+        subjectId: showId,
+      })
+    })
+
+    it('allows users with a profile to manage episodes they are authorized to', async () => {
+      const showId = 'test-show-id'
+
+      roles.getPermissionsForTable.mockResolvedValueOnce({
+        [showId]: [Update, ManageEpisodes],
+      })
+
+      await rules.forUser(user, builder)
+
+      expect(roles.getPermissionsForTable).toBeCalledTimes(1)
+
+      expect(builder.can).toBeCalledTimes(4)
+      expect(builder.can).toBeCalledWith(Action.Update, 'Show', {id: showId})
+      expect(builder.can).toBeCalledWith(Action.Manage, 'Episode', {
+        showId: showId,
+      })
     })
   })
 })

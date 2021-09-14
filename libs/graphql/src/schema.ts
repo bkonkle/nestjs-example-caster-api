@@ -29,6 +29,14 @@ export type Scalars = {
   JSON: Prisma.JsonValue
 }
 
+export type CreateEpisodeInput = {
+  title: Scalars['String']
+  summary?: Maybe<Scalars['String']>
+  picture?: Maybe<Scalars['String']>
+  content?: Maybe<Scalars['JSON']>
+  showId: Scalars['String']
+}
+
 export type CreateProfileInput = {
   email: Scalars['String']
   displayName?: Maybe<Scalars['String']>
@@ -56,6 +64,57 @@ export type CreateUserProfileInput = {
   content?: Maybe<Scalars['JSON']>
 }
 
+export type Episode = {
+  __typename?: 'Episode'
+  id: Scalars['ID']
+  title: Scalars['String']
+  summary?: Maybe<Scalars['String']>
+  picture?: Maybe<Scalars['String']>
+  content?: Maybe<Scalars['JSON']>
+  showId?: Maybe<Scalars['String']>
+  show?: Maybe<Show>
+  createdAt: Scalars['DateTime']
+  updatedAt: Scalars['DateTime']
+}
+
+export type EpisodeCondition = {
+  id?: Maybe<Scalars['ID']>
+  title?: Maybe<Scalars['String']>
+  summary?: Maybe<Scalars['String']>
+  picture?: Maybe<Scalars['String']>
+  content?: Maybe<Scalars['JSON']>
+  showId?: Maybe<Scalars['String']>
+  createdAt?: Maybe<Scalars['DateTime']>
+  updatedAt?: Maybe<Scalars['DateTime']>
+}
+
+export enum EpisodesOrderBy {
+  IdAsc = 'ID_ASC',
+  IdDesc = 'ID_DESC',
+  TitleAsc = 'TITLE_ASC',
+  TitleDesc = 'TITLE_DESC',
+  SummaryAsc = 'SUMMARY_ASC',
+  SummaryDesc = 'SUMMARY_DESC',
+  CreatedAtAsc = 'CREATED_AT_ASC',
+  CreatedAtDesc = 'CREATED_AT_DESC',
+  UpdatedAtAsc = 'UPDATED_AT_ASC',
+  UpdatedAtDesc = 'UPDATED_AT_DESC',
+}
+
+export type EpisodesPage = {
+  __typename?: 'EpisodesPage'
+  data: Array<Episode>
+  count: Scalars['Int']
+  total: Scalars['Int']
+  page: Scalars['Int']
+  pageCount: Scalars['Int']
+}
+
+export type MutateEpisodeResult = {
+  __typename?: 'MutateEpisodeResult'
+  episode?: Maybe<Episode>
+}
+
 export type MutateProfileResult = {
   __typename?: 'MutateProfileResult'
   profile?: Maybe<Profile>
@@ -73,7 +132,6 @@ export type MutateUserResult = {
 
 export type Mutation = {
   __typename?: 'Mutation'
-  createUser: MutateUserResult
   getOrCreateCurrentUser: MutateUserResult
   updateCurrentUser: MutateUserResult
   createProfile: MutateProfileResult
@@ -82,10 +140,9 @@ export type Mutation = {
   createShow: MutateShowResult
   updateShow: MutateShowResult
   deleteShow: Scalars['Boolean']
-}
-
-export type MutationCreateUserArgs = {
-  input: CreateUserInput
+  createEpisode: MutateEpisodeResult
+  updateEpisode: MutateEpisodeResult
+  deleteEpisode: Scalars['Boolean']
 }
 
 export type MutationGetOrCreateCurrentUserArgs = {
@@ -119,6 +176,19 @@ export type MutationUpdateShowArgs = {
 }
 
 export type MutationDeleteShowArgs = {
+  id: Scalars['ID']
+}
+
+export type MutationCreateEpisodeArgs = {
+  input: CreateEpisodeInput
+}
+
+export type MutationUpdateEpisodeArgs = {
+  input: UpdateEpisodeInput
+  id: Scalars['ID']
+}
+
+export type MutationDeleteEpisodeArgs = {
   id: Scalars['ID']
 }
 
@@ -177,6 +247,8 @@ export type Query = {
   getManyProfiles: ProfilesPage
   getShow?: Maybe<Show>
   getManyShows: ShowsPage
+  getEpisode?: Maybe<Episode>
+  getManyEpisodes: EpisodesPage
 }
 
 export type QueryGetProfileArgs = {
@@ -199,6 +271,17 @@ export type QueryGetManyShowsArgs = {
   pageSize?: Maybe<Scalars['Int']>
   orderBy?: Maybe<Array<ShowsOrderBy>>
   where?: Maybe<ShowCondition>
+}
+
+export type QueryGetEpisodeArgs = {
+  id: Scalars['ID']
+}
+
+export type QueryGetManyEpisodesArgs = {
+  page?: Maybe<Scalars['Int']>
+  pageSize?: Maybe<Scalars['Int']>
+  orderBy?: Maybe<Array<EpisodesOrderBy>>
+  where?: Maybe<EpisodeCondition>
 }
 
 export type Show = {
@@ -242,6 +325,14 @@ export type ShowsPage = {
   total: Scalars['Int']
   page: Scalars['Int']
   pageCount: Scalars['Int']
+}
+
+export type UpdateEpisodeInput = {
+  title?: Maybe<Scalars['String']>
+  summary?: Maybe<Scalars['String']>
+  picture?: Maybe<Scalars['String']>
+  content?: Maybe<Scalars['JSON']>
+  showId?: Maybe<Scalars['String']>
 }
 
 export type UpdateProfileInput = {
@@ -385,29 +476,36 @@ export type DirectiveResolverFn<
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
-  CreateProfileInput: CreateProfileInput
+  CreateEpisodeInput: CreateEpisodeInput
   String: ResolverTypeWrapper<Scalars['String']>
+  CreateProfileInput: CreateProfileInput
   CreateShowInput: CreateShowInput
   CreateUserInput: CreateUserInput
   CreateUserProfileInput: CreateUserProfileInput
   DateTime: ResolverTypeWrapper<Scalars['DateTime']>
+  Episode: ResolverTypeWrapper<Episode>
+  ID: ResolverTypeWrapper<Scalars['ID']>
+  EpisodeCondition: EpisodeCondition
+  EpisodesOrderBy: EpisodesOrderBy
+  EpisodesPage: ResolverTypeWrapper<EpisodesPage>
+  Int: ResolverTypeWrapper<Scalars['Int']>
   JSON: ResolverTypeWrapper<Scalars['JSON']>
+  MutateEpisodeResult: ResolverTypeWrapper<MutateEpisodeResult>
   MutateProfileResult: ResolverTypeWrapper<MutateProfileResult>
   MutateShowResult: ResolverTypeWrapper<MutateShowResult>
   MutateUserResult: ResolverTypeWrapper<MutateUserResult>
   Mutation: ResolverTypeWrapper<{}>
-  ID: ResolverTypeWrapper<Scalars['ID']>
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>
   Profile: ResolverTypeWrapper<Profile>
   ProfileCondition: ProfileCondition
   ProfilesOrderBy: ProfilesOrderBy
   ProfilesPage: ResolverTypeWrapper<ProfilesPage>
-  Int: ResolverTypeWrapper<Scalars['Int']>
   Query: ResolverTypeWrapper<{}>
   Show: ResolverTypeWrapper<Show>
   ShowCondition: ShowCondition
   ShowsOrderBy: ShowsOrderBy
   ShowsPage: ResolverTypeWrapper<ShowsPage>
+  UpdateEpisodeInput: UpdateEpisodeInput
   UpdateProfileInput: UpdateProfileInput
   UpdateShowInput: UpdateShowInput
   UpdateUserInput: UpdateUserInput
@@ -416,27 +514,33 @@ export type ResolversTypes = ResolversObject<{
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
-  CreateProfileInput: CreateProfileInput
+  CreateEpisodeInput: CreateEpisodeInput
   String: Scalars['String']
+  CreateProfileInput: CreateProfileInput
   CreateShowInput: CreateShowInput
   CreateUserInput: CreateUserInput
   CreateUserProfileInput: CreateUserProfileInput
   DateTime: Scalars['DateTime']
+  Episode: Episode
+  ID: Scalars['ID']
+  EpisodeCondition: EpisodeCondition
+  EpisodesPage: EpisodesPage
+  Int: Scalars['Int']
   JSON: Scalars['JSON']
+  MutateEpisodeResult: MutateEpisodeResult
   MutateProfileResult: MutateProfileResult
   MutateShowResult: MutateShowResult
   MutateUserResult: MutateUserResult
   Mutation: {}
-  ID: Scalars['ID']
   Boolean: Scalars['Boolean']
   Profile: Profile
   ProfileCondition: ProfileCondition
   ProfilesPage: ProfilesPage
-  Int: Scalars['Int']
   Query: {}
   Show: Show
   ShowCondition: ShowCondition
   ShowsPage: ShowsPage
+  UpdateEpisodeInput: UpdateEpisodeInput
   UpdateProfileInput: UpdateProfileInput
   UpdateShowInput: UpdateShowInput
   UpdateUserInput: UpdateUserInput
@@ -448,10 +552,46 @@ export interface DateTimeScalarConfig
   name: 'DateTime'
 }
 
+export type EpisodeResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['Episode'] = ResolversParentTypes['Episode']
+> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  summary?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  picture?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  content?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>
+  showId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  show?: Resolver<Maybe<ResolversTypes['Show']>, ParentType, ContextType>
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}>
+
+export type EpisodesPageResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['EpisodesPage'] = ResolversParentTypes['EpisodesPage']
+> = ResolversObject<{
+  data?: Resolver<Array<ResolversTypes['Episode']>, ParentType, ContextType>
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  page?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  pageCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}>
+
 export interface JsonScalarConfig
   extends GraphQLScalarTypeConfig<ResolversTypes['JSON'], any> {
   name: 'JSON'
 }
+
+export type MutateEpisodeResultResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MutateEpisodeResult'] = ResolversParentTypes['MutateEpisodeResult']
+> = ResolversObject<{
+  episode?: Resolver<Maybe<ResolversTypes['Episode']>, ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}>
 
 export type MutateProfileResultResolvers<
   ContextType = any,
@@ -481,12 +621,6 @@ export type MutationResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
 > = ResolversObject<{
-  createUser?: Resolver<
-    ResolversTypes['MutateUserResult'],
-    ParentType,
-    ContextType,
-    RequireFields<MutationCreateUserArgs, 'input'>
-  >
   getOrCreateCurrentUser?: Resolver<
     ResolversTypes['MutateUserResult'],
     ParentType,
@@ -534,6 +668,24 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationDeleteShowArgs, 'id'>
+  >
+  createEpisode?: Resolver<
+    ResolversTypes['MutateEpisodeResult'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreateEpisodeArgs, 'input'>
+  >
+  updateEpisode?: Resolver<
+    ResolversTypes['MutateEpisodeResult'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationUpdateEpisodeArgs, 'input' | 'id'>
+  >
+  deleteEpisode?: Resolver<
+    ResolversTypes['Boolean'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteEpisodeArgs, 'id'>
   >
 }>
 
@@ -608,6 +760,18 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryGetManyShowsArgs, never>
   >
+  getEpisode?: Resolver<
+    Maybe<ResolversTypes['Episode']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryGetEpisodeArgs, 'id'>
+  >
+  getManyEpisodes?: Resolver<
+    ResolversTypes['EpisodesPage'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryGetManyEpisodesArgs, never>
+  >
 }>
 
 export type ShowResolvers<
@@ -652,7 +816,10 @@ export type UserResolvers<
 
 export type Resolvers<ContextType = any> = ResolversObject<{
   DateTime?: GraphQLScalarType
+  Episode?: EpisodeResolvers<ContextType>
+  EpisodesPage?: EpisodesPageResolvers<ContextType>
   JSON?: GraphQLScalarType
+  MutateEpisodeResult?: MutateEpisodeResultResolvers<ContextType>
   MutateProfileResult?: MutateProfileResultResolvers<ContextType>
   MutateShowResult?: MutateShowResultResolvers<ContextType>
   MutateUserResult?: MutateUserResultResolvers<ContextType>

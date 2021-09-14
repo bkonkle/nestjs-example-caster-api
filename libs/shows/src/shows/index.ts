@@ -5,5 +5,6 @@ export * from './show.roles'
 export * from './show.rules'
 export * from './shows.module'
 export * from './shows.resolver'
+export * from './shows.service'
 
 export * as ShowRoles from './show.roles'
