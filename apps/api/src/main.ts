@@ -1,11 +1,10 @@
 import bodyParser from 'body-parser'
 import chalk from 'chalk'
+import morgan from 'morgan'
 import {INestApplication, ValidationPipe, Logger} from '@nestjs/common'
 import {NestFactory} from '@nestjs/core'
 
 import {AppModule} from './app.module'
-
-const APP_NAME = 'Caster'
 
 export async function init(): Promise<INestApplication> {
   const {NODE_ENV} = process.env
@@ -14,6 +13,13 @@ export async function init(): Promise<INestApplication> {
 
   const environment = NODE_ENV || 'production'
   const isDev = environment === 'development'
+  const isTest = environment === 'test'
+
+  if (isDev) {
+    app.use(morgan('dev'))
+  } else if (!isTest) {
+    app.use(morgan('combined'))
+  }
 
   app.use(bodyParser.json({limit: '50mb'}))
   app.enableCors()
@@ -29,20 +35,20 @@ async function bootstrap(): Promise<void> {
 
   const port = PORT || '3000'
 
+  const logger = new Logger('Caster')
+
   app.startAllMicroservices()
 
   await app.listen(Number(port), () => {
-    Logger.log(
+    logger.log(
       chalk.cyan(
-        `${chalk.yellow(`[${APP_NAME}]`)} started at: ${chalk.green(
-          `http://localhost:${chalk.yellow(port)}`
-        )}`
+        `Started at: ${chalk.green(`http://localhost:${chalk.yellow(port)}`)}`
       )
     )
 
-    Logger.log(
+    logger.log(
       chalk.cyan(
-        `${chalk.yellow('[GraphQL]')} available at: ${chalk.green(
+        `GraphQL at: ${chalk.green(
           `http://localhost:${chalk.yellow(port)}/graphql`
         )}`
       )

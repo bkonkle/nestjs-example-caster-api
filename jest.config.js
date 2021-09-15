@@ -8,5 +8,6 @@ module.exports = {
     '<rootDir>/libs/authz',
     '<rootDir>/libs/authn',
     '<rootDir>/libs/roles',
+    '<rootDir>/libs/events',
   ],
 }

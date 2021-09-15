@@ -22,10 +22,16 @@
     "api": {
       "tags": []
     },
+    "web": {
+      "tags": []
+    },
     "authn": {
       "tags": []
     },
     "authz": {
+      "tags": []
+    },
+    "events": {
       "tags": []
     },
     "graphql": {

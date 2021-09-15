@@ -21,6 +21,9 @@ import {
 } from '@caster/shows'
 import {AbilityModule} from '@caster/authz'
 import {RolesModule} from '@caster/roles'
+import {EventsModule} from '@caster/events'
+
+import {AppController} from './app.controller'
 
 const env = process.env.NODE_ENV || 'production'
 const isDev = env === 'development'
@@ -48,6 +51,7 @@ const isTest = env === 'test'
     ProfilesModule,
     ShowsModule,
     EpisodesModule,
+    EventsModule,
     AbilityModule.forRoot({
       rules: [UserRules, ProfileRules, ShowRules, EpisodeRules],
     }),
@@ -57,5 +61,6 @@ const isTest = env === 'test'
     }),
   ],
   providers: [Logger],
+  controllers: [AppController],
 })
 export class AppModule {}
