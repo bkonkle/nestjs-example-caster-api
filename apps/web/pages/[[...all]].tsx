@@ -12,8 +12,6 @@ import {
 
 import Layout from '../components/Layout'
 
-const DEFAULT_EPISODE_ID = '123'
-
 export const Index = () => {
   const [loaded, setLoaded] = useState<boolean>(false)
   const [socket, setSocket] = useState<Socket>()
@@ -41,7 +39,7 @@ export const Index = () => {
         console.log('[socket] connected')
 
         const event: ClientRegister = {
-          episodeId: episodeId || DEFAULT_EPISODE_ID,
+          episodeId,
         }
 
         ws.emit(EventTypes.ClientRegister, event)
@@ -66,16 +64,24 @@ export const Index = () => {
   }, [loaded, episodeId, setSocket])
 
   const sendMessage: MouseEventHandler<HTMLButtonElement> = (_event) => {
-    if (socket) {
-      const event: MessageSend = {
-        episodeId: episodeId || DEFAULT_EPISODE_ID,
-        text: 'Sending Message',
-      }
-
-      socket.emit(EventTypes.MessageSend, event)
-    } else {
+    if (!socket) {
       console.error('No socket initialized')
+
+      return
     }
+
+    if (!episodeId) {
+      console.error('No episodeId selected')
+
+      return
+    }
+
+    const event: MessageSend = {
+      episodeId,
+      text: 'Sending Message',
+    }
+
+    socket.emit(EventTypes.MessageSend, event)
   }
 
   return (

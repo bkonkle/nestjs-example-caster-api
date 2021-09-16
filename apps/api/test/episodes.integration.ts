@@ -40,7 +40,7 @@ describe('Episodes', () => {
   const {credentials, altCredentials} = OAuth2.init()
   const prisma = new PrismaService()
 
-  const tables = ['User', 'Profile', 'Episode']
+  const tables = ['User', 'Profile', 'Show', 'Episode']
 
   const createEpisode = (input: CreateEpisodeInput) =>
     prisma.episode.create({
