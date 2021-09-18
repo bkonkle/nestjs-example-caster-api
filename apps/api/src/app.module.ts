@@ -51,7 +51,7 @@ const isTest = env === 'test'
     ProfilesModule,
     ShowsModule,
     EpisodesModule,
-    EventsModule,
+    EventsModule.forRoot(),
     AbilityModule.forRoot({
       rules: [UserRules, ProfileRules, ShowRules, EpisodeRules],
     }),

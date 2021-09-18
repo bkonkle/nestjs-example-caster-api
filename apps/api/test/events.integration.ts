@@ -27,8 +27,7 @@ describe('Events', () => {
   let show: Show
   let episode: Episode
 
-  // @ts-expect-error - Needs to exist, but isn't used
-  let _profile: Profile
+  let profile: Profile
   // @ts-expect-error - Needs to exist, but isn't used
   let _otherProfile: Profile
 
@@ -85,7 +84,7 @@ describe('Events', () => {
 
     user = await prisma.user.create({data: {username, isActive: true}})
 
-    _profile = await prisma.profile.create({
+    profile = await prisma.profile.create({
       include: {user: true},
       data: ProfileFactory.makeCreateInput({userId: user.id}),
     })
@@ -120,7 +119,10 @@ describe('Events', () => {
 
   describe('Event: ClientRegister', () => {
     it('handles the event', async () => {
-      clientSocket.emit(EventTypes.ClientRegister, {episodeId: episode.id})
+      clientSocket.emit(EventTypes.ClientRegister, {
+        episodeId: episode.id,
+        profileId: profile.id,
+      })
 
       await delay(200)
     })

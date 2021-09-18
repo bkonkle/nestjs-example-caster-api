@@ -1,4 +1,4 @@
-import {DynamicModule, Module} from '@nestjs/common'
+import {DynamicModule, Global, Module} from '@nestjs/common'
 
 import {config} from './config.default'
 import {Config} from './config.types'
@@ -8,6 +8,7 @@ const defaultProvider = {
   useValue: config,
 }
 
+@Global()
 @Module({
   providers: [defaultProvider],
   exports: [defaultProvider],
