@@ -19,7 +19,7 @@ import {
   EpisodesModule,
   EpisodeRules,
 } from '@caster/shows'
-import {AbilityModule} from '@caster/authz'
+import {AuthzModule} from '@caster/authz'
 import {RolesModule} from '@caster/roles'
 import {EventsModule} from '@caster/events'
 
@@ -47,18 +47,18 @@ const isTest = env === 'test'
       autoSchemaFile: join(process.cwd(), 'schema.graphql'),
       context: ({req}) => ({req}),
     }),
-    UsersModule,
-    ProfilesModule,
-    ShowsModule,
-    EpisodesModule,
     EventsModule.forRoot(),
-    AbilityModule.forRoot({
+    AuthzModule.forRoot({
       rules: [UserRules, ProfileRules, ShowRules, EpisodeRules],
     }),
     RolesModule.forRoot({
       roles: [...ShowRoles.roles],
       permissions: [...ShowRoles.permissions],
     }),
+    UsersModule,
+    ProfilesModule,
+    ShowsModule,
+    EpisodesModule,
   ],
   providers: [Logger],
   controllers: [AppController],

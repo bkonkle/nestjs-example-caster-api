@@ -21,7 +21,7 @@ describe('EpisodeRules', () => {
     rules = testModule.get(EpisodeRules)
   })
 
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks()
   })
 

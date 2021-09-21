@@ -9,8 +9,7 @@ import {
 import {Logger} from '@nestjs/common'
 import {Socket} from 'socket.io'
 
-import {AppAbility} from '@caster/authz'
-import {Ability} from '@caster/users'
+import {Censor, CensorFields} from '@caster/authz'
 
 import {ClientRegister, EventTypes} from './event.types'
 import {ChannelService} from './channel.service'
@@ -24,10 +23,10 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection {
   @SubscribeMessage(EventTypes.ClientRegister)
   async clientRegister(
     @MessageBody() event: ClientRegister,
-    @Ability() ability: AppAbility,
+    @Censor() censor: CensorFields,
     @ConnectedSocket() socket: Socket
   ) {
-    this.service.registerClient(event, ability, socket)
+    this.service.registerClient(event, censor, socket)
   }
 
   @SubscribeMessage(EventTypes.MessageSend)

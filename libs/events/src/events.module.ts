@@ -1,6 +1,7 @@
 import {ConsoleLogger, DynamicModule, Logger, Module} from '@nestjs/common'
 import Redis from 'ioredis'
 
+import {ProfilesModule} from '@caster/users'
 import {Config} from '@caster/utils'
 
 import {EventsGateway} from './events.gateway'
@@ -12,6 +13,7 @@ export interface EventsOptions {
 }
 
 @Module({
+  imports: [ProfilesModule],
   providers: [
     {provide: Logger, useClass: ConsoleLogger},
     EventsGateway,

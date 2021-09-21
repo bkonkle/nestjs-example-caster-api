@@ -30,7 +30,7 @@ describe('ShowRules', () => {
     rules = testModule.get(ShowRules)
   })
 
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks()
   })
 

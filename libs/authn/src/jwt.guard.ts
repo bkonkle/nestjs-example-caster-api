@@ -1,12 +1,14 @@
 import {ExecutionContext, Injectable, Optional} from '@nestjs/common'
 import {Reflector} from '@nestjs/core'
-import {GqlExecutionContext} from '@nestjs/graphql'
 import {AuthGuard, AuthModuleOptions} from '@nestjs/passport'
 import {isObservable} from 'rxjs'
 
-import {AllowAnonymousMetadata, ALLOW_ANONYMOUS} from './jwt.decorators'
-import {JWT, JwtContext} from './jwt.types'
+import {getRequest} from './authn.utils'
+import {JWT, JwtRequest} from './jwt.types'
 
+/**
+ * Extends the JWT AuthGuard to allow anonymous requests and move the annotation to req.jwt.
+ */
 @Injectable()
 export class JwtGuard extends AuthGuard('jwt') {
   constructor(
@@ -16,20 +18,12 @@ export class JwtGuard extends AuthGuard('jwt') {
     super(options)
   }
 
-  getRequest(context: ExecutionContext) {
-    const ctx = GqlExecutionContext.create(context)
-
-    return ctx.getContext<JwtContext>().req
+  getRequest(context: ExecutionContext): JwtRequest {
+    return getRequest(context)
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const canActivate = super.canActivate(context)
-
-    const allowAnonymous =
-      this.reflector.getAllAndOverride<AllowAnonymousMetadata>(
-        ALLOW_ANONYMOUS,
-        [context.getHandler(), context.getClass()]
-      )
 
     // The canActivate method needs to be run in order to annotate the `user` property on the
     // request, but we need to intercept failures in order to allow anonymous requests.
@@ -39,15 +33,11 @@ export class JwtGuard extends AuthGuard('jwt') {
         ? await canActivate.toPromise()
         : await canActivate
     } catch (error) {
-      if (allowAnonymous) {
-        return true
-      }
-
-      throw error
+      return true
     }
 
     if (!success) {
-      return allowAnonymous
+      return true
     }
 
     const request = this.getRequest(context)

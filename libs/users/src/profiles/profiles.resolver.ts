@@ -3,12 +3,16 @@ import {ForbiddenException, NotFoundException, UseGuards} from '@nestjs/common'
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {subject} from '@casl/ability'
 
-import {AllowAnonymous} from '@caster/authn'
-import {AppAbility, censorFields} from '@caster/authz'
+import {
+  Ability,
+  AllowAnonymous,
+  AppAbility,
+  AuthzGuard,
+  Censor,
+  CensorFields,
+} from '@caster/authz'
 import {fromOrderByInput} from '@caster/utils'
 
-import {Ability} from '../users/user.decorators'
-import {UserGuard} from '../users/user.guard'
 import {Profile as ProfileModel} from './profile.model'
 import {ProfilesService} from './profiles.service'
 import {fieldOptions, fromProfileCondition} from './profile.utils'
@@ -24,7 +28,7 @@ import {
 } from './profile-mutations.model'
 
 @Resolver(() => ProfileModel)
-@UseGuards(UserGuard)
+@UseGuards(AuthzGuard)
 export class ProfilesResolver {
   constructor(private readonly service: ProfilesService) {}
 
@@ -32,22 +36,21 @@ export class ProfilesResolver {
   @AllowAnonymous()
   async getProfile(
     @Args('id', {type: () => ID}) id: string,
-    @Ability() ability: AppAbility
+    @Censor() censor: CensorFields
   ): Promise<ProfileModel | undefined> {
     const profile = await this.service.get(id)
 
     if (profile) {
-      return censorFields(subject('Profile', profile), {
-        ability,
-        fieldOptions,
-      })
+      const result = censor(subject('Profile', profile), fieldOptions)
+
+      return result
     }
   }
 
   @Query(() => ProfilesPage)
   @AllowAnonymous()
   async getManyProfiles(
-    @Ability() ability: AppAbility,
+    @Censor() censor: CensorFields,
     @Args('where', {nullable: true}) where?: ProfileCondition,
     @Args('orderBy', {nullable: true, type: () => [ProfilesOrderBy]})
     orderBy?: ProfilesOrderBy[],
@@ -62,10 +65,7 @@ export class ProfilesResolver {
     })
 
     const permitted = data.map((profile) =>
-      censorFields(subject('Profile', profile), {
-        ability,
-        fieldOptions,
-      })
+      censor(subject('Profile', profile), fieldOptions)
     )
 
     return {...rest, data: permitted}
@@ -76,7 +76,11 @@ export class ProfilesResolver {
     @Args('input') input: CreateProfileInput,
     @Ability() ability: AppAbility
   ): Promise<MutateProfileResult> {
-    if (!ability.can('create', subject('Profile', input as Profile))) {
+    const condition = ability.can(
+      'create',
+      subject('Profile', input as Profile)
+    )
+    if (!condition) {
       throw new ForbiddenException()
     }
 

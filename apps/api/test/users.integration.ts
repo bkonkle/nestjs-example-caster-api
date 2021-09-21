@@ -385,7 +385,7 @@ describe('Users', () => {
       ])
     })
 
-    it('requires authorization', async () => {
+    it('requires a valid user record', async () => {
       const {token} = credentials
       const variables = {
         input: {isActive: false},
@@ -402,14 +402,10 @@ describe('Users', () => {
 
       expect(body).toHaveProperty('errors', [
         expect.objectContaining({
-          message: 'Forbidden resource',
+          message: 'Unauthorized',
           extensions: {
-            code: 'FORBIDDEN',
-            response: {
-              error: 'Forbidden',
-              message: 'Forbidden resource',
-              statusCode: 403,
-            },
+            code: 'UNAUTHENTICATED',
+            response: {message: 'Unauthorized', statusCode: 401},
           },
         }),
       ])

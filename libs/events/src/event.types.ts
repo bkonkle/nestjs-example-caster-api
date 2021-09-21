@@ -1,7 +1,7 @@
 import {Redis} from 'ioredis'
 import {Socket} from 'socket.io'
 
-import {AppAbility} from '@caster/authz'
+import {CensorFields} from '@caster/authz'
 import {ProfileWithUser} from '@caster/users'
 import {InjectionToken} from '@caster/utils'
 
@@ -46,6 +46,6 @@ export interface ChatMessage {
 
 export interface MessageContext {
   episodeId: string
-  ability: AppAbility
+  censor: CensorFields
   socket: Socket
 }

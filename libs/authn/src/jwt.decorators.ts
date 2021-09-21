@@ -1,7 +1,6 @@
 import {
   createParamDecorator,
   ExecutionContext,
-  SetMetadata,
   UnauthorizedException,
 } from '@nestjs/common'
 import {GqlExecutionContext} from '@nestjs/graphql'
@@ -71,12 +70,3 @@ export const Username = createParamDecorator(
     return username
   }
 )
-
-/**
- * Set metadata indicating that this route should be public.
- */
-export const ALLOW_ANONYMOUS = 'auth:allow-anonymous'
-export type AllowAnonymousMetadata = boolean
-
-export const AllowAnonymous = () =>
-  SetMetadata<string, AllowAnonymousMetadata>(ALLOW_ANONYMOUS, true)

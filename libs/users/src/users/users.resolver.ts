@@ -1,6 +1,10 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {ForbiddenException, UseGuards} from '@nestjs/common'
 
+import {Username} from '@caster/authn'
+import {AllowAnonymous} from '@caster/authz/authz.decorators'
+import {AuthzGuard} from '@caster/authz/authz.guard'
+
 import {User} from './user.model'
 import {
   CreateUserInput,
@@ -8,12 +12,10 @@ import {
   UpdateUserInput,
 } from './user-input.model'
 import {UsersService} from './users.service'
-import {UserGuard} from './user.guard'
-import {AllowAnonymous, Username} from '@caster/authn'
 import {RequestUser} from './user.decorators'
 
 @Resolver(() => User)
-@UseGuards(UserGuard)
+@UseGuards(AuthzGuard)
 export class UsersResolver {
   constructor(private readonly service: UsersService) {}
 

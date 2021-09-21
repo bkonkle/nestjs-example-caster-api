@@ -62,7 +62,7 @@ describe('EpisodesResolver', () => {
     resolver = testModule.get(EpisodesResolver)
   })
 
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks()
   })
 

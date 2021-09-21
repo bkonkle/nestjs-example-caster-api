@@ -1,22 +1,30 @@
-import {ExecutionContext, Optional} from '@nestjs/common'
+import {
+  ExecutionContext,
+  forwardRef,
+  Inject,
+  Injectable,
+  Optional,
+  UnauthorizedException,
+} from '@nestjs/common'
 import {Reflector} from '@nestjs/core'
 import {AuthModuleOptions} from '@nestjs/passport'
 
+import {JwtGuard, getUsername} from '@caster/authn'
+import {UsersService} from '@caster/users/users/users.service'
+
+import {AbilityFactory} from './ability.factory'
 import {
   ALLOW_ANONYMOUS,
   AllowAnonymousMetadata,
-  JwtGuard,
-  getUsername,
-} from '@caster/authn'
-import {AbilityFactory} from '@caster/authz'
+  CensorFields,
+} from './authz.types'
+import {censorFields, getRequest} from './authz.utils'
 
-import {UsersService} from './users.service'
-import {UserContext} from './user.types'
-import {GqlExecutionContext} from '@nestjs/graphql'
-
-export class UserGuard extends JwtGuard {
+@Injectable()
+export class AuthzGuard extends JwtGuard {
   constructor(
     protected readonly reflector: Reflector,
+    @Inject(forwardRef(() => UsersService))
     private readonly users: UsersService,
     private readonly ability: AbilityFactory,
     @Optional() protected readonly options?: AuthModuleOptions
@@ -25,9 +33,7 @@ export class UserGuard extends JwtGuard {
   }
 
   getRequest(context: ExecutionContext) {
-    const ctx = GqlExecutionContext.create(context)
-
-    return ctx.getContext<UserContext>().req
+    return getRequest(context)
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -43,11 +49,12 @@ export class UserGuard extends JwtGuard {
       if (allowAnonymous) {
         // Annotate an anonymous ability on the request
         request.ability = await this.ability.createForUser()
+        request.censor = censorFields(request.ability) as CensorFields
 
         return true
       }
 
-      return false
+      throw new UnauthorizedException()
     }
 
     // Should annotate the `jwt` on the request if available
@@ -72,6 +79,9 @@ export class UserGuard extends JwtGuard {
     // Annotate the user object and the user's abilities on the request
     request.user = user
     request.ability = await this.ability.createForUser(user)
+
+    // Annotate the censor function based on the ability
+    request.censor = censorFields(request.ability) as CensorFields
 
     return true
   }

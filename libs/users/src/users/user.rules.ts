@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common'
 
-import {Action, RuleBuilder, RuleEnhancer} from '@caster/authz'
+import {Action, RuleBuilder, RuleEnhancer} from '@caster/authz/authz.types'
 
 import {UserWithProfile} from './user.types'
 

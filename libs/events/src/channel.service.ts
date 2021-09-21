@@ -12,7 +12,7 @@ import {
   MessageReceive,
   IoRedis,
 } from './event.types'
-import {AppAbility, censorFields} from '@caster/authz'
+import {CensorFields} from '@caster/authz'
 import {subject} from '@casl/ability'
 
 export class ChannelService {
@@ -25,10 +25,10 @@ export class ChannelService {
 
   registerClient = async (
     event: ClientRegister,
-    ability: AppAbility,
+    censor: CensorFields,
     socket: Socket
   ): Promise<void> => {
-    const context = {episodeId: event.episodeId, ability, socket}
+    const context = {episodeId: event.episodeId, censor, socket}
 
     this.redis.on('message', this.handleMessage(context))
 
@@ -55,7 +55,7 @@ export class ChannelService {
       channel: string | Buffer,
       message: string | Buffer
     ): Promise<void> => {
-      const {episodeId, ability, socket} = context
+      const {episodeId, censor, socket} = context
       const {text, sender}: Partial<ChatMessage> = JSON.parse(`${message}`)
 
       const senderProfile =
@@ -77,10 +77,10 @@ export class ChannelService {
         return
       }
 
-      const censoredSender = censorFields(subject('Profile', senderProfile), {
-        ability,
-        fieldOptions,
-      })
+      const censoredSender = censor(
+        subject('Profile', senderProfile),
+        fieldOptions
+      )
 
       const receiveEvent: MessageReceive = {
         episodeId,

@@ -6,10 +6,11 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
+import {subject} from '@casl/ability'
 
-import {AllowAnonymous} from '@caster/authn'
+import {AllowAnonymous, Ability, AppAbility, AuthzGuard} from '@caster/authz'
 import {RolesService} from '@caster/roles'
-import {Ability, RequestUser, UserWithProfile, UserGuard} from '@caster/users'
+import {RequestUser, UserWithProfile} from '@caster/users'
 import {fromOrderByInput} from '@caster/utils'
 
 import {Show as ShowModel} from './show.model'
@@ -22,11 +23,9 @@ import {
   UpdateShowInput,
   MutateShowResult,
 } from './show-mutations.model'
-import {AppAbility} from '@caster/authz'
-import {subject} from '@casl/ability'
 
 @Resolver(() => ShowModel)
-@UseGuards(UserGuard)
+@UseGuards(AuthzGuard)
 export class ShowsResolver {
   constructor(
     private readonly service: ShowsService,

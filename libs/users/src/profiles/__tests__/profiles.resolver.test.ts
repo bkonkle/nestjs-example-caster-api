@@ -1,13 +1,13 @@
 import faker from 'faker'
+import {subject} from '@casl/ability'
 import {Test} from '@nestjs/testing'
-import {mockDeep} from 'jest-mock-extended'
-import omit from 'lodash/omit'
+import {mockFn, mockDeep} from 'jest-mock-extended'
 
-import {AbilityFactory, AbilityModule, AppAbility} from '@caster/authz'
+import {AppAbility, CensorFields} from '@caster/authz'
+import {AuthzTestModule} from '@caster/authz/authz-test.module'
 
 import {ProfileFactory, UserFactory} from '../../../test/factories'
 import {UserWithProfile} from '../../users/user.types'
-import {UserRules} from '../../users/user.rules'
 import {
   CreateProfileInput,
   UpdateProfileInput,
@@ -15,13 +15,10 @@ import {
 import {ProfileCondition, ProfilesOrderBy} from '../profile-queries.model'
 import {ProfilesResolver} from '../profiles.resolver'
 import {ProfilesService} from '../profiles.service'
-import {ProfileWithUser} from '../profile.utils'
-import {ProfileRules} from '../profile.rules'
+import {ProfileWithUser, fieldOptions} from '../profile.utils'
 
 describe('ProfilesResolver', () => {
   let resolver: ProfilesResolver
-  let ability: AppAbility
-  let otherAbility: AppAbility
 
   const service = mockDeep<ProfilesService>()
 
@@ -29,6 +26,8 @@ describe('ProfilesResolver', () => {
   const email = 'test@email.com'
 
   const user = UserFactory.make({username}) as UserWithProfile
+  const ability = mockDeep<AppAbility>()
+  const censor = mockFn<CensorFields>()
 
   const otherUser = {
     ...user,
@@ -44,7 +43,7 @@ describe('ProfilesResolver', () => {
 
   beforeAll(async () => {
     const testModule = await Test.createTestingModule({
-      imports: [AbilityModule.forRoot({rules: [UserRules, ProfileRules]})],
+      imports: [AuthzTestModule],
       providers: [
         {provide: ProfilesService, useValue: service},
         ProfilesResolver,
@@ -52,41 +51,36 @@ describe('ProfilesResolver', () => {
     }).compile()
 
     resolver = testModule.get(ProfilesResolver)
-
-    const abilityFactory = testModule.get(AbilityFactory)
-
-    ability = await abilityFactory.createForUser(user)
-    otherAbility = await abilityFactory.createForUser(otherUser)
-
-    jest.spyOn(ability, 'can')
-    jest.spyOn(ability, 'cannot')
   })
 
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks()
   })
 
   describe('getProfile()', () => {
     it('uses the ProfilesService to find the Profiles by username', async () => {
       service.get.mockResolvedValueOnce(profile)
+      censor.mockReturnValueOnce(subject('Profile', profile))
 
-      const result = await resolver.getProfile(profile.id, ability)
+      const result = await resolver.getProfile(profile.id, censor)
 
       expect(service.get).toBeCalledTimes(1)
       expect(service.get).toBeCalledWith(profile.id)
+
+      expect(censor).toBeCalledTimes(1)
+      expect(censor).toBeCalledWith(profile, fieldOptions)
 
       expect(result).toEqual(profile)
     })
 
     it('censors the results for unauthorized users', async () => {
       service.get.mockResolvedValueOnce(profile)
+      censor.mockReturnValueOnce(subject('Profile', profile))
 
-      const result = await resolver.getProfile(profile.id, otherAbility)
+      await resolver.getProfile(profile.id, censor)
 
       expect(service.get).toBeCalledTimes(1)
-      expect(service.get).toBeCalledWith(profile.id)
-
-      expect(result).toEqual(omit(profile, ['email', 'userId', 'user']))
+      expect(censor).toBeCalledTimes(1)
     })
   })
 
@@ -104,9 +98,10 @@ describe('ProfilesResolver', () => {
       }
 
       service.getMany.mockResolvedValueOnce(expected)
+      censor.mockReturnValueOnce(subject('Profile', profile))
 
       const result = await resolver.getManyProfiles(
-        ability,
+        censor,
         where,
         orderBy,
         undefined,
@@ -120,6 +115,9 @@ describe('ProfilesResolver', () => {
           id: 'asc',
         },
       })
+
+      expect(censor).toBeCalledTimes(1)
+      expect(censor).toBeCalledWith(profile, fieldOptions)
 
       expect(result).toEqual(expected)
     })
@@ -138,13 +136,14 @@ describe('ProfilesResolver', () => {
 
       const expected = {
         ...profiles,
-        data: [omit(profile, ['email', 'userId', 'user'])],
+        data: [profile],
       }
 
       service.getMany.mockResolvedValueOnce(profiles)
+      censor.mockReturnValueOnce(subject('Profile', profile))
 
       const result = await resolver.getManyProfiles(
-        otherAbility,
+        censor,
         where,
         orderBy,
         undefined,
@@ -152,6 +151,7 @@ describe('ProfilesResolver', () => {
       )
 
       expect(service.getMany).toBeCalledTimes(1)
+      expect(censor).toBeCalledTimes(1)
 
       expect(result).toEqual(expected)
     })
@@ -161,6 +161,7 @@ describe('ProfilesResolver', () => {
     it('uses the ProfilesService to create a Profile', async () => {
       const input: CreateProfileInput = {email, userId: user.id}
 
+      ability.can.mockReturnValueOnce(true)
       service.create.mockResolvedValueOnce(profile)
 
       const result = await resolver.createProfile(input, ability)
@@ -190,6 +191,7 @@ describe('ProfilesResolver', () => {
     it('uses the ProfilesService to update an existing Profile', async () => {
       const input: UpdateProfileInput = {displayName: 'Test Display Name'}
 
+      ability.can.mockReturnValueOnce(true)
       service.get.mockResolvedValueOnce(profile)
       service.update.mockResolvedValueOnce(profile)
 
@@ -228,6 +230,7 @@ describe('ProfilesResolver', () => {
 
   describe('deleteProfile()', () => {
     it('uses the ProfilesService to remove an existing Profile', async () => {
+      ability.can.mockReturnValueOnce(true)
       service.get.mockResolvedValueOnce(profile)
 
       const result = await resolver.deleteProfile(profile.id, ability)
