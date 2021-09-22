@@ -1,7 +1,7 @@
 import {ExecutionContext, InternalServerErrorException} from '@nestjs/common'
 import {GqlExecutionContext} from '@nestjs/graphql'
 
-import {JwtRequest, JwtContext} from './jwt.types'
+import {JwtRequest, JwtContext} from './authn.types'
 
 /**
  * Get the Request from the ExecutionContext in either GraphQL or REST contexts.
@@ -13,7 +13,6 @@ export const getRequest = (context: ExecutionContext): JwtRequest => {
   }
 
   const gqlCtx: JwtContext = GqlExecutionContext.create(context).getContext()
-
   if (gqlCtx.req) {
     return gqlCtx.req
   }

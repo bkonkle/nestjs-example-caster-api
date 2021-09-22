@@ -7,12 +7,12 @@ import {range} from 'lodash'
 import supertest from 'supertest'
 import {URL} from 'url'
 
+import {EventTypes} from '@caster/events'
 import {dbCleaner, OAuth2} from '@caster/utils/test'
 import {EpisodeFactory, ShowFactory} from '@caster/shows/test'
 import {ProfileFactory} from '@caster/users/test'
 
 import {AppModule} from '../src/app.module'
-import {EventTypes} from '@caster/events'
 
 const delay = async (timeout: number) =>
   new Promise((resolve) => setTimeout(resolve, timeout))
@@ -52,6 +52,9 @@ describe('Events', () => {
     const {port} = new URL(test.url)
 
     clientSocket = io(`http://localhost:${port}`, {
+      extraHeaders: {
+        Authorization: `Bearer ${credentials.token}`,
+      },
       transports: ['websocket'],
       path: '/socket.io/',
     })
@@ -124,7 +127,7 @@ describe('Events', () => {
         profileId: profile.id,
       })
 
-      await delay(200)
+      await delay(1000)
     })
   })
 })

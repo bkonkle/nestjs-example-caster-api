@@ -6,15 +6,16 @@ import {
   SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets'
-import {Logger} from '@nestjs/common'
+import {Logger, UseGuards} from '@nestjs/common'
 import {Socket} from 'socket.io'
 
-import {Censor, CensorFields} from '@caster/authz'
+import {AuthzGuard, Censor, CensorFields} from '@caster/authz'
 
 import {ClientRegister, EventTypes} from './event.types'
 import {ChannelService} from './channel.service'
 
 @WebSocketGateway()
+@UseGuards(AuthzGuard)
 export class EventsGateway implements OnGatewayInit, OnGatewayConnection {
   private readonly logger = new Logger(EventsGateway.name)
 

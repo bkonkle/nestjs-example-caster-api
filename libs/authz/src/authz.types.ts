@@ -5,6 +5,9 @@ import {PrismaAbility, Subjects} from '@casl/prisma'
 
 import {JwtContext, JwtRequest} from '@caster/authn'
 import {InjectionToken} from '@caster/utils'
+
+// Deep import used to avoid circular dependencies
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import {UserWithProfile} from '@caster/users/users/user.types'
 
 /**
@@ -53,7 +56,7 @@ export const Rules: InjectionToken<RuleEnhancer[]> = 'AUTHZ_CASL_RULES'
  * Custom JWT Request and Context objects with the metadata added to the Request.
  */
 
-export interface AuthRequest extends JwtRequest {
+export type AuthRequest = JwtRequest & {
   user?: UserWithProfile
   ability?: AppAbility
   censor?: <T extends AppSubjects>(

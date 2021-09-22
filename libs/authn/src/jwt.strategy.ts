@@ -5,7 +5,7 @@ import {passportJwtSecret} from 'jwks-rsa'
 
 import {Config} from '@caster/utils'
 
-import {JWT} from './jwt.types'
+import {JWT} from './authn.types'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

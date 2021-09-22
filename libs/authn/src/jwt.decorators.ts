@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common'
 import {GqlExecutionContext} from '@nestjs/graphql'
 
-import {JWT, JwtContext, JwtRequest} from './jwt.types'
+import {JWT, JwtContext, JwtRequest} from './authn.types'
 
 const getRequest = (ctx: ExecutionContext): JwtRequest => {
   const context = GqlExecutionContext.create(ctx)

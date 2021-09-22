@@ -10,6 +10,9 @@ import {Reflector} from '@nestjs/core'
 import {AuthModuleOptions} from '@nestjs/passport'
 
 import {JwtGuard, getUsername} from '@caster/authn'
+
+// Deep import used to avoid circular dependencies
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import {UsersService} from '@caster/users/users/users.service'
 
 import {AbilityFactory} from './ability.factory'

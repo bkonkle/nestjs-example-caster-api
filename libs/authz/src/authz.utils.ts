@@ -36,7 +36,6 @@ export const getRequest = (context: ExecutionContext): AuthRequest => {
   }
 
   const gqlCtx: AuthContext = GqlExecutionContext.create(context).getContext()
-
   if (gqlCtx.req) {
     return gqlCtx.req
   }
