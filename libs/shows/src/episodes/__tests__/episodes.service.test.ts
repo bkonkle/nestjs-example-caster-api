@@ -3,8 +3,8 @@ import {Episode as PrismaEpisode} from '@prisma/client'
 import {mockDeep} from 'jest-mock-extended'
 import {PrismaService} from 'nestjs-prisma'
 
-import * as ShowFactory from '../../../test/factories/show.factory'
-import * as EpisodeFactory from '../../../test/factories/episodes.factory'
+import {ShowFactory} from '../../../test/factories/show.factory'
+import {EpisodeFactory} from '../../../test/factories/episodes.factory'
 import {
   CreateEpisodeInput,
   UpdateEpisodeInput,

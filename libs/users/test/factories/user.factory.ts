@@ -20,4 +20,4 @@ export const make = (overrides?: Partial<User> | null): User => ({
   ...overrides,
 })
 
-export default {make, makeCreateInput}
+export const UserFactory = {make, makeCreateInput}

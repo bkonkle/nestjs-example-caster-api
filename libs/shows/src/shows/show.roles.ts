@@ -28,8 +28,6 @@ export const ManageRoles: Permission = {
   description: 'Grant or revoke User Roles for a particular Show',
 }
 
-export const permissions = [Update, Delete, ManageEpisodes, ManageRoles]
-
 /**
  * Roles
  */
@@ -48,4 +46,11 @@ export const Admin: Role = {
   permissions: [...Manager.permissions, Delete, ManageRoles],
 }
 
-export const roles = [Manager, Admin]
+/**
+ * Index
+ */
+
+export const ShowRoles = {
+  roles: [Manager, Admin],
+  permissions: [Update, Delete, ManageEpisodes, ManageRoles],
+}

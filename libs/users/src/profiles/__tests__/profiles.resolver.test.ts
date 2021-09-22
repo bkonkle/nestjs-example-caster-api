@@ -8,8 +8,8 @@ import {AppAbility, CensorFields} from '@caster/authz/authz.types'
 import {AuthzTestModule} from '@caster/authz/authz-test.module'
 /* eslint-enable @nrwl/nx/enforce-module-boundaries */
 
-import * as UserFactory from '../../../test/factories/user.factory'
-import * as ProfileFactory from '../../../test/factories/profile.factory'
+import {UserFactory} from '../../../test/factories/user.factory'
+import {ProfileFactory} from '../../../test/factories/profile.factory'
 import {UserWithProfile} from '../../users/user.types'
 import {
   CreateProfileInput,

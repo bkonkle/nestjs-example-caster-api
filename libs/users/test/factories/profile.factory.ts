@@ -25,4 +25,4 @@ export const make = (overrides?: Partial<Profile> | null): Profile => {
   }
 }
 
-export default {make, makeCreateInput}
+export const ProfileFactory = {make, makeCreateInput}

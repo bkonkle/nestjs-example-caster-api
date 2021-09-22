@@ -13,12 +13,12 @@ import {
   MessageSend,
 } from '@caster/events/event.types'
 import {dbCleaner} from '@caster/utils/test/prisma'
-import * as OAuth2 from '@caster/utils/test/oauth2'
+import {OAuth2} from '@caster/utils/test/oauth2'
 import {retry} from '@caster/utils/test/events'
-import * as EpisodeRoles from '@caster/shows/episodes/episode.roles'
-import * as ShowFactory from '@caster/shows/test/factories/show.factory'
-import * as EpisodeFactory from '@caster/shows/test/factories/episodes.factory'
-import * as ProfileFactory from '@caster/users/test/factories/profile.factory'
+import {Guest, Reader} from '@caster/shows/episodes/episode.roles'
+import {ShowFactory} from '@caster/shows/test/factories/show.factory'
+import {EpisodeFactory} from '@caster/shows/test/factories/episodes.factory'
+import {ProfileFactory} from '@caster/users/test/factories/profile.factory'
 
 import {AppModule} from '../src/app.module'
 
@@ -125,7 +125,7 @@ describe('Events', () => {
     await prisma.roleGrant.create({
       data: {
         profileId: profile.id,
-        roleKey: EpisodeRoles.Guest.key,
+        roleKey: Guest.key,
         subjectTable: 'Episode',
         subjectId: episode.id,
       },
@@ -285,7 +285,7 @@ describe('Events', () => {
       await prisma.roleGrant.create({
         data: {
           profileId: otherProfile.id,
-          roleKey: EpisodeRoles.Reader.key,
+          roleKey: Reader.key,
           subjectTable: 'Episode',
           subjectId: episode.id,
         },
@@ -358,7 +358,7 @@ describe('Events', () => {
       await prisma.roleGrant.create({
         data: {
           profileId: otherProfile.id,
-          roleKey: EpisodeRoles.Reader.key,
+          roleKey: Reader.key,
           subjectTable: 'Episode',
           subjectId: episode.id,
         },
@@ -448,7 +448,7 @@ describe('Events', () => {
       await prisma.roleGrant.create({
         data: {
           profileId: profile.id,
-          roleKey: EpisodeRoles.Guest.key,
+          roleKey: Guest.key,
           subjectTable: 'Episode',
           subjectId: episode.id,
         },

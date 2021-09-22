@@ -25,4 +25,4 @@ export const make = (overrides?: Partial<Show> | null): Show => {
   }
 }
 
-export default {make, makeCreateInput}
+export const ShowFactory = {make, makeCreateInput}

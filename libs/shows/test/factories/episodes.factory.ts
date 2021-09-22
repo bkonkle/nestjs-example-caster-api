@@ -26,4 +26,4 @@ export const make = (overrides?: Partial<Episode> | null): Episode => {
   }
 }
 
-export default {make, makeCreateInput}
+export const EpisodeFactory = {make, makeCreateInput}

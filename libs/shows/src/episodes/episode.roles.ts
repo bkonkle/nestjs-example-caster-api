@@ -16,8 +16,6 @@ export const ReadChat: Permission = {
   description: 'Read chat Messages for an Episode',
 }
 
-export const permissions = [Chat, ReadChat]
-
 /**
  * Roles
  */
@@ -36,4 +34,11 @@ export const Guest: Role = {
   permissions: [Chat, ReadChat],
 }
 
-export const roles = [Reader, Guest]
+/**
+ * Index
+ */
+
+export const EpisodeRoles = {
+  roles: [Reader, Guest],
+  permissions: [Chat, ReadChat],
+}

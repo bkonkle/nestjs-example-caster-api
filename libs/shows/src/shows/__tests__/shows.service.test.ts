@@ -3,7 +3,7 @@ import {Show as PrismaShow} from '@prisma/client'
 import {mockDeep} from 'jest-mock-extended'
 import {PrismaService} from 'nestjs-prisma'
 
-import * as ShowFactory from '../../../test/factories/show.factory'
+import {ShowFactory} from '../../../test/factories/show.factory'
 import {CreateShowInput, UpdateShowInput} from '../show-mutations.model'
 import {ShowsService} from '../shows.service'
 

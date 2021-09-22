@@ -80,3 +80,7 @@ export const init = (config: Config = defaultConfig) => {
     altCredentials,
   }
 }
+
+export const OAuth2 = {
+  init,
+}

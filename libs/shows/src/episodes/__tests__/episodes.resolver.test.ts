@@ -8,11 +8,11 @@ import {AppAbility} from '@caster/authz/authz.types'
 import {UserWithProfile} from '@caster/users/users/user.types'
 import {RolesService} from '@caster/roles/roles.service'
 
-import * as UserFactory from '@caster/users/test/factories/user.factory'
-import * as ProfileFactory from '@caster/users/test/factories/profile.factory'
+import {UserFactory} from '@caster/users/test/factories/user.factory'
+import {ProfileFactory} from '@caster/users/test/factories/profile.factory'
 
-import * as ShowFactory from '../../../test/factories/show.factory'
-import * as EpisodeFactory from '../../../test/factories/episodes.factory'
+import {ShowFactory} from '../../../test/factories/show.factory'
+import {EpisodeFactory} from '../../../test/factories/episodes.factory'
 import {
   CreateEpisodeInput,
   UpdateEpisodeInput,
