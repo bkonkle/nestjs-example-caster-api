@@ -1,3 +1,5 @@
+import {subject} from '@casl/ability'
+import {Message} from '@prisma/client'
 import {
   ConnectedSocket,
   MessageBody,
@@ -10,7 +12,7 @@ import {
 import {Logger, UseGuards} from '@nestjs/common'
 import {Socket} from 'socket.io'
 
-import {Censor, CensorFields} from '@caster/authz'
+import {Ability, Action, AppAbility, Censor, CensorFields} from '@caster/authz'
 import {RequestUser, UserWithProfile} from '@caster/users'
 
 import {ClientRegister, EventTypes, MessageSend} from './event.types'
@@ -27,9 +29,22 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection {
   @SubscribeMessage(EventTypes.ClientRegister)
   async clientRegister(
     @MessageBody() event: ClientRegister,
+    @Ability() ability: AppAbility,
     @Censor() censor: CensorFields,
     @ConnectedSocket() socket: Socket
   ) {
+    // Check for authorization
+    if (
+      !ability.can(
+        Action.Read,
+        subject('Message', {
+          episodeId: event.episodeId,
+        } as Message)
+      )
+    ) {
+      throw new WsException('Forbidden')
+    }
+
     try {
       await this.service.registerClient(event, censor, socket)
     } catch (error) {
@@ -40,10 +55,24 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection {
   @SubscribeMessage(EventTypes.MessageSend)
   async messageSend(
     @MessageBody() event: MessageSend,
+    @Ability() ability: AppAbility,
     @RequestUser({require: true}) user: UserWithProfile
   ) {
     if (!user.profile) {
       throw new WsException('No User Profile found')
+    }
+
+    // Check for authorization
+    if (
+      !ability.can(
+        Action.Create,
+        subject('Message', {
+          episodeId: event.episodeId,
+          profileId: user.profile.id,
+        } as Message)
+      )
+    ) {
+      throw new WsException('Forbidden')
     }
 
     try {

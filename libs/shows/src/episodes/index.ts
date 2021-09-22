@@ -1,3 +1,4 @@
+export * as EpisodeRoles from './episode.roles'
 export * from './episode-mutations.model'
 export * from './episode-queries.model'
 export * from './episode.model'

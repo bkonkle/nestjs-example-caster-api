@@ -1,4 +1,4 @@
-import {User, Profile, RoleGrant, Show, Episode} from '@prisma/client'
+import {User, Profile, RoleGrant, Show, Episode, Message} from '@prisma/client'
 import {AbilityBuilder, AbilityClass} from '@casl/ability'
 import {PermittedFieldsOptions} from '@casl/ability/extra'
 import {PrismaAbility, Subjects} from '@casl/prisma'
@@ -29,6 +29,7 @@ export type AppSubjects = Subjects<{
   RoleGrant: RoleGrant
   Show: Show
   Episode: Episode
+  Message: Message
 }>
 
 export type AppAbility = PrismaAbility<[string, AppSubjects]>

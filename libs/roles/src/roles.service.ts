@@ -89,7 +89,11 @@ export class RolesService {
     subject: RoleSubject
   ): Promise<Role[]> => {
     const grants = await this.prisma.roleGrant.findMany({
-      where: {profileId, subjectId: subject.id, subjectTable: subject.table},
+      where: {
+        profile: {id: profileId},
+        subjectId: subject.id,
+        subjectTable: subject.table,
+      },
     })
 
     return grants.map(this.fromGrant)
@@ -103,7 +107,7 @@ export class RolesService {
     subjectTable: string
   ): Promise<Record<string, Role[]>> => {
     const grants = await this.prisma.roleGrant.findMany({
-      where: {profileId, subjectTable},
+      where: {profile: {id: profileId}, subjectTable},
     })
 
     const grouped = groupBy(grants, (grant) => grant.subjectId)

@@ -18,6 +18,7 @@ import {
   ShowRoles,
   EpisodesModule,
   EpisodeRules,
+  EpisodeRoles,
 } from '@caster/shows'
 import {AuthzModule} from '@caster/authz'
 import {RolesModule} from '@caster/roles'
@@ -52,8 +53,8 @@ const isTest = env === 'test'
       rules: [UserRules, ProfileRules, ShowRules, EpisodeRules],
     }),
     RolesModule.forRoot({
-      roles: [...ShowRoles.roles],
-      permissions: [...ShowRoles.permissions],
+      roles: [...ShowRoles.roles, ...EpisodeRoles.roles],
+      permissions: [...ShowRoles.permissions, ...EpisodeRoles.permissions],
     }),
     UsersModule,
     ProfilesModule,

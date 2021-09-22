@@ -77,7 +77,7 @@
         "db-reset": {
           "executor": "@nrwl/workspace:run-commands",
           "options": {
-            "command": "yarn db:reset"
+            "command": "yarn db:reset -- --force"
           }
         },
         "docker-up": {

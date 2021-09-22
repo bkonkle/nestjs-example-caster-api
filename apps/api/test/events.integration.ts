@@ -9,6 +9,7 @@ import omit from 'lodash/omit'
 
 import {ClientRegister, EventTypes, MessageSend} from '@caster/events'
 import {dbCleaner, OAuth2, retry} from '@caster/utils/test'
+import {EpisodeRoles} from '@caster/shows'
 import {EpisodeFactory, ShowFactory} from '@caster/shows/test'
 import {ProfileFactory} from '@caster/users/test'
 
@@ -28,13 +29,12 @@ describe('Events', () => {
   let episode: Episode
 
   let profile: Profile
-  // @ts-expect-error - Needs to exist, but isn't used
-  let _otherProfile: Profile
+  let otherProfile: Profile
 
   const {credentials, altCredentials} = OAuth2.init()
   const prisma = new PrismaService()
 
-  const tables = ['User', 'Profile', 'Show', 'Episode']
+  const tables = ['User', 'Profile', 'Show', 'Episode', 'RoleGrant']
 
   const createSocket = async (
     headers: Record<string, string> = defaultHeaders
@@ -113,6 +113,16 @@ describe('Events', () => {
     episode = await prisma.episode.create({
       data: EpisodeFactory.makeCreateInput({showId: show.id}),
     })
+
+    // Give the primary profile the Guest role
+    await prisma.roleGrant.create({
+      data: {
+        profileId: profile.id,
+        roleKey: EpisodeRoles.Guest.key,
+        subjectTable: 'Episode',
+        subjectId: episode.id,
+      },
+    })
   })
 
   beforeAll(async () => {
@@ -124,7 +134,7 @@ describe('Events', () => {
 
     otherUser = await prisma.user.create({data: {username, isActive: true}})
 
-    _otherProfile = await prisma.profile.create({
+    otherProfile = await prisma.profile.create({
       include: {user: true},
       data: ProfileFactory.makeCreateInput({userId: otherUser.id}),
     })
@@ -170,6 +180,31 @@ describe('Events', () => {
         {
           eventName: 'exception',
           args: [{message: 'Unauthorized', status: 'error'}],
+        },
+      ])
+    })
+
+    it('requires authorization', async () => {
+      /**
+       * The secondary user
+       */
+
+      const {socket, state} = await createSocket({
+        Authorization: `Bearer ${altCredentials.token}`,
+      })
+
+      socket.emit(EventTypes.ClientRegister, {
+        ...registerEvent,
+        profileId: otherProfile.id,
+      })
+
+      // Wait for the ClientRegistered acknowledge event
+      await retry(async () => state.events.length, 10)
+
+      expect(state.events).toEqual([
+        {
+          eventName: 'exception',
+          args: [{status: 'error', message: 'Forbidden'}],
         },
       ])
     })
@@ -239,14 +274,34 @@ describe('Events', () => {
        * The secondary user
        */
 
+      // First grant permission
+      await prisma.roleGrant.create({
+        data: {
+          profileId: otherProfile.id,
+          roleKey: EpisodeRoles.Reader.key,
+          subjectTable: 'Episode',
+          subjectId: episode.id,
+        },
+      })
+
       const {socket: otherSocket, state: otherState} = await createSocket({
         Authorization: `Bearer ${altCredentials.token}`,
       })
 
-      otherSocket.emit(EventTypes.ClientRegister, registerEvent)
+      otherSocket.emit(EventTypes.ClientRegister, {
+        ...registerEvent,
+        profileId: otherProfile.id,
+      })
 
       // Wait for the ClientRegistered acknowledge event
       await retry(async () => otherState.events.length, 10)
+
+      expect(otherState.events).toEqual([
+        {
+          eventName: EventTypes.ClientRegistered,
+          args: [{...registerEvent, profileId: otherProfile.id}],
+        },
+      ])
 
       // Reset the event state
       otherState.events = []
@@ -276,6 +331,67 @@ describe('Events', () => {
           ],
         },
       ])
+
+      // Finally, revoke permission to return to status quo
+      await prisma.roleGrant.deleteMany({
+        where: {
+          profileId: otherProfile.id,
+          subjectTable: 'Episode',
+          subjectId: episode.id,
+        },
+      })
+    })
+
+    it('requires authorization', async () => {
+      const {socket, state} = await createSocket({
+        Authorization: `Bearer ${altCredentials.token}`,
+      })
+
+      // Grant read permission
+      await prisma.roleGrant.create({
+        data: {
+          profileId: otherProfile.id,
+          roleKey: EpisodeRoles.Reader.key,
+          subjectTable: 'Episode',
+          subjectId: episode.id,
+        },
+      })
+
+      socket.emit(EventTypes.ClientRegister, {
+        ...registerEvent,
+        profileId: otherProfile.id,
+      })
+
+      // Wait for the ClientRegistered acknowledge event
+      await retry(async () => state.events.length, 10)
+
+      // Reset the event state
+      state.events = []
+
+      socket.emit(EventTypes.MessageSend, sendEvent)
+
+      await retry(async () => state.events.length, 10)
+
+      expect(state.events).toEqual([
+        {
+          eventName: 'exception',
+          args: [
+            {
+              status: 'error',
+              message: 'Forbidden',
+            },
+          ],
+        },
+      ])
+
+      // Revoke permission
+      await prisma.roleGrant.deleteMany({
+        where: {
+          profileId: otherProfile.id,
+          subjectTable: 'Episode',
+          subjectId: episode.id,
+        },
+      })
     })
 
     it('throws errors when no associated Profile is found', async () => {
@@ -289,8 +405,13 @@ describe('Events', () => {
       // Reset the event state
       state.events = []
 
-      // Delete the profile
-      await prisma.profile.delete({where: {id: profile.id}})
+      // Delete the profile and roleGrants
+      await prisma.roleGrant.deleteMany({
+        where: {profileId: profile.id},
+      })
+      await prisma.profile.delete({
+        where: {id: profile.id},
+      })
 
       socket.emit(EventTypes.MessageSend, sendEvent)
 
@@ -314,6 +435,16 @@ describe('Events', () => {
           ...omit(profile, ['user', 'userId']),
           user: {connect: {id: user.id}},
         } as Profile,
+      })
+
+      // Give the profile the Guest role back
+      await prisma.roleGrant.create({
+        data: {
+          profileId: profile.id,
+          roleKey: EpisodeRoles.Guest.key,
+          subjectTable: 'Episode',
+          subjectId: episode.id,
+        },
       })
     })
   })
