@@ -1,25 +1,28 @@
 import {Redis} from 'ioredis'
 import {Socket} from 'socket.io'
 import {Inject, Logger} from '@nestjs/common'
+import {subject} from '@casl/ability'
 
 import {ProfilesService, fieldOptions} from '@caster/users'
+import {CensorFields} from '@caster/authz'
 
 import {
   ChatMessage,
-  MessageContext,
   ClientRegister,
   EventTypes,
+  MessageContext,
   MessageReceive,
-  IoRedis,
+  MessageSend,
+  Publisher,
+  Subscriber,
 } from './event.types'
-import {CensorFields} from '@caster/authz'
-import {subject} from '@casl/ability'
 
 export class ChannelService {
   private readonly logger = new Logger(ChannelService.name)
 
   constructor(
-    @Inject(IoRedis) private readonly redis: Redis,
+    @Inject(Publisher) private readonly publisher: Redis,
+    @Inject(Subscriber) private readonly subscriber: Redis,
     private readonly profiles: ProfilesService
   ) {}
 
@@ -30,11 +33,9 @@ export class ChannelService {
   ): Promise<void> => {
     const context = {episodeId: event.episodeId, censor, socket}
 
-    this.redis.on('message', this.handleMessage(context))
+    this.subscriber.on('message', this.handleMessage(context))
 
-    this.redis.on('messageBuffer', this.handleMessage(context))
-
-    this.redis.subscribe(`ep:${event.episodeId}`, (err, _count) => {
+    this.subscriber.subscribe(`ep:${event.episodeId}`, (err, _count) => {
       if (err) {
         this.logger.error(
           `Error during Redis subscribe for profileId - ${event.profileId}, channel - "ep:${event.episodeId}"`,
@@ -44,6 +45,18 @@ export class ChannelService {
         return
       }
     })
+
+    // Acknowledge that the client was registered
+    socket.emit(EventTypes.ClientRegistered, event)
+  }
+
+  sendMessage = async (event: MessageSend, profileId: string) => {
+    const chatMessage: ChatMessage = {
+      sender: {profileId: profileId},
+      text: event.text,
+    }
+
+    this.publisher.publish(`ep:${event.episodeId}`, JSON.stringify(chatMessage))
   }
 
   /**

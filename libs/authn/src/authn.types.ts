@@ -1,5 +1,4 @@
 import {Request} from 'express'
-import {Socket} from 'socket.io'
 import {GraphQLExtensionStack} from 'graphql-extensions'
 
 export interface JWT {
@@ -12,7 +11,7 @@ export interface JWT {
   nbf?: number // not before
 }
 
-export type JwtRequest = (Socket | Request) & {
+export interface JwtRequest extends Request {
   jwt?: JWT
 }
 

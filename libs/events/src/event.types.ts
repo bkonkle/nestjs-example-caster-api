@@ -7,6 +7,7 @@ import {InjectionToken} from '@caster/utils'
 
 export const EventTypes = {
   ClientRegister: 'client-register',
+  ClientRegistered: 'client-registered',
   Ping: 'ping',
   MessageSend: 'message-send',
   MessageReceive: 'message-receive',
@@ -32,7 +33,15 @@ export interface MessageReceive {
 /**
  * Redis Event Bus
  */
-export const IoRedis: InjectionToken<Redis> = 'EVENTS_IOREDIS'
+export const Publisher: InjectionToken<Redis> = 'EVENTS_IOREDIS_PUBLISHER'
+
+export const Subscriber: InjectionToken<Redis> = 'EVENTS_IOREDIS_SUBSCRIBER'
+
+export interface MessageContext {
+  episodeId: string
+  censor: CensorFields
+  socket: Socket
+}
 
 /**
  * A chat message send on a Redis channel
@@ -42,10 +51,4 @@ export interface ChatMessage {
     profileId: string
   }
   text: string
-}
-
-export interface MessageContext {
-  episodeId: string
-  censor: CensorFields
-  socket: Socket
 }

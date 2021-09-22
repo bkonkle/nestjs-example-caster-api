@@ -5,7 +5,7 @@ import {ProfilesModule} from '@caster/users'
 import {Config} from '@caster/utils'
 
 import {EventsGateway} from './events.gateway'
-import {IoRedis} from './event.types'
+import {Publisher, Subscriber} from './event.types'
 import {ChannelService} from './channel.service'
 
 export interface EventsOptions {
@@ -26,7 +26,16 @@ export class EventsModule {
       module: EventsModule,
       providers: [
         {
-          provide: IoRedis,
+          provide: Subscriber,
+          useFactory: (config: Config) => {
+            const url = options.url || config.get('redis.url')
+
+            return new Redis(url)
+          },
+          inject: [Config],
+        },
+        {
+          provide: Publisher,
           useFactory: (config: Config) => {
             const url = options.url || config.get('redis.url')
 

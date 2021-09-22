@@ -32,7 +32,7 @@ export class AuthzGuard extends JwtGuard {
     private readonly ability: AbilityFactory,
     @Optional() protected readonly options?: AuthModuleOptions
   ) {
-    super(reflector, options)
+    super(options)
   }
 
   getRequest(context: ExecutionContext) {

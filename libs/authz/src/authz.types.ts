@@ -56,7 +56,7 @@ export const Rules: InjectionToken<RuleEnhancer[]> = 'AUTHZ_CASL_RULES'
  * Custom JWT Request and Context objects with the metadata added to the Request.
  */
 
-export type AuthRequest = JwtRequest & {
+export interface AuthRequest extends JwtRequest {
   user?: UserWithProfile
   ability?: AppAbility
   censor?: <T extends AppSubjects>(

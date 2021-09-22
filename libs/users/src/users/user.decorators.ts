@@ -4,6 +4,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 
+// Deep import used to avoid circular dependencies
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import {getRequest} from '@caster/authz/authz.utils'
 
 /**
