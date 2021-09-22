@@ -3,7 +3,7 @@ import {ForbiddenException, NotFoundException, UseGuards} from '@nestjs/common'
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {subject} from '@casl/ability'
 
-import {JwtGuard} from '@caster/authn'
+import {JwtGuard} from '@caster/authn/jwt.guard'
 
 // Deep import used to avoid circular dependencies
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
@@ -12,7 +12,7 @@ import {AppAbility, CensorFields} from '@caster/authz/authz.types'
 import {AuthzGuard} from '@caster/authz/authz.guard'
 /* eslint-enable @nrwl/nx/enforce-module-boundaries */
 
-import {fromOrderByInput} from '@caster/utils'
+import {fromOrderByInput} from '@caster/utils/prisma'
 
 import {Profile as ProfileModel} from './profile.model'
 import {ProfilesService} from './profiles.service'

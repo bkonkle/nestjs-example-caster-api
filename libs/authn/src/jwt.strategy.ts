@@ -3,7 +3,7 @@ import {PassportStrategy} from '@nestjs/passport'
 import {ExtractJwt, Strategy} from 'passport-jwt'
 import {passportJwtSecret} from 'jwks-rsa'
 
-import {Config} from '@caster/utils'
+import {Config} from '@caster/utils/config/config.types'
 
 import {JWT} from './authn.types'
 

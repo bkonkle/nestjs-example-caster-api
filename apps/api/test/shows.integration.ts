@@ -5,13 +5,17 @@ import {Test} from '@nestjs/testing'
 import {omit, pick} from 'lodash'
 import {PrismaService} from 'nestjs-prisma'
 
-import {OAuth2, GraphQL, Validation, dbCleaner} from '@caster/utils/test'
-import {Admin, CreateShowInput} from '@caster/shows'
-import {ShowFactory} from '@caster/shows/test'
+import {GraphQL} from '@caster/utils/test/graphql'
+import * as Validation from '@caster/utils/test/validation'
+import * as OAuth2 from '@caster/utils/test/oauth2'
+import {dbCleaner} from '@caster/utils/test/prisma'
+import {CreateShowInput} from '@caster/shows/shows/show-mutations.model'
+import {Admin} from '@caster/shows/shows/show.roles'
+import * as ShowFactory from '@caster/shows/test/factories/show.factory'
+import * as ProfileFactory from '@caster/users/test/factories/profile.factory'
 import {Query, Mutation} from '@caster/graphql/schema'
 
 import {AppModule} from '../src/app.module'
-import {ProfileFactory} from '@caster/users/test'
 
 // Fields that should be selected in successful responses
 const fields = ['id', 'title', 'summary', 'picture', 'content'] as const

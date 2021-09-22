@@ -1,7 +1,8 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {ForbiddenException, UseGuards} from '@nestjs/common'
 
-import {JwtGuard, Username} from '@caster/authn'
+import {Username} from '@caster/authn/jwt.decorators'
+import {JwtGuard} from '@caster/authn/jwt.guard'
 
 // Deep import used to avoid circular dependencies
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */

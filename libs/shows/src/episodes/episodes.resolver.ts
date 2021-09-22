@@ -8,10 +8,13 @@ import {
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {subject} from '@casl/ability'
 
-import {JwtGuard} from '@caster/authn'
-import {Ability, AppAbility, AuthzGuard, AllowAnonymous} from '@caster/authz'
-import {RequestUser, UserWithProfile} from '@caster/users'
-import {fromOrderByInput} from '@caster/utils'
+import {JwtGuard} from '@caster/authn/jwt.guard'
+import {Ability, AllowAnonymous} from '@caster/authz/authz.decorators'
+import {AuthzGuard} from '@caster/authz/authz.guard'
+import {AppAbility} from '@caster/authz/authz.types'
+import {UserWithProfile} from '@caster/users/users/user.types'
+import {RequestUser} from '@caster/users/users/user.decorators'
+import {fromOrderByInput} from '@caster/utils/prisma'
 
 import {Episode as EpisodeModel} from './episode.model'
 import {EpisodesService} from './episodes.service'

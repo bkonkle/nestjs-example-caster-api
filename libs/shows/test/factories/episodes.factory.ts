@@ -1,6 +1,7 @@
 import faker from 'faker'
 
-import {Episode, CreateEpisodeInput} from '../../src/episodes'
+import {Episode} from '../../src/episodes/episode.model'
+import {CreateEpisodeInput} from '../../src/episodes/episode-mutations.model'
 
 export const makeCreateInput = (
   overrides?: Partial<CreateEpisodeInput> | null

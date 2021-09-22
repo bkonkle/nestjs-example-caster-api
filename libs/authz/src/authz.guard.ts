@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common'
 import {Reflector} from '@nestjs/core'
 
-import {getUsername} from '@caster/authn'
+import {getUsername} from '@caster/authn/authn.utils'
 
 // Deep import used to avoid circular dependencies
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries

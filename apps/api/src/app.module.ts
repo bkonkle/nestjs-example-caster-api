@@ -4,25 +4,22 @@ import {ScheduleModule} from '@nestjs/schedule'
 import {GraphQLModule} from '@nestjs/graphql'
 import {PrismaModule} from 'nestjs-prisma'
 
-import {AuthnModule} from '@caster/authn'
-import {ConfigModule, HealthModule} from '@caster/utils'
-import {
-  UsersModule,
-  ProfilesModule,
-  UserRules,
-  ProfileRules,
-} from '@caster/users'
-import {
-  ShowsModule,
-  ShowRules,
-  ShowRoles,
-  EpisodesModule,
-  EpisodeRules,
-  EpisodeRoles,
-} from '@caster/shows'
-import {AuthzModule} from '@caster/authz'
-import {RolesModule} from '@caster/roles'
-import {EventsModule} from '@caster/events'
+import {AuthnModule} from '@caster/authn/authn.module'
+import {ConfigModule} from '@caster/utils/config/config.module'
+import {HealthModule} from '@caster/utils/health/health.module'
+import {UsersModule} from '@caster/users/users/users.module'
+import {UserRules} from '@caster/users/users/user.rules'
+import {ProfilesModule} from '@caster/users/profiles/profiles.module'
+import {ProfileRules} from '@caster/users/profiles/profile.rules'
+import {ShowsModule} from '@caster/shows/shows/shows.module'
+import {ShowRules} from '@caster/shows/shows/show.rules'
+import * as ShowRoles from '@caster/shows/shows/show.roles'
+import {EpisodesModule} from '@caster/shows/episodes/episodes.module'
+import {EpisodeRules} from '@caster/shows/episodes/episode.rules'
+import * as EpisodeRoles from '@caster/shows/episodes/episode.roles'
+import {AuthzModule} from '@caster/authz/authz.module'
+import {RolesModule} from '@caster/roles/roles.module'
+import {EventsModule} from '@caster/events/events.module'
 
 import {AppController} from './app.controller'
 

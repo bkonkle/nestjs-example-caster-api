@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-import {Config, config as defaultConfig} from '../src/config'
+import {Config} from '../src/config/config.types'
+import {defaultConfig} from '../src/config/config.default'
 
 export interface Credentials {
   token?: string

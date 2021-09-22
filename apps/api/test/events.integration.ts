@@ -7,11 +7,18 @@ import supertest from 'supertest'
 import {URL} from 'url'
 import omit from 'lodash/omit'
 
-import {ClientRegister, EventTypes, MessageSend} from '@caster/events'
-import {dbCleaner, OAuth2, retry} from '@caster/utils/test'
-import {EpisodeRoles} from '@caster/shows'
-import {EpisodeFactory, ShowFactory} from '@caster/shows/test'
-import {ProfileFactory} from '@caster/users/test'
+import {
+  ClientRegister,
+  EventTypes,
+  MessageSend,
+} from '@caster/events/event.types'
+import {dbCleaner} from '@caster/utils/test/prisma'
+import * as OAuth2 from '@caster/utils/test/oauth2'
+import {retry} from '@caster/utils/test/events'
+import * as EpisodeRoles from '@caster/shows/episodes/episode.roles'
+import * as ShowFactory from '@caster/shows/test/factories/show.factory'
+import * as EpisodeFactory from '@caster/shows/test/factories/episodes.factory'
+import * as ProfileFactory from '@caster/users/test/factories/profile.factory'
 
 import {AppModule} from '../src/app.module'
 

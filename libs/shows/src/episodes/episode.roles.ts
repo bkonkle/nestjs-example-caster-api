@@ -1,4 +1,4 @@
-import {Permission, Role} from '@caster/roles'
+import {Permission, Role} from '@caster/roles/roles.types'
 
 /**
  * Permissions

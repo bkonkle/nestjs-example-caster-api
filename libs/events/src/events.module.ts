@@ -1,8 +1,8 @@
 import {ConsoleLogger, DynamicModule, Logger, Module} from '@nestjs/common'
 import Redis from 'ioredis'
 
-import {ProfilesModule} from '@caster/users'
-import {Config} from '@caster/utils'
+import {ProfilesModule} from '@caster/users/profiles/profiles.module'
+import {Config} from '@caster/utils/config/config.types'
 
 import {EventsGateway} from './events.gateway'
 import {Publisher, Subscriber} from './event.types'

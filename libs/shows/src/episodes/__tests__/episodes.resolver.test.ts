@@ -3,12 +3,16 @@ import {Episode} from '@prisma/client'
 import {Test} from '@nestjs/testing'
 import {mockDeep} from 'jest-mock-extended'
 
-import {AbilityFactory, AppAbility} from '@caster/authz'
-import {UserWithProfile} from '@caster/users'
-import {RolesService} from '@caster/roles'
-import {ProfileFactory, UserFactory} from '@caster/users/test'
+import {AbilityFactory} from '@caster/authz/ability.factory'
+import {AppAbility} from '@caster/authz/authz.types'
+import {UserWithProfile} from '@caster/users/users/user.types'
+import {RolesService} from '@caster/roles/roles.service'
 
-import {EpisodeFactory, ShowFactory} from '../../../test/factories'
+import * as UserFactory from '@caster/users/test/factories/user.factory'
+import * as ProfileFactory from '@caster/users/test/factories/profile.factory'
+
+import * as ShowFactory from '../../../test/factories/show.factory'
+import * as EpisodeFactory from '../../../test/factories/episodes.factory'
 import {
   CreateEpisodeInput,
   UpdateEpisodeInput,
@@ -16,14 +20,16 @@ import {
 import {EpisodeCondition, EpisodesOrderBy} from '../episode-queries.model'
 import {EpisodesResolver} from '../episodes.resolver'
 import {EpisodesService} from '../episodes.service'
+import {UsersService} from '@caster/users/users/users.service'
 
 describe('EpisodesResolver', () => {
   let resolver: EpisodesResolver
 
-  const service = mockDeep<EpisodesService>()
-  const roles = mockDeep<RolesService>()
-  const abilityFactory = mockDeep<AbilityFactory>()
   const ability = mockDeep<AppAbility>()
+  const abilityFactory = mockDeep<AbilityFactory>()
+  const roles = mockDeep<RolesService>()
+  const service = mockDeep<EpisodesService>()
+  const users = mockDeep<UsersService>()
 
   // Default to "true"
   ability.can.mockReturnValue(true)
@@ -52,6 +58,7 @@ describe('EpisodesResolver', () => {
       providers: [
         {provide: EpisodesService, useValue: service},
         {provide: RolesService, useValue: roles},
+        {provide: UsersService, useValue: users},
         {provide: AbilityFactory, useValue: abilityFactory},
         EpisodesResolver,
       ],

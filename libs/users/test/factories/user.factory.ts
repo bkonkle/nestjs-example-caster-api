@@ -1,6 +1,7 @@
 import faker from 'faker'
 
-import {User, CreateUserInput} from '../../src/users'
+import {User} from '../../src/users/user.model'
+import {CreateUserInput} from '../../src/users/user-input.model'
 
 export const makeCreateInput = (
   overrides?: Partial<Omit<CreateUserInput, 'profile'>> | null

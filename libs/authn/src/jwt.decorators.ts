@@ -3,30 +3,8 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common'
-import {GqlExecutionContext} from '@nestjs/graphql'
 
-import {JWT, JwtContext, JwtRequest} from './authn.types'
-
-const getRequest = (ctx: ExecutionContext): JwtRequest => {
-  const context = GqlExecutionContext.create(ctx)
-
-  return context.getContext<JwtContext>().req
-}
-
-/**
- * Return a boolean indicating whether a user is present on the request.
- */
-export const isAuthenticated = (req: JwtRequest): boolean => Boolean(req.jwt)
-
-/**
- * Return the user parameter on requests if present.
- */
-export const getJwt = (req: JwtRequest): JWT | undefined => req.jwt
-
-/**
- * Return the user sub parameter on requests if present.
- */
-export const getUsername = (req: JwtRequest): string | undefined => req.jwt?.sub
+import {getJwt, getRequest, getUsername, isAuthenticated} from './authn.utils'
 
 /**
  * Return a boolean indicating whether a user is present on the request.

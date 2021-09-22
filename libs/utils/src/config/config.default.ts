@@ -154,4 +154,4 @@ export const schema: convict.Schema<Schema> = {
   },
 }
 
-export const config = convict(schema)
+export const defaultConfig = convict(schema)

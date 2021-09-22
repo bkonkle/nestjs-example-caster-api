@@ -1,6 +1,7 @@
 import {DynamicModule, Module} from '@nestjs/common'
 import {Class} from 'type-fest'
 
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import {UsersModule} from '@caster/users/users/users.module'
 
 import {AbilityFactory} from './ability.factory'

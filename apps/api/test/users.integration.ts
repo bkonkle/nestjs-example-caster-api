@@ -3,8 +3,11 @@ import {INestApplication, ValidationPipe} from '@nestjs/common'
 import {Test} from '@nestjs/testing'
 import {PrismaService} from 'nestjs-prisma'
 
-import {OAuth2, GraphQL, Validation, dbCleaner} from '@caster/utils/test'
-import {UserFactory} from '@caster/users/test'
+import * as OAuth2 from '@caster/utils/test/oauth2'
+import {GraphQL} from '@caster/utils/test/graphql'
+import * as Validation from '@caster/utils/test/validation'
+import {dbCleaner} from '@caster/utils/test/prisma'
+import * as UserFactory from '@caster/users/test/factories/user.factory'
 import {Query, Mutation} from '@caster/graphql/schema'
 
 import {AppModule} from '../src/app.module'

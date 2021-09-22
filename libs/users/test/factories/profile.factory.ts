@@ -1,6 +1,7 @@
 import faker from 'faker'
 
-import {Profile, CreateProfileInput} from '../../src/profiles'
+import {Profile} from '../../src/profiles/profile.model'
+import {CreateProfileInput} from '../../src/profiles/profile-mutations.model'
 
 export const makeCreateInput = (
   overrides?: Partial<CreateProfileInput> | null

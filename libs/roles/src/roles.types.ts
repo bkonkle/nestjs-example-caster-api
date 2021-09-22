@@ -1,4 +1,4 @@
-import {InjectionToken} from '@caster/utils'
+import {InjectionToken} from '@caster/utils/injection'
 
 /**
  * Permissions

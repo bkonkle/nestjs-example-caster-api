@@ -1,5 +1,0 @@
-export * from './config'
-export * from './health'
-export * from './injection'
-export * from './pagination'
-export * from './prisma'

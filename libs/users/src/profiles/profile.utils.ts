@@ -1,9 +1,12 @@
 import {Prisma, Profile, User} from '@prisma/client'
 import {PermittedFieldsOptions} from '@casl/ability/extra'
 
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+import {AppAbility} from '@caster/authz/authz.types'
+/* eslint-enable @nrwl/nx/enforce-module-boundaries */
+
 import {ProfileCondition} from './profile-queries.model'
 import {UpdateProfileInput} from './profile-mutations.model'
-import {AppAbility} from '@caster/authz'
 
 export type ProfileWithUser = Profile & {user: User | null}
 

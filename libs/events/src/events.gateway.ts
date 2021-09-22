@@ -12,16 +12,12 @@ import {
 import {Logger, UseGuards} from '@nestjs/common'
 import {Socket} from 'socket.io'
 
-import {SocketJwtGuard} from '@caster/authn'
-import {
-  Ability,
-  Action,
-  AppAbility,
-  Censor,
-  CensorFields,
-  SocketAuthzGuard,
-} from '@caster/authz'
-import {RequestUser, UserWithProfile} from '@caster/users'
+import {SocketJwtGuard} from '@caster/authn/socket-jwt.guard'
+import {Ability, Censor} from '@caster/authz/authz.decorators'
+import {SocketAuthzGuard} from '@caster/authz/socket-authz.guard'
+import {Action, AppAbility, CensorFields} from '@caster/authz/authz.types'
+import {RequestUser} from '@caster/users/users/user.decorators'
+import {UserWithProfile} from '@caster/users/users/user.types'
 
 import {ClientRegister, EventTypes, MessageSend} from './event.types'
 import {ChannelService} from './channel.service'

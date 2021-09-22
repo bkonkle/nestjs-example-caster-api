@@ -3,25 +3,29 @@ import {Show} from '@prisma/client'
 import {Test} from '@nestjs/testing'
 import {mockDeep} from 'jest-mock-extended'
 
-import {AbilityFactory, AppAbility} from '@caster/authz'
-import {UserWithProfile} from '@caster/users'
-import {RolesService} from '@caster/roles'
-import {ProfileFactory, UserFactory} from '@caster/users/test'
+import {AbilityFactory} from '@caster/authz/ability.factory'
+import {AppAbility} from '@caster/authz/authz.types'
+import {UserWithProfile} from '@caster/users/users/user.types'
+import {RolesService} from '@caster/roles/roles.service'
+import * as UserFactory from '@caster/users/test/factories/user.factory'
+import * as ProfileFactory from '@caster/users/test/factories/profile.factory'
 
-import {ShowFactory} from '../../../test/factories'
+import * as ShowFactory from '../../../test/factories/show.factory'
 import {CreateShowInput, UpdateShowInput} from '../show-mutations.model'
 import {ShowCondition, ShowsOrderBy} from '../show-queries.model'
 import {ShowsResolver} from '../shows.resolver'
 import {Admin} from '../show.roles'
 import {ShowsService} from '../shows.service'
+import {UsersService} from '@caster/users/users/users.service'
 
 describe('ShowsResolver', () => {
   let resolver: ShowsResolver
 
-  const service = mockDeep<ShowsService>()
-  const roles = mockDeep<RolesService>()
-  const abilityFactory = mockDeep<AbilityFactory>()
   const ability = mockDeep<AppAbility>()
+  const abilityFactory = mockDeep<AbilityFactory>()
+  const roles = mockDeep<RolesService>()
+  const service = mockDeep<ShowsService>()
+  const users = mockDeep<UsersService>()
 
   // Default to "true"
   ability.can.mockReturnValue(true)
@@ -49,6 +53,7 @@ describe('ShowsResolver', () => {
       providers: [
         {provide: ShowsService, useValue: service},
         {provide: RolesService, useValue: roles},
+        {provide: UsersService, useValue: users},
         {provide: AbilityFactory, useValue: abilityFactory},
         ShowsResolver,
       ],

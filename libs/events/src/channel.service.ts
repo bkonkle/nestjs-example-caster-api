@@ -3,8 +3,9 @@ import {Socket} from 'socket.io'
 import {Inject, Logger} from '@nestjs/common'
 import {subject} from '@casl/ability'
 
-import {ProfilesService, fieldOptions} from '@caster/users'
-import {CensorFields} from '@caster/authz'
+import {ProfilesService} from '@caster/users/profiles/profiles.service'
+import {fieldOptions} from '@caster/users/profiles/profile.utils'
+import {CensorFields} from '@caster/authz/authz.types'
 
 import {
   ChatMessage,

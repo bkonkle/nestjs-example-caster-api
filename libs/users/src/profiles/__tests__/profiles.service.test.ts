@@ -3,7 +3,8 @@ import {Profile as PrismaProfile} from '@prisma/client'
 import {mockDeep} from 'jest-mock-extended'
 import {PrismaService} from 'nestjs-prisma'
 
-import {UserFactory, ProfileFactory} from '../../../test/factories'
+import * as UserFactory from '../../../test/factories/user.factory'
+import * as ProfileFactory from '../../../test/factories/profile.factory'
 import {
   CreateProfileInput,
   UpdateProfileInput,

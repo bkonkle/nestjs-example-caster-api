@@ -3,10 +3,13 @@ import {subject} from '@casl/ability'
 import {Test} from '@nestjs/testing'
 import {mockFn, mockDeep} from 'jest-mock-extended'
 
-import {AppAbility, CensorFields} from '@caster/authz'
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+import {AppAbility, CensorFields} from '@caster/authz/authz.types'
 import {AuthzTestModule} from '@caster/authz/authz-test.module'
+/* eslint-enable @nrwl/nx/enforce-module-boundaries */
 
-import {ProfileFactory, UserFactory} from '../../../test/factories'
+import * as UserFactory from '../../../test/factories/user.factory'
+import * as ProfileFactory from '../../../test/factories/profile.factory'
 import {UserWithProfile} from '../../users/user.types'
 import {
   CreateProfileInput,
@@ -16,11 +19,13 @@ import {ProfileCondition, ProfilesOrderBy} from '../profile-queries.model'
 import {ProfilesResolver} from '../profiles.resolver'
 import {ProfilesService} from '../profiles.service'
 import {ProfileWithUser, fieldOptions} from '../profile.utils'
+import {UsersService} from '../../users/users.service'
 
 describe('ProfilesResolver', () => {
   let resolver: ProfilesResolver
 
   const service = mockDeep<ProfilesService>()
+  const users = mockDeep<UsersService>()
 
   const username = 'test-username'
   const email = 'test@email.com'
@@ -46,6 +51,7 @@ describe('ProfilesResolver', () => {
       imports: [AuthzTestModule],
       providers: [
         {provide: ProfilesService, useValue: service},
+        {provide: UsersService, useValue: users},
         ProfilesResolver,
       ],
     }).compile()

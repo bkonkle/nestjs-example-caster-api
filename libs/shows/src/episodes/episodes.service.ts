@@ -2,7 +2,11 @@ import {Injectable} from '@nestjs/common'
 import {Prisma, Episode} from '@prisma/client'
 import {PrismaService} from 'nestjs-prisma'
 
-import {getOffset, ManyResponse, paginateResponse} from '@caster/utils'
+import {
+  getOffset,
+  ManyResponse,
+  paginateResponse,
+} from '@caster/utils/pagination'
 
 import {CreateEpisodeInput, UpdateEpisodeInput} from './episode-mutations.model'
 import {fromEpisodeInput} from './episode.utils'
