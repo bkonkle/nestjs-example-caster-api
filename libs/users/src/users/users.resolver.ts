@@ -1,9 +1,13 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {ForbiddenException, UseGuards} from '@nestjs/common'
 
-import {Username} from '@caster/authn'
+import {JwtGuard, Username} from '@caster/authn'
+
+// Deep import used to avoid circular dependencies
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {AllowAnonymous} from '@caster/authz/authz.decorators'
 import {AuthzGuard} from '@caster/authz/authz.guard'
+/* eslint-enable @nrwl/nx/enforce-module-boundaries */
 
 import {User} from './user.model'
 import {
@@ -15,7 +19,7 @@ import {UsersService} from './users.service'
 import {RequestUser} from './user.decorators'
 
 @Resolver(() => User)
-@UseGuards(AuthzGuard)
+@UseGuards(JwtGuard, AuthzGuard)
 export class UsersResolver {
   constructor(private readonly service: UsersService) {}
 

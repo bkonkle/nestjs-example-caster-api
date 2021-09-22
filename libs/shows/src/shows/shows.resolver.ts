@@ -8,6 +8,7 @@ import {
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {subject} from '@casl/ability'
 
+import {JwtGuard} from '@caster/authn'
 import {AllowAnonymous, Ability, AppAbility, AuthzGuard} from '@caster/authz'
 import {RolesService} from '@caster/roles'
 import {RequestUser, UserWithProfile} from '@caster/users'
@@ -25,7 +26,7 @@ import {
 } from './show-mutations.model'
 
 @Resolver(() => ShowModel)
-@UseGuards(AuthzGuard)
+@UseGuards(JwtGuard, AuthzGuard)
 export class ShowsResolver {
   constructor(
     private readonly service: ShowsService,

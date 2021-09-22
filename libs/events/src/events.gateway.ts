@@ -12,15 +12,22 @@ import {
 import {Logger, UseGuards} from '@nestjs/common'
 import {Socket} from 'socket.io'
 
-import {Ability, Action, AppAbility, Censor, CensorFields} from '@caster/authz'
+import {SocketJwtGuard} from '@caster/authn'
+import {
+  Ability,
+  Action,
+  AppAbility,
+  Censor,
+  CensorFields,
+  SocketAuthzGuard,
+} from '@caster/authz'
 import {RequestUser, UserWithProfile} from '@caster/users'
 
 import {ClientRegister, EventTypes, MessageSend} from './event.types'
 import {ChannelService} from './channel.service'
-import {EventsGuard} from './events.guard'
 
 @WebSocketGateway()
-@UseGuards(EventsGuard)
+@UseGuards(SocketJwtGuard, SocketAuthzGuard)
 export class EventsGateway implements OnGatewayInit, OnGatewayConnection {
   private readonly logger = new Logger(EventsGateway.name)
 

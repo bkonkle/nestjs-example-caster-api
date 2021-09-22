@@ -1,15 +1,14 @@
 import {
+  CanActivate,
   ExecutionContext,
   forwardRef,
   Inject,
   Injectable,
-  Optional,
   UnauthorizedException,
 } from '@nestjs/common'
 import {Reflector} from '@nestjs/core'
-import {AuthModuleOptions} from '@nestjs/passport'
 
-import {JwtGuard, getUsername} from '@caster/authn'
+import {getUsername} from '@caster/authn'
 
 // Deep import used to avoid circular dependencies
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
@@ -24,24 +23,19 @@ import {
 import {censorFields, getRequest} from './authz.utils'
 
 @Injectable()
-export class AuthzGuard extends JwtGuard {
+export class AuthzGuard implements CanActivate {
   constructor(
     protected readonly reflector: Reflector,
     @Inject(forwardRef(() => UsersService))
     private readonly users: UsersService,
-    private readonly ability: AbilityFactory,
-    @Optional() protected readonly options?: AuthModuleOptions
-  ) {
-    super(options)
-  }
+    private readonly ability: AbilityFactory
+  ) {}
 
   getRequest(context: ExecutionContext) {
     return getRequest(context)
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const canActivate = super.canActivate(context)
-
     const allowAnonymous =
       this.reflector.getAllAndOverride<AllowAnonymousMetadata>(
         ALLOW_ANONYMOUS,
@@ -58,13 +52,6 @@ export class AuthzGuard extends JwtGuard {
       }
 
       throw new UnauthorizedException()
-    }
-
-    // Should annotate the `jwt` on the request if available
-    const success = await canActivate
-
-    if (!success) {
-      return false
     }
 
     const request = this.getRequest(context)

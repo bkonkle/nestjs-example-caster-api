@@ -6,8 +6,10 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
+import {subject} from '@casl/ability'
 
-import {Ability, AuthzGuard, AllowAnonymous} from '@caster/authz'
+import {JwtGuard} from '@caster/authn'
+import {Ability, AppAbility, AuthzGuard, AllowAnonymous} from '@caster/authz'
 import {RequestUser, UserWithProfile} from '@caster/users'
 import {fromOrderByInput} from '@caster/utils'
 
@@ -24,11 +26,9 @@ import {
   UpdateEpisodeInput,
   MutateEpisodeResult,
 } from './episode-mutations.model'
-import {AppAbility} from '@caster/authz'
-import {subject} from '@casl/ability'
 
 @Resolver(() => EpisodeModel)
-@UseGuards(AuthzGuard)
+@UseGuards(JwtGuard, AuthzGuard)
 export class EpisodesResolver {
   constructor(private readonly service: EpisodesService) {}
 
