@@ -2,7 +2,7 @@ import GraphQLTypeJson from 'graphql-type-json'
 import {Field, ID, ObjectType} from '@nestjs/graphql'
 import {Prisma} from '@prisma/client'
 
-import {User} from '../users/user.model'
+import {User} from '../user.model'
 
 @ObjectType()
 export class Profile {

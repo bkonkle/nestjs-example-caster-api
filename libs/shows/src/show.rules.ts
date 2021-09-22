@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common'
 
 import {Action, RuleBuilder, RuleEnhancer} from '@caster/authz/authz.types'
 import {RolesService} from '@caster/roles/roles.service'
-import {UserWithProfile} from '@caster/users/users/user.types'
+import {UserWithProfile} from '@caster/users/user.types'
 
 import {Update, Delete, ManageEpisodes, ManageRoles} from './show.roles'
 

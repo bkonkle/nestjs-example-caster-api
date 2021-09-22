@@ -1,7 +1,7 @@
 import faker from 'faker'
 
-import {Show} from '../../src/shows/show.model'
-import {CreateShowInput} from '../../src/shows/show-mutations.model'
+import {Show} from '../../src/show.model'
+import {CreateShowInput} from '../../src/show-mutations.model'
 
 export const makeCreateInput = (
   overrides?: Partial<CreateShowInput> | null

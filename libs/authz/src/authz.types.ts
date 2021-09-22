@@ -8,7 +8,7 @@ import {InjectionToken} from '@caster/utils/injection'
 
 // Deep import used to avoid circular dependencies
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
-import {UserWithProfile} from '@caster/users/users/user.types'
+import {UserWithProfile} from '@caster/users/user.types'
 
 /**
  * Abilities for the App, based on Prisma Entities

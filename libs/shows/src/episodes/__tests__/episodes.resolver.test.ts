@@ -5,7 +5,7 @@ import {mockDeep} from 'jest-mock-extended'
 
 import {AbilityFactory} from '@caster/authz/ability.factory'
 import {AppAbility} from '@caster/authz/authz.types'
-import {UserWithProfile} from '@caster/users/users/user.types'
+import {UserWithProfile} from '@caster/users/user.types'
 import {RolesService} from '@caster/roles/roles.service'
 
 import {UserFactory} from '@caster/users/test/factories/user.factory'
@@ -20,7 +20,7 @@ import {
 import {EpisodeCondition, EpisodesOrderBy} from '../episode-queries.model'
 import {EpisodesResolver} from '../episodes.resolver'
 import {EpisodesService} from '../episodes.service'
-import {UsersService} from '@caster/users/users/users.service'
+import {UsersService} from '@caster/users/users.service'
 
 describe('EpisodesResolver', () => {
   let resolver: EpisodesResolver

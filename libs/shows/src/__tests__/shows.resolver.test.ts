@@ -5,18 +5,18 @@ import {mockDeep} from 'jest-mock-extended'
 
 import {AbilityFactory} from '@caster/authz/ability.factory'
 import {AppAbility} from '@caster/authz/authz.types'
-import {UserWithProfile} from '@caster/users/users/user.types'
+import {UserWithProfile} from '@caster/users/user.types'
 import {RolesService} from '@caster/roles/roles.service'
 import {UserFactory} from '@caster/users/test/factories/user.factory'
 import {ProfileFactory} from '@caster/users/test/factories/profile.factory'
 
-import {ShowFactory} from '../../../test/factories/show.factory'
+import {ShowFactory} from '../../test/factories/show.factory'
 import {CreateShowInput, UpdateShowInput} from '../show-mutations.model'
 import {ShowCondition, ShowsOrderBy} from '../show-queries.model'
 import {ShowsResolver} from '../shows.resolver'
 import {Admin} from '../show.roles'
 import {ShowsService} from '../shows.service'
-import {UsersService} from '@caster/users/users/users.service'
+import {UsersService} from '@caster/users/users.service'
 
 describe('ShowsResolver', () => {
   let resolver: ShowsResolver

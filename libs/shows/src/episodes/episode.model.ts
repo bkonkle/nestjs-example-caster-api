@@ -2,7 +2,7 @@ import GraphQLTypeJson from 'graphql-type-json'
 import {Field, ID, ObjectType} from '@nestjs/graphql'
 import {Prisma} from '@prisma/client'
 
-import {Show} from '../shows/show.model'
+import {Show} from '../show.model'
 
 @ObjectType()
 export class Episode {
