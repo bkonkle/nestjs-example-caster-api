@@ -22,9 +22,6 @@
     "api": {
       "tags": []
     },
-    "web": {
-      "tags": []
-    },
     "authn": {
       "tags": []
     },
