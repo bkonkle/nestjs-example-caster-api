@@ -2,13 +2,13 @@ import uniqBy from 'lodash/uniqBy'
 import groupBy from 'lodash/groupBy'
 import mapValues from 'lodash/mapValues'
 import {Inject, Injectable} from '@nestjs/common'
-import {RoleGrant} from '@prisma/client'
+import {Prisma, RoleGrant} from '@prisma/client'
 import {PrismaService} from 'nestjs-prisma'
 
 import {Permission, Permissions, Role, Roles} from './roles.types'
 
 export interface RoleSubject {
-  table: string
+  table: Prisma.ModelName
   id: string
 }
 
