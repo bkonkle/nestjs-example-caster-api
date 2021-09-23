@@ -22,12 +22,6 @@
     "api": {
       "tags": []
     },
-    "authn": {
-      "tags": []
-    },
-    "authz": {
-      "tags": []
-    },
     "events": {
       "tags": []
     },

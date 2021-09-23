@@ -8,12 +8,8 @@ import {
 } from '@nestjs/common'
 import {Reflector} from '@nestjs/core'
 
-import {getUsername} from '@caster/authn/authn.utils'
-
-// Deep import used to avoid circular dependencies
-// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
-import {UsersService} from '@caster/users/users.service'
-
+import {getUsername} from '../authn/authn.utils'
+import {UsersService} from '../users.service'
 import {AbilityFactory} from './ability.factory'
 import {
   ALLOW_ANONYMOUS,

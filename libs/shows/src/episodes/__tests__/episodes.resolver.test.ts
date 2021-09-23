@@ -3,8 +3,8 @@ import {Episode} from '@prisma/client'
 import {Test} from '@nestjs/testing'
 import {mockDeep} from 'jest-mock-extended'
 
-import {AbilityFactory} from '@caster/authz/ability.factory'
-import {AppAbility} from '@caster/authz/authz.types'
+import {AbilityFactory} from '@caster/users/authz/ability.factory'
+import {AppAbility} from '@caster/users/authz/authz.types'
 import {UserWithProfile} from '@caster/users/user.types'
 import {RolesService} from '@caster/roles/roles.service'
 

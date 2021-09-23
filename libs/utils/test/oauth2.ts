@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, {AxiosError} from 'axios'
 
 import {Config} from '../src/config/config.types'
 import {defaultConfig} from '../src/config/config.default'
@@ -31,9 +31,8 @@ export const init = (config: Config = defaultConfig) => {
           }
         )
         credentials.token = accessToken
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        console.error(err.response.data)
+      } catch (err) {
+        console.error((err as AxiosError).response?.data)
 
         throw err
       }

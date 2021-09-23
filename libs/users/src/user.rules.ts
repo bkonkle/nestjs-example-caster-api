@@ -1,8 +1,6 @@
 import {Injectable} from '@nestjs/common'
 
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-import {Action, RuleBuilder, RuleEnhancer} from '@caster/authz/authz.types'
-/* eslint-enable @nrwl/nx/enforce-module-boundaries */
+import {Action, RuleBuilder, RuleEnhancer} from './authz/authz.types'
 
 import {UserWithProfile} from './user.types'
 

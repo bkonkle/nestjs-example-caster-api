@@ -1,7 +1,7 @@
 import {mockDeep} from 'jest-mock-extended'
 import {Test} from '@nestjs/testing'
 
-import {Action, RuleBuilder} from '@caster/authz/authz.types'
+import {Action, RuleBuilder} from '@caster/users/authz/authz.types'
 import {RolesService} from '@caster/roles/roles.service'
 import {UserWithProfile} from '@caster/users/user.types'
 import {UserFactory} from '@caster/users/test/factories/user.factory'

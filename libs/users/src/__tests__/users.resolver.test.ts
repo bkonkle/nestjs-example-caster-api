@@ -1,12 +1,9 @@
 import {Test} from '@nestjs/testing'
 import {mockDeep} from 'jest-mock-extended'
 
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-import {AbilityFactory} from '@caster/authz/ability.factory'
-import {AppAbility} from '@caster/authz/authz.types'
-/* eslint-enable @nrwl/nx/enforce-module-boundaries */
-
 import {UserFactory} from '../../test/factories/user.factory'
+import {AbilityFactory} from '../authz/ability.factory'
+import {AppAbility} from '../authz/authz.types'
 import {UsersResolver} from '../users.resolver'
 import {UsersService} from '../users.service'
 import {UserWithProfile} from '../user.types'
