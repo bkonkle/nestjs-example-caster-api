@@ -8,7 +8,8 @@ import {
 } from '@nestjs/common'
 import {Reflector} from '@nestjs/core'
 
-import {getUsername} from '../authn/authn.utils'
+import {getUsername} from '@caster/authn/authn.utils'
+
 import {UsersService} from '../users.service'
 import {AbilityFactory} from './ability.factory'
 import {

@@ -28,6 +28,7 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "paths": {
+      "@caster/authn/*": ["libs/authn/src/*"],
       "@caster/events/*": ["libs/events/src/*"],
       "@caster/graphql/*": ["libs/graphql/src/*"],
       "@caster/roles/*": ["libs/roles/src/*"],

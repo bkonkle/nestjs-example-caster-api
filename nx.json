@@ -22,6 +22,9 @@
     "api": {
       "tags": []
     },
+    "authn": {
+      "tags": []
+    },
     "events": {
       "tags": []
     },

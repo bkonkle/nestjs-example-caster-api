@@ -4,7 +4,7 @@ import {ScheduleModule} from '@nestjs/schedule'
 import {GraphQLModule} from '@nestjs/graphql'
 import {PrismaModule} from 'nestjs-prisma'
 
-import {AuthnModule} from '@caster/users/authn/authn.module'
+import {AuthnModule} from '@caster/authn/authn.module'
 import {ConfigModule} from '@caster/utils/config/config.module'
 import {HealthModule} from '@caster/utils/health/health.module'
 import {UsersModule} from '@caster/users/users.module'

@@ -8,7 +8,7 @@ import {
 import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {subject} from '@casl/ability'
 
-import {JwtGuard} from '@caster/users/authn/jwt.guard'
+import {JwtGuard} from '@caster/authn/jwt.guard'
 import {Ability, AllowAnonymous} from '@caster/users/authz/authz.decorators'
 import {AuthzGuard} from '@caster/users/authz/authz.guard'
 import {AppAbility} from '@caster/users/authz/authz.types'

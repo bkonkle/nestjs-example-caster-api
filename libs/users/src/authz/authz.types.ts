@@ -4,8 +4,8 @@ import {PermittedFieldsOptions} from '@casl/ability/extra'
 import {PrismaAbility, Subjects} from '@casl/prisma'
 
 import {InjectionToken} from '@caster/utils/injection'
+import {JwtContext, JwtRequest} from '@caster/authn/authn.types'
 
-import {JwtContext, JwtRequest} from '../authn/authn.types'
 import {UserWithProfile} from '../user.types'
 
 /**

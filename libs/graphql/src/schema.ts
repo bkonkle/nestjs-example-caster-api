@@ -132,25 +132,17 @@ export type MutateUserResult = {
 
 export type Mutation = {
   __typename?: 'Mutation'
-  getOrCreateCurrentUser: MutateUserResult
-  updateCurrentUser: MutateUserResult
   createProfile: MutateProfileResult
   updateProfile: MutateProfileResult
   deleteProfile: Scalars['Boolean']
+  getOrCreateCurrentUser: MutateUserResult
+  updateCurrentUser: MutateUserResult
   createShow: MutateShowResult
   updateShow: MutateShowResult
   deleteShow: Scalars['Boolean']
   createEpisode: MutateEpisodeResult
   updateEpisode: MutateEpisodeResult
   deleteEpisode: Scalars['Boolean']
-}
-
-export type MutationGetOrCreateCurrentUserArgs = {
-  input: CreateUserInput
-}
-
-export type MutationUpdateCurrentUserArgs = {
-  input: UpdateUserInput
 }
 
 export type MutationCreateProfileArgs = {
@@ -164,6 +156,14 @@ export type MutationUpdateProfileArgs = {
 
 export type MutationDeleteProfileArgs = {
   id: Scalars['ID']
+}
+
+export type MutationGetOrCreateCurrentUserArgs = {
+  input: CreateUserInput
+}
+
+export type MutationUpdateCurrentUserArgs = {
+  input: UpdateUserInput
 }
 
 export type MutationCreateShowArgs = {
@@ -242,9 +242,9 @@ export type ProfilesPage = {
 
 export type Query = {
   __typename?: 'Query'
-  getCurrentUser?: Maybe<User>
   getProfile?: Maybe<Profile>
   getManyProfiles: ProfilesPage
+  getCurrentUser?: Maybe<User>
   getShow?: Maybe<Show>
   getManyShows: ShowsPage
   getEpisode?: Maybe<Episode>
@@ -621,18 +621,6 @@ export type MutationResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
 > = ResolversObject<{
-  getOrCreateCurrentUser?: Resolver<
-    ResolversTypes['MutateUserResult'],
-    ParentType,
-    ContextType,
-    RequireFields<MutationGetOrCreateCurrentUserArgs, 'input'>
-  >
-  updateCurrentUser?: Resolver<
-    ResolversTypes['MutateUserResult'],
-    ParentType,
-    ContextType,
-    RequireFields<MutationUpdateCurrentUserArgs, 'input'>
-  >
   createProfile?: Resolver<
     ResolversTypes['MutateProfileResult'],
     ParentType,
@@ -650,6 +638,18 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationDeleteProfileArgs, 'id'>
+  >
+  getOrCreateCurrentUser?: Resolver<
+    ResolversTypes['MutateUserResult'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationGetOrCreateCurrentUserArgs, 'input'>
+  >
+  updateCurrentUser?: Resolver<
+    ResolversTypes['MutateUserResult'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationUpdateCurrentUserArgs, 'input'>
   >
   createShow?: Resolver<
     ResolversTypes['MutateShowResult'],
@@ -731,11 +731,6 @@ export type QueryResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
 > = ResolversObject<{
-  getCurrentUser?: Resolver<
-    Maybe<ResolversTypes['User']>,
-    ParentType,
-    ContextType
-  >
   getProfile?: Resolver<
     Maybe<ResolversTypes['Profile']>,
     ParentType,
@@ -747,6 +742,11 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryGetManyProfilesArgs, never>
+  >
+  getCurrentUser?: Resolver<
+    Maybe<ResolversTypes['User']>,
+    ParentType,
+    ContextType
   >
   getShow?: Resolver<
     Maybe<ResolversTypes['Show']>,

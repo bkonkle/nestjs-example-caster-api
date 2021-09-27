@@ -4,8 +4,8 @@ import {Args, ID, Int, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {subject} from '@casl/ability'
 
 import {fromOrderByInput} from '@caster/utils/prisma'
+import {JwtGuard} from '@caster/authn/jwt.guard'
 
-import {JwtGuard} from '../authn/jwt.guard'
 import {Ability, AllowAnonymous, Censor} from '../authz/authz.decorators'
 import {AppAbility, CensorFields} from '../authz/authz.types'
 import {AuthzGuard} from '../authz/authz.guard'

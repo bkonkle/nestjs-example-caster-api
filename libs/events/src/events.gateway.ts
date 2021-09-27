@@ -12,7 +12,7 @@ import {
 import {Logger, UseGuards} from '@nestjs/common'
 import {Socket} from 'socket.io'
 
-import {SocketJwtGuard} from '@caster/users/authn/socket-jwt.guard'
+import {SocketJwtGuard} from '@caster/authn/socket-jwt.guard'
 import {Ability, Censor} from '@caster/users/authz/authz.decorators'
 import {SocketAuthzGuard} from '@caster/users/authz/socket-authz.guard'
 import {Action, AppAbility, CensorFields} from '@caster/users/authz/authz.types'

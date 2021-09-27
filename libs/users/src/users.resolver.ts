@@ -1,8 +1,9 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql'
 import {ForbiddenException, UseGuards} from '@nestjs/common'
 
-import {Username} from './authn/jwt.decorators'
-import {JwtGuard} from './authn/jwt.guard'
+import {Username} from '@caster/authn/jwt.decorators'
+import {JwtGuard} from '@caster/authn/jwt.guard'
+
 import {AllowAnonymous} from './authz/authz.decorators'
 import {AuthzGuard} from './authz/authz.guard'
 import {User} from './user.model'
