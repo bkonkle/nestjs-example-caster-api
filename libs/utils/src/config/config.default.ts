@@ -92,11 +92,11 @@ export const schema: convict.Schema<Schema> = {
     },
   },
   auth: {
-    domain: {
-      doc: 'OAuth2 domain',
+    url: {
+      doc: 'OAuth2 url',
       format: String,
-      default: 'caster-api.us.auth0.com',
-      env: 'OAUTH2_DOMAIN',
+      default: 'https://my-domain.us.auth0.com',
+      env: 'OAUTH2_URL',
     },
     audience: {
       doc: 'OAuth2 audience',

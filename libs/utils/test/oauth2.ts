@@ -18,18 +18,15 @@ export const init = (config: Config = defaultConfig) => {
       try {
         const {
           data: {access_token: accessToken},
-        } = await axios.post(
-          `https://${config.get('auth.domain')}/oauth/token`,
-          {
-            grant_type: 'password',
-            username: config.get('auth.test.user.username'),
-            password: config.get('auth.test.user.password'),
-            client_id: config.get('auth.client.id'),
-            client_secret: config.get('auth.client.secret'),
-            scope: 'openid profile email',
-            audience: config.get('auth.audience'),
-          }
-        )
+        } = await axios.post(`${config.get('auth.url')}/oauth/token`, {
+          grant_type: 'password',
+          username: config.get('auth.test.user.username'),
+          password: config.get('auth.test.user.password'),
+          client_id: config.get('auth.client.id'),
+          client_secret: config.get('auth.client.secret'),
+          scope: 'openid profile email',
+          audience: config.get('auth.audience'),
+        })
         credentials.token = accessToken
       } catch (err) {
         console.error((err as AxiosError).response?.data)
@@ -41,7 +38,7 @@ export const init = (config: Config = defaultConfig) => {
     if (!credentials.username || !credentials.email) {
       const {
         data: {sub, email},
-      } = await axios.get(`https://${config.get('auth.domain')}/userinfo`, {
+      } = await axios.get(`${config.get('auth.url')}/userinfo`, {
         headers: {Authorization: `Bearer ${credentials.token}`},
       })
       credentials.username = sub
@@ -51,7 +48,7 @@ export const init = (config: Config = defaultConfig) => {
     if (!altCredentials.token) {
       const {
         data: {access_token: altAccessToken},
-      } = await axios.post(`https://${config.get('auth.domain')}/oauth/token`, {
+      } = await axios.post(`${config.get('auth.url')}/oauth/token`, {
         grant_type: 'password',
         username: config.get('auth.test.alt.username'),
         password: config.get('auth.test.alt.password'),
@@ -66,7 +63,7 @@ export const init = (config: Config = defaultConfig) => {
     if (!altCredentials.username || !altCredentials.email) {
       const {
         data: {sub: altSub, email: altEmail},
-      } = await axios.get(`https://${config.get('auth.domain')}/userinfo`, {
+      } = await axios.get(`${config.get('auth.url')}/userinfo`, {
         headers: {Authorization: `Bearer ${altCredentials.token}`},
       })
       altCredentials.username = altSub

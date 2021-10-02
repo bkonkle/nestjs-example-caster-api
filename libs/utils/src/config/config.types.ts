@@ -22,7 +22,7 @@ export interface Schema {
     url: string
   }
   auth: {
-    domain: string
+    url: string
     audience: string
     client: {
       id: string | null
