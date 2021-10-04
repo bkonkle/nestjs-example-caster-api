@@ -31,9 +31,6 @@ describe('EpisodesResolver', () => {
   const service = mockDeep<EpisodesService>()
   const users = mockDeep<UsersService>()
 
-  // Default to "true"
-  ability.can.mockReturnValue(true)
-
   const username = 'test-username'
   const email = 'test@email.com'
 
@@ -128,8 +125,8 @@ describe('EpisodesResolver', () => {
 
       const result = await resolver.createEpisode(input, user, ability)
 
-      expect(ability.can).toBeCalledTimes(1)
-      expect(ability.can).toBeCalledWith('create', input)
+      expect(ability.cannot).toBeCalledTimes(1)
+      expect(ability.cannot).toBeCalledWith('create', input)
 
       expect(service.create).toBeCalledTimes(1)
       expect(service.create).toBeCalledWith(input)
@@ -140,13 +137,13 @@ describe('EpisodesResolver', () => {
     it('requires authorization', async () => {
       const input: CreateEpisodeInput = {title: 'My Episode', showId: show.id}
 
-      ability.can.mockReturnValueOnce(false)
+      ability.cannot.mockReturnValueOnce(true)
 
       await expect(
         resolver.createEpisode(input, otherUser, ability)
       ).rejects.toThrowError('Forbidden')
 
-      expect(ability.can).toBeCalledTimes(1)
+      expect(ability.cannot).toBeCalledTimes(1)
       expect(roles.grantRoles).not.toBeCalled()
       expect(service.create).not.toBeCalled()
     })
@@ -161,8 +158,8 @@ describe('EpisodesResolver', () => {
 
       const result = await resolver.updateEpisode(episode.id, input, ability)
 
-      expect(ability.can).toBeCalledTimes(1)
-      expect(ability.can).toBeCalledWith('update', episode)
+      expect(ability.cannot).toBeCalledTimes(1)
+      expect(ability.cannot).toBeCalledWith('update', episode)
 
       expect(service.get).toBeCalledTimes(1)
       expect(service.get).toBeCalledWith(episode.id)
@@ -176,14 +173,14 @@ describe('EpisodesResolver', () => {
     it('requires authorization', async () => {
       const input: UpdateEpisodeInput = {title: 'Test Title'}
 
-      ability.can.mockReturnValueOnce(false)
+      ability.cannot.mockReturnValueOnce(true)
       service.get.mockResolvedValueOnce(episode as Episode)
 
       await expect(
         resolver.updateEpisode(episode.id, input, ability)
       ).rejects.toThrowError('Forbidden')
 
-      expect(ability.can).toBeCalledTimes(1)
+      expect(ability.cannot).toBeCalledTimes(1)
       expect(service.get).toBeCalledTimes(1)
       expect(service.update).not.toBeCalled()
     })
@@ -195,8 +192,8 @@ describe('EpisodesResolver', () => {
 
       const result = await resolver.deleteEpisode(episode.id, ability)
 
-      expect(ability.can).toBeCalledTimes(1)
-      expect(ability.can).toBeCalledWith('delete', episode)
+      expect(ability.cannot).toBeCalledTimes(1)
+      expect(ability.cannot).toBeCalledWith('delete', episode)
 
       expect(service.get).toBeCalledTimes(1)
       expect(service.get).toBeCalledWith(episode.id)
@@ -208,14 +205,14 @@ describe('EpisodesResolver', () => {
     })
 
     it('requires authorization', async () => {
-      ability.can.mockReturnValueOnce(false)
+      ability.cannot.mockReturnValueOnce(true)
       service.get.mockResolvedValueOnce(episode as Episode)
 
       await expect(
         resolver.deleteEpisode(episode.id, ability)
       ).rejects.toThrowError('Forbidden')
 
-      expect(ability.can).toBeCalledTimes(1)
+      expect(ability.cannot).toBeCalledTimes(1)
       expect(service.get).toBeCalledTimes(1)
       expect(service.delete).not.toBeCalled()
     })

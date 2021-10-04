@@ -38,7 +38,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection {
   ) {
     // Check for authorization
     if (
-      !ability.can(
+      ability.cannot(
         Action.Read,
         subject('Message', {
           episodeId: event.episodeId,
@@ -67,7 +67,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection {
 
     // Check for authorization
     if (
-      !ability.can(
+      ability.cannot(
         Action.Create,
         subject('Message', {
           episodeId: event.episodeId,

@@ -164,13 +164,12 @@ describe('ProfilesResolver', () => {
     it('uses the ProfilesService to create a Profile', async () => {
       const input: CreateProfileInput = {email, userId: user.id}
 
-      ability.can.mockReturnValueOnce(true)
       service.create.mockResolvedValueOnce(profile)
 
       const result = await resolver.createProfile(input, ability)
 
-      expect(ability.can).toBeCalledTimes(1)
-      expect(ability.can).toBeCalledWith('create', input)
+      expect(ability.cannot).toBeCalledTimes(1)
+      expect(ability.cannot).toBeCalledWith('create', input)
 
       expect(service.create).toBeCalledTimes(1)
       expect(service.create).toBeCalledWith(input)
@@ -181,11 +180,13 @@ describe('ProfilesResolver', () => {
     it('requires authorization', async () => {
       const input: CreateProfileInput = {email, userId: otherUser.id}
 
+      ability.cannot.mockReturnValueOnce(true)
+
       await expect(resolver.createProfile(input, ability)).rejects.toThrowError(
         'Forbidden'
       )
 
-      expect(ability.can).toBeCalledTimes(1)
+      expect(ability.cannot).toBeCalledTimes(1)
       expect(service.create).not.toBeCalled()
     })
   })
@@ -194,14 +195,13 @@ describe('ProfilesResolver', () => {
     it('uses the ProfilesService to update an existing Profile', async () => {
       const input: UpdateProfileInput = {displayName: 'Test Display Name'}
 
-      ability.can.mockReturnValueOnce(true)
       service.get.mockResolvedValueOnce(profile)
       service.update.mockResolvedValueOnce(profile)
 
       const result = await resolver.updateProfile(profile.id, input, ability)
 
-      expect(ability.can).toBeCalledTimes(1)
-      expect(ability.can).toBeCalledWith('update', profile)
+      expect(ability.cannot).toBeCalledTimes(1)
+      expect(ability.cannot).toBeCalledWith('update', profile)
 
       expect(service.get).toBeCalledTimes(1)
       expect(service.get).toBeCalledWith(profile.id)
@@ -215,6 +215,8 @@ describe('ProfilesResolver', () => {
     it('requires authorization', async () => {
       const input: UpdateProfileInput = {displayName: 'Test Display Name'}
 
+      ability.cannot.mockReturnValueOnce(true)
+
       service.get.mockResolvedValueOnce({
         ...profile,
         userId: otherUser.id,
@@ -225,7 +227,7 @@ describe('ProfilesResolver', () => {
         resolver.updateProfile(profile.id, input, ability)
       ).rejects.toThrowError('Forbidden')
 
-      expect(ability.can).toBeCalledTimes(1)
+      expect(ability.cannot).toBeCalledTimes(1)
       expect(service.get).toBeCalledTimes(1)
       expect(service.update).not.toBeCalled()
     })
@@ -233,13 +235,12 @@ describe('ProfilesResolver', () => {
 
   describe('deleteProfile()', () => {
     it('uses the ProfilesService to remove an existing Profile', async () => {
-      ability.can.mockReturnValueOnce(true)
       service.get.mockResolvedValueOnce(profile)
 
       const result = await resolver.deleteProfile(profile.id, ability)
 
-      expect(ability.can).toBeCalledTimes(1)
-      expect(ability.can).toBeCalledWith('delete', profile)
+      expect(ability.cannot).toBeCalledTimes(1)
+      expect(ability.cannot).toBeCalledWith('delete', profile)
 
       expect(service.get).toBeCalledTimes(1)
       expect(service.get).toBeCalledWith(profile.id)
@@ -257,11 +258,13 @@ describe('ProfilesResolver', () => {
         user: otherUser,
       })
 
+      ability.cannot.mockReturnValueOnce(true)
+
       await expect(
         resolver.deleteProfile(profile.id, ability)
       ).rejects.toThrowError('Forbidden')
 
-      expect(ability.can).toBeCalledTimes(1)
+      expect(ability.cannot).toBeCalledTimes(1)
       expect(service.get).toBeCalledTimes(1)
       expect(service.delete).not.toBeCalled()
     })

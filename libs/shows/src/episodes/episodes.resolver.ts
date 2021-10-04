@@ -74,7 +74,7 @@ export class EpisodesResolver {
       throw new BadRequestException('User object did not come with a Profile')
     }
 
-    if (!ability.can('create', subject('Episode', input as Episode))) {
+    if (ability.cannot('create', subject('Episode', input as Episode))) {
       throw new ForbiddenException()
     }
 
@@ -91,7 +91,7 @@ export class EpisodesResolver {
   ): Promise<MutateEpisodeResult> {
     const existing = await this.getExisting(id)
 
-    if (!ability.can('update', subject('Episode', existing))) {
+    if (ability.cannot('update', subject('Episode', existing))) {
       throw new ForbiddenException()
     }
 
@@ -107,7 +107,7 @@ export class EpisodesResolver {
   ): Promise<boolean> {
     const existing = await this.getExisting(id)
 
-    if (!ability.can('delete', subject('Episode', existing))) {
+    if (ability.cannot('delete', subject('Episode', existing))) {
       throw new ForbiddenException()
     }
 

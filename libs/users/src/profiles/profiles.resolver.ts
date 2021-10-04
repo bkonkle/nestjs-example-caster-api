@@ -72,11 +72,7 @@ export class ProfilesResolver {
     @Args('input') input: CreateProfileInput,
     @Ability() ability: AppAbility
   ): Promise<MutateProfileResult> {
-    const condition = ability.can(
-      'create',
-      subject('Profile', input as Profile)
-    )
-    if (!condition) {
+    if (ability.cannot('create', subject('Profile', input as Profile))) {
       throw new ForbiddenException()
     }
 
@@ -93,7 +89,7 @@ export class ProfilesResolver {
   ): Promise<MutateProfileResult> {
     const existing = await this.getExisting(id)
 
-    if (!ability.can('update', subject('Profile', existing))) {
+    if (ability.cannot('update', subject('Profile', existing))) {
       throw new ForbiddenException()
     }
 
@@ -109,7 +105,7 @@ export class ProfilesResolver {
   ): Promise<boolean> {
     const existing = await this.getExisting(id)
 
-    if (!ability.can('delete', subject('Profile', existing))) {
+    if (ability.cannot('delete', subject('Profile', existing))) {
       throw new ForbiddenException()
     }
 
