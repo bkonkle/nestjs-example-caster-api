@@ -1,14 +1,19 @@
 import {mockDeep} from 'jest-mock-extended'
 import {Test} from '@nestjs/testing'
+import {AbilityBuilder, subject} from '@casl/ability'
+import {Episode, Show} from '@prisma/client'
 
-import {Action, RuleBuilder} from '@caster/users/authz/authz.types'
+import {Action, AppAbility} from '@caster/users/authz/authz.types'
 import {RolesService} from '@caster/roles/roles.service'
 import {UserWithProfile} from '@caster/users/user.types'
 import {UserFactory} from '@caster/users/test/factories/user.factory'
 import {ProfileFactory} from '@caster/users/test/factories/profile.factory'
+import {ShowFactory} from '@caster/shows/test/factories/show.factory'
+import {RoleGrantFactory} from '@caster/roles/test/factories/role-grant.factory'
 
 import {Update, Delete, ManageEpisodes, ManageRoles} from '../show.roles'
 import {ShowRules} from '../show.rules'
+import {EpisodeFactory} from '@caster/shows/test/factories/episodes.factory'
 
 describe('ShowRules', () => {
   let rules: ShowRules
@@ -20,8 +25,6 @@ describe('ShowRules', () => {
     profileId: profile.id,
     profile,
   }) as UserWithProfile
-
-  const builder = mockDeep<RuleBuilder>()
 
   beforeAll(async () => {
     const testModule = await Test.createTestingModule({
@@ -37,28 +40,38 @@ describe('ShowRules', () => {
 
   describe('forUser()', () => {
     it('allows everyone to read', async () => {
+      const builder = new AbilityBuilder(AppAbility)
+
       await rules.forUser(undefined, builder)
 
       expect(roles.getPermissionsForTable).not.toBeCalled()
 
-      expect(builder.can).toBeCalledTimes(1)
-      expect(builder.can).toBeCalledWith(Action.Read, 'Show')
+      const ability = builder.build()
+
+      expect(ability.can(Action.Read, 'Show')).toBe(true)
     })
 
     it('allows authenticated users to create', async () => {
+      const builder = new AbilityBuilder(AppAbility)
+
       roles.getPermissionsForTable.mockResolvedValueOnce({})
 
       await rules.forUser(user, builder)
 
+      const ability = builder.build()
+
       expect(roles.getPermissionsForTable).toBeCalledTimes(1)
       expect(roles.getPermissionsForTable).toBeCalledWith(profile.id, 'Show')
 
-      expect(builder.can).toBeCalledTimes(2)
-      expect(builder.can).toBeCalledWith(Action.Create, 'Show')
+      expect(ability.can(Action.Create, 'Show')).toBe(true)
     })
 
     it('supports the Admin role', async () => {
+      const builder = new AbilityBuilder(AppAbility)
+
       const showId = 'test-show-id'
+      const show = ShowFactory.make({id: showId}) as Show
+      const episode = EpisodeFactory.make({showId}) as Episode
 
       roles.getPermissionsForTable.mockResolvedValueOnce({
         [showId]: [Update, Delete, ManageEpisodes, ManageRoles],
@@ -68,20 +81,28 @@ describe('ShowRules', () => {
 
       expect(roles.getPermissionsForTable).toBeCalledTimes(1)
 
-      expect(builder.can).toBeCalledTimes(6)
-      expect(builder.can).toBeCalledWith(Action.Update, 'Show', {id: showId})
-      expect(builder.can).toBeCalledWith(Action.Delete, 'Show', {id: showId})
-      expect(builder.can).toBeCalledWith(Action.Manage, 'Episode', {
-        showId: showId,
-      })
-      expect(builder.can).toBeCalledWith(Action.Manage, 'RoleGrant', {
-        subjectTable: 'Show',
-        subjectId: showId,
-      })
+      const ability = builder.build()
+
+      expect(ability.can(Action.Update, subject('Show', show)))
+      expect(ability.can(Action.Delete, subject('Show', show)))
+      expect(ability.can(Action.Manage, subject('Episode', episode)))
+      expect(
+        ability.can(
+          Action.Manage,
+          subject(
+            'RoleGrant',
+            RoleGrantFactory.make({subjectTable: 'Show', subjectId: showId})
+          )
+        )
+      )
     })
 
     it('allows users with a profile to manage episodes they are authorized to', async () => {
+      const builder = new AbilityBuilder(AppAbility)
+
       const showId = 'test-show-id'
+      const show = ShowFactory.make({id: showId}) as Show
+      const episode = EpisodeFactory.make({showId}) as Episode
 
       roles.getPermissionsForTable.mockResolvedValueOnce({
         [showId]: [Update, ManageEpisodes],
@@ -91,11 +112,10 @@ describe('ShowRules', () => {
 
       expect(roles.getPermissionsForTable).toBeCalledTimes(1)
 
-      expect(builder.can).toBeCalledTimes(4)
-      expect(builder.can).toBeCalledWith(Action.Update, 'Show', {id: showId})
-      expect(builder.can).toBeCalledWith(Action.Manage, 'Episode', {
-        showId: showId,
-      })
+      const ability = builder.build()
+
+      expect(ability.can(Action.Update, subject('Show', show)))
+      expect(ability.can(Action.Update, subject('Episode', episode)))
     })
   })
 })

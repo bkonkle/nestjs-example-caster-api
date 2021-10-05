@@ -19,9 +19,10 @@ export class AbilityFactory {
   ): Promise<AppAbility> {
     const {can, cannot, build} = new AbilityBuilder(AppAbility)
 
-    await Promise.all(
-      this.enhancers.map((enhancer) => enhancer.forUser(user, {can, cannot}))
-    )
+    // Run through each registered enhancer serially
+    for (const enhancer of this.enhancers) {
+      await enhancer.forUser(user, {can, cannot})
+    }
 
     return build()
   }

@@ -32,6 +32,7 @@
       "@caster/events/*": ["libs/events/src/*"],
       "@caster/graphql/*": ["libs/graphql/src/*"],
       "@caster/roles/*": ["libs/roles/src/*"],
+      "@caster/roles/test/*": ["libs/roles/test/*"],
       "@caster/shows/*": ["libs/shows/src/*"],
       "@caster/shows/test/*": ["libs/shows/test/*"],
       "@caster/users/*": ["libs/users/src/*"],

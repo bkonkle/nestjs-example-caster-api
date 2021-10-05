@@ -198,18 +198,14 @@ export class RolesService {
     subject: RoleSubject,
     roleKeys: string[]
   ): Promise<void> => {
-    await Promise.all(
-      roleKeys.map(this.getRole).map((role) =>
-        this.prisma.roleGrant.create({
-          data: {
-            roleKey: role.key,
-            profileId,
-            subjectTable: subject.table,
-            subjectId: subject.id,
-          },
-        })
-      )
-    )
+    await this.prisma.roleGrant.createMany({
+      data: roleKeys.map(this.getRole).map((role) => ({
+        roleKey: role.key,
+        profileId,
+        subjectTable: subject.table,
+        subjectId: subject.id,
+      })),
+    })
   }
 
   /**
