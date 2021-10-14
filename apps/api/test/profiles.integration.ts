@@ -8,7 +8,6 @@ import {PrismaService} from 'nestjs-prisma'
 import {OAuth2} from '@caster/utils/test/oauth2'
 import {GraphQL} from '@caster/utils/test/graphql'
 import {Validation} from '@caster/utils/test/validation'
-import {dbCleaner} from '@caster/utils/test/prisma'
 import {CreateProfileInput} from '@caster/users/profiles/profile-mutations.model'
 import {ProfileFactory} from '@caster/users/test/factories/profile.factory'
 import {Query, Mutation} from '@caster/graphql/schema'
@@ -24,8 +23,6 @@ describe('Profiles', () => {
 
   const {credentials, altCredentials} = OAuth2.init()
   const prisma = new PrismaService()
-
-  const tables = ['User', 'Profile']
 
   const createProfile = (input: CreateProfileInput) =>
     prisma.profile.upsert({
@@ -44,7 +41,8 @@ describe('Profiles', () => {
   })
 
   beforeAll(async () => {
-    await dbCleaner(prisma, tables)
+    await prisma.user.deleteMany({where: {}})
+    await prisma.profile.deleteMany({where: {}})
 
     const moduleFixture = await Test.createTestingModule({
       imports: [AppModule],

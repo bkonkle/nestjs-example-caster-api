@@ -1,4 +1,4 @@
-import {Profile, User, Show, Episode} from '@prisma/client'
+import {Prisma, Profile, User, Show, Episode} from '@prisma/client'
 import {INestApplication, ValidationPipe} from '@nestjs/common'
 import {Test} from '@nestjs/testing'
 import {PrismaService} from 'nestjs-prisma'
@@ -12,7 +12,6 @@ import {
   EventTypes,
   MessageSend,
 } from '@caster/events/event.types'
-import {dbCleaner} from '@caster/utils/test/prisma'
 import {OAuth2} from '@caster/utils/test/oauth2'
 import {retry} from '@caster/utils/test/events'
 import {Guest, Reader} from '@caster/shows/episodes/episode.roles'
@@ -40,8 +39,6 @@ describe('Events', () => {
 
   const {credentials, altCredentials} = OAuth2.init()
   const prisma = new PrismaService()
-
-  const tables = ['User', 'Profile', 'Show', 'Episode', 'RoleGrant']
 
   const createSocket = async (
     headers: Record<string, string> = defaultHeaders
@@ -78,7 +75,11 @@ describe('Events', () => {
   }
 
   beforeAll(async () => {
-    await dbCleaner(prisma, tables)
+    await prisma.user.deleteMany({where: {}})
+    await prisma.profile.deleteMany({where: {}})
+    await prisma.show.deleteMany({where: {}})
+    await prisma.episode.deleteMany({where: {}})
+    await prisma.roleGrant.deleteMany({where: {}})
 
     const moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
@@ -440,8 +441,9 @@ describe('Events', () => {
       await prisma.profile.create({
         data: {
           ...omit(profile, ['user', 'userId']),
+          content: undefined,
           user: {connect: {id: user.id}},
-        } as Profile,
+        } as Prisma.ProfileCreateInput,
       })
 
       // Give the profile the Guest role back

@@ -3,7 +3,7 @@ import {mockDeep} from 'jest-mock-extended'
 import {PrismaService} from 'nestjs-prisma'
 
 import {UserFactory} from '../../test/factories/user.factory'
-import {CreateUserInput, UpdateUserInput} from '../user-input.model'
+import {CreateUserInput, UpdateUserInput} from '../user-mutations.model'
 import {UsersService} from '../users.service'
 
 describe('UsersService', () => {

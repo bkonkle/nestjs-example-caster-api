@@ -11,7 +11,7 @@ import {
   CreateUserInput,
   MutateUserResult,
   UpdateUserInput,
-} from './user-input.model'
+} from './user-mutations.model'
 import {UsersService} from './users.service'
 import {RequestUser} from './user.decorators'
 

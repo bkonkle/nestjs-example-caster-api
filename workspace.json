@@ -64,7 +64,7 @@
         "db-migrate": {
           "executor": "@nrwl/workspace:run-commands",
           "options": {
-            "command": "yarn db:migrate"
+            "command": "npx prisma migrate dev --preview-feature"
           }
         },
         "db-deploy": {
@@ -77,7 +77,7 @@
         "db-reset": {
           "executor": "@nrwl/workspace:run-commands",
           "options": {
-            "command": "yarn db:reset -- --force"
+            "command": "npx prisma migrate reset --preview-feature --force"
           }
         },
         "docker-up": {

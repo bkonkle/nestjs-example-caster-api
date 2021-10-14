@@ -8,7 +8,6 @@ import {PrismaService} from 'nestjs-prisma'
 import {GraphQL} from '@caster/utils/test/graphql'
 import {Validation} from '@caster/utils/test/validation'
 import {OAuth2} from '@caster/utils/test/oauth2'
-import {dbCleaner} from '@caster/utils/test/prisma'
 import {CreateShowInput} from '@caster/shows/show-mutations.model'
 import {Admin} from '@caster/shows/show.roles'
 import {ShowFactory} from '@caster/shows/test/factories/show.factory'
@@ -37,8 +36,6 @@ describe('Shows', () => {
   const {credentials, altCredentials} = OAuth2.init()
   const prisma = new PrismaService()
 
-  const tables = ['User', 'Profile', 'Show']
-
   const createShow = (input: CreateShowInput) =>
     prisma.show.create({
       data: input,
@@ -47,7 +44,9 @@ describe('Shows', () => {
   const deleteShow = (id: string) => prisma.show.delete({where: {id}})
 
   beforeAll(async () => {
-    await dbCleaner(prisma, tables)
+    await prisma.user.deleteMany({where: {}})
+    await prisma.profile.deleteMany({where: {}})
+    await prisma.show.deleteMany({where: {}})
 
     const moduleFixture = await Test.createTestingModule({
       imports: [AppModule],

@@ -6,7 +6,6 @@ import {PrismaService} from 'nestjs-prisma'
 import {OAuth2} from '@caster/utils/test/oauth2'
 import {GraphQL} from '@caster/utils/test/graphql'
 import {Validation} from '@caster/utils/test/validation'
-import {dbCleaner} from '@caster/utils/test/prisma'
 import {UserFactory} from '@caster/users/test/factories/user.factory'
 import {Query, Mutation} from '@caster/graphql/schema'
 
@@ -18,8 +17,6 @@ describe('Users', () => {
 
   const {credentials} = OAuth2.init()
   const prisma = new PrismaService()
-
-  const tables = ['User']
 
   const createUser = async (
     input: Omit<Prisma.UserCreateInput, 'username'>
@@ -55,7 +52,7 @@ describe('Users', () => {
   }
 
   beforeAll(async () => {
-    await dbCleaner(prisma, tables)
+    await prisma.user.deleteMany({where: {}})
 
     const moduleFixture = await Test.createTestingModule({
       imports: [AppModule],

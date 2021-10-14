@@ -18,15 +18,18 @@ export const init = (config: Config = defaultConfig) => {
       try {
         const {
           data: {access_token: accessToken},
-        } = await axios.post(`${config.get('auth.url')}/oauth/token`, {
-          grant_type: 'password',
-          username: config.get('auth.test.user.username'),
-          password: config.get('auth.test.user.password'),
-          client_id: config.get('auth.client.id'),
-          client_secret: config.get('auth.client.secret'),
-          scope: 'openid profile email',
-          audience: config.get('auth.audience'),
-        })
+        } = await axios.post<{access_token?: string}>(
+          `${config.get('auth.url')}/oauth/token`,
+          {
+            grant_type: 'password',
+            username: config.get('auth.test.user.username'),
+            password: config.get('auth.test.user.password'),
+            client_id: config.get('auth.client.id'),
+            client_secret: config.get('auth.client.secret'),
+            scope: 'openid profile email',
+            audience: config.get('auth.audience'),
+          }
+        )
         credentials.token = accessToken
       } catch (err) {
         console.error((err as AxiosError).response?.data)
@@ -38,9 +41,12 @@ export const init = (config: Config = defaultConfig) => {
     if (!credentials.username || !credentials.email) {
       const {
         data: {sub, email},
-      } = await axios.get(`${config.get('auth.url')}/userinfo`, {
-        headers: {Authorization: `Bearer ${credentials.token}`},
-      })
+      } = await axios.get<{sub?: string; email?: string}>(
+        `${config.get('auth.url')}/userinfo`,
+        {
+          headers: {Authorization: `Bearer ${credentials.token}`},
+        }
+      )
       credentials.username = sub
       credentials.email = email
     }
@@ -48,24 +54,30 @@ export const init = (config: Config = defaultConfig) => {
     if (!altCredentials.token) {
       const {
         data: {access_token: altAccessToken},
-      } = await axios.post(`${config.get('auth.url')}/oauth/token`, {
-        grant_type: 'password',
-        username: config.get('auth.test.alt.username'),
-        password: config.get('auth.test.alt.password'),
-        client_id: config.get('auth.client.id'),
-        client_secret: config.get('auth.client.secret'),
-        scope: 'openid profile email',
-        audience: config.get('auth.audience'),
-      })
+      } = await axios.post<{access_token?: string}>(
+        `${config.get('auth.url')}/oauth/token`,
+        {
+          grant_type: 'password',
+          username: config.get('auth.test.alt.username'),
+          password: config.get('auth.test.alt.password'),
+          client_id: config.get('auth.client.id'),
+          client_secret: config.get('auth.client.secret'),
+          scope: 'openid profile email',
+          audience: config.get('auth.audience'),
+        }
+      )
       altCredentials.token = altAccessToken
     }
 
     if (!altCredentials.username || !altCredentials.email) {
       const {
         data: {sub: altSub, email: altEmail},
-      } = await axios.get(`${config.get('auth.url')}/userinfo`, {
-        headers: {Authorization: `Bearer ${altCredentials.token}`},
-      })
+      } = await axios.get<{sub?: string; email?: string}>(
+        `${config.get('auth.url')}/userinfo`,
+        {
+          headers: {Authorization: `Bearer ${altCredentials.token}`},
+        }
+      )
       altCredentials.username = altSub
       altCredentials.email = altEmail
     }

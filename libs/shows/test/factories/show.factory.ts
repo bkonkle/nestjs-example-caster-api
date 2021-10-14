@@ -4,7 +4,7 @@ import {Show} from '../../src/show.model'
 import {CreateShowInput} from '../../src/show-mutations.model'
 
 export const makeCreateInput = (
-  overrides?: Partial<CreateShowInput> | null
+  overrides?: Partial<CreateShowInput>
 ): CreateShowInput => {
   return {
     title: faker.hacker.noun(),
@@ -15,7 +15,7 @@ export const makeCreateInput = (
   }
 }
 
-export const make = (overrides?: Partial<Show> | null): Show => {
+export const make = (overrides?: Partial<Show>): Show => {
   return {
     id: faker.datatype.uuid(),
     createdAt: faker.date.recent(),

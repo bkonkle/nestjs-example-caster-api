@@ -9,14 +9,14 @@ export class CreateProfileInput {
   @Field()
   email!: string
 
-  @Field(() => String, {nullable: true})
-  displayName?: string | null
+  @Field({nullable: true})
+  displayName?: string
 
-  @Field(() => String, {nullable: true})
-  picture?: string | null
+  @Field({nullable: true})
+  picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.JsonValue | null
+  content?: Prisma.InputJsonValue
 
   @Field()
   userId!: string
@@ -24,24 +24,24 @@ export class CreateProfileInput {
 
 @InputType()
 export class UpdateProfileInput {
-  @Field(() => String, {nullable: true})
-  email?: string | null
+  @Field({nullable: true})
+  email?: string
 
-  @Field(() => String, {nullable: true})
-  displayName?: string | null
+  @Field({nullable: true})
+  displayName?: string
 
-  @Field(() => String, {nullable: true})
-  picture?: string | null
+  @Field({nullable: true})
+  picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.JsonValue | null
+  content?: Prisma.InputJsonValue
 
-  @Field(() => String, {nullable: true})
-  userId?: string | null
+  @Field({nullable: true})
+  userId?: string
 }
 
 @ObjectType()
 export class MutateProfileResult {
   @Field(() => Profile, {nullable: true})
-  profile?: Profile | null
+  profile?: Profile
 }

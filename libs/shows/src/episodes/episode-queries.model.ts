@@ -32,28 +32,28 @@ export class EpisodesPage {
 @InputType()
 export class EpisodeCondition {
   @Field(() => ID, {nullable: true})
-  id?: string | null
+  id?: string
 
-  @Field(() => String, {nullable: true})
+  @Field({nullable: true})
   title?: string
 
-  @Field(() => String, {nullable: true})
-  summary?: string | null
+  @Field({nullable: true})
+  summary?: string
 
-  @Field(() => String, {nullable: true})
-  picture?: string | null
+  @Field({nullable: true})
+  picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.JsonValue | null
+  content?: Prisma.InputJsonValue
 
-  @Field(() => String, {nullable: true})
-  showId?: string | null
-
-  @Field(() => Date, {nullable: true})
-  createdAt?: Date | null
+  @Field({nullable: true})
+  showId?: string
 
   @Field(() => Date, {nullable: true})
-  updatedAt?: Date | null
+  createdAt?: Date
+
+  @Field(() => Date, {nullable: true})
+  updatedAt?: Date
 }
 
 export enum EpisodesOrderBy {

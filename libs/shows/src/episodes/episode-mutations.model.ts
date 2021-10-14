@@ -6,42 +6,42 @@ import {Episode} from './episode.model'
 
 @InputType()
 export class CreateEpisodeInput {
-  @Field(() => String)
+  @Field()
   title!: string
 
-  @Field(() => String, {nullable: true})
-  summary?: string | null
+  @Field({nullable: true})
+  summary?: string
 
-  @Field(() => String, {nullable: true})
-  picture?: string | null
+  @Field({nullable: true})
+  picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.JsonValue | null
+  content?: Prisma.InputJsonValue
 
-  @Field(() => String)
+  @Field()
   showId!: string
 }
 
 @InputType()
 export class UpdateEpisodeInput {
-  @Field(() => String, {nullable: true})
+  @Field({nullable: true})
   title?: string
 
-  @Field(() => String, {nullable: true})
-  summary?: string | null
+  @Field({nullable: true})
+  summary?: string
 
-  @Field(() => String, {nullable: true})
-  picture?: string | null
+  @Field({nullable: true})
+  picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.JsonValue | null
+  content?: Prisma.InputJsonValue
 
-  @Field(() => String, {nullable: true})
-  showId?: string | null
+  @Field({nullable: true})
+  showId?: string
 }
 
 @ObjectType()
 export class MutateEpisodeResult {
   @Field(() => Episode, {nullable: true})
-  episode?: Episode | null
+  episode?: Episode
 }

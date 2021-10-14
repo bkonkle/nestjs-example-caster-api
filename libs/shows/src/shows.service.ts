@@ -23,7 +23,7 @@ export class ShowsService {
 
   async getMany(options: {
     where: Prisma.ShowWhereInput | undefined
-    orderBy: Prisma.ShowOrderByInput | undefined
+    orderBy: Prisma.ShowOrderByWithRelationInput | undefined
     pageSize?: number
     page?: number
   }): Promise<ManyResponse<Show>> {

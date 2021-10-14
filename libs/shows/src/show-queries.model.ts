@@ -32,25 +32,25 @@ export class ShowsPage {
 @InputType()
 export class ShowCondition {
   @Field(() => ID, {nullable: true})
-  id?: string | null
+  id?: string
 
-  @Field(() => String, {nullable: true})
+  @Field({nullable: true})
   title?: string
 
-  @Field(() => String, {nullable: true})
-  summary?: string | null
+  @Field({nullable: true})
+  summary?: string
 
-  @Field(() => String, {nullable: true})
-  picture?: string | null
+  @Field({nullable: true})
+  picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.JsonValue | null
+  content?: Prisma.InputJsonValue
 
   @Field(() => Date, {nullable: true})
-  createdAt?: Date | null
+  createdAt?: Date
 
   @Field(() => Date, {nullable: true})
-  updatedAt?: Date | null
+  updatedAt?: Date
 }
 
 export enum ShowsOrderBy {

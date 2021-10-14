@@ -4,7 +4,7 @@ import {Profile} from '../../src/profiles/profile.model'
 import {CreateProfileInput} from '../../src/profiles/profile-mutations.model'
 
 export const makeCreateInput = (
-  overrides?: Partial<CreateProfileInput> | null
+  overrides?: Partial<CreateProfileInput>
 ): CreateProfileInput => {
   return {
     email: faker.internet.email(),
@@ -15,7 +15,7 @@ export const makeCreateInput = (
   }
 }
 
-export const make = (overrides?: Partial<Profile> | null): Profile => {
+export const make = (overrides?: Partial<Profile>): Profile => {
   return {
     id: faker.datatype.uuid(),
     createdAt: faker.date.recent(),

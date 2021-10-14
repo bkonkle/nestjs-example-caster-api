@@ -6,36 +6,36 @@ import {Show} from './show.model'
 
 @InputType()
 export class CreateShowInput {
-  @Field(() => String)
+  @Field()
   title!: string
 
-  @Field(() => String, {nullable: true})
-  summary?: string | null
+  @Field({nullable: true})
+  summary?: string
 
-  @Field(() => String, {nullable: true})
-  picture?: string | null
+  @Field({nullable: true})
+  picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.JsonValue | null
+  content?: Prisma.InputJsonValue
 }
 
 @InputType()
 export class UpdateShowInput {
-  @Field(() => String, {nullable: true})
+  @Field({nullable: true})
   title?: string
 
-  @Field(() => String, {nullable: true})
-  summary?: string | null
+  @Field({nullable: true})
+  summary?: string
 
-  @Field(() => String, {nullable: true})
-  picture?: string | null
+  @Field({nullable: true})
+  picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.JsonValue | null
+  content?: Prisma.InputJsonValue
 }
 
 @ObjectType()
 export class MutateShowResult {
   @Field(() => Show, {nullable: true})
-  show?: Show | null
+  show?: Show
 }

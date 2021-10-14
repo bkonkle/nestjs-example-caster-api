@@ -32,28 +32,28 @@ export class ProfilesPage {
 @InputType()
 export class ProfileCondition {
   @Field(() => ID, {nullable: true})
-  id?: string | null
+  id?: string
 
-  @Field(() => String, {nullable: true})
-  email?: string | null
+  @Field({nullable: true})
+  email?: string
 
-  @Field(() => String, {nullable: true})
-  displayName?: string | null
+  @Field({nullable: true})
+  displayName?: string
 
-  @Field(() => String, {nullable: true})
-  picture?: string | null
+  @Field({nullable: true})
+  picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.JsonValue | null
+  content?: Prisma.InputJsonValue
 
   @Field(() => ID, {nullable: true})
-  userId?: string | null
+  userId?: string
 
   @Field(() => Date, {nullable: true})
-  createdAt?: Date | null
+  createdAt?: Date
 
   @Field(() => Date, {nullable: true})
-  updatedAt?: Date | null
+  updatedAt?: Date
 }
 
 export enum ProfilesOrderBy {

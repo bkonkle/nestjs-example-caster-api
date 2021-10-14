@@ -20,7 +20,7 @@ export class ProfilesService {
 
   async getMany(options: {
     where: Prisma.ProfileWhereInput | undefined
-    orderBy: Prisma.ProfileOrderByInput | undefined
+    orderBy: Prisma.ProfileOrderByWithRelationInput | undefined
     pageSize?: number
     page?: number
   }) {

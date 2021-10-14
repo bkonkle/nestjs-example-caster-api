@@ -23,7 +23,7 @@ export class EpisodesService {
 
   async getMany(options: {
     where: Prisma.EpisodeWhereInput | undefined
-    orderBy: Prisma.EpisodeOrderByInput | undefined
+    orderBy: Prisma.EpisodeOrderByWithRelationInput | undefined
     pageSize?: number
     page?: number
   }): Promise<ManyResponse<Episode>> {
