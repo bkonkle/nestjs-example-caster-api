@@ -1,0 +1,19 @@
+# Start by ignoring everything
+*
+
+# Package management
+!package.json
+!yarn.lock
+!package-lock.json
+!.yarnrc
+!.npmrc
+
+# source files
+!src/
+
+# Configs
+!.eslintrc.js
+!.eslintignore
+!.prettierignore
+!tsconfig.app.json
+!tsconfig.json

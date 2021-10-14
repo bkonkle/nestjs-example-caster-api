@@ -1,0 +1,25 @@
+# Start by ignoring everything
+*
+
+# Package management
+!package.json
+!yarn.lock
+!package-lock.json
+!.yarnrc
+!.npmrc
+
+# dist files
+!dist
+!node_modules/.prisma/client
+node_modules/.prisma/client/query-engine-*
+!node_modules/.prisma/client/query-engine-linux-musl-*
+
+# Configs
+!.eslintrc.js
+!.eslintignore
+!.prettierignore
+!.prettierrc
+!nest-cli.json
+!tsconfig.base.json
+!workspace.json
+!nx.json

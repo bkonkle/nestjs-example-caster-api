@@ -17,7 +17,8 @@
             "outputPath": "dist/apps/api",
             "main": "apps/api/src/main.ts",
             "tsConfig": "apps/api/tsconfig.app.json",
-            "assets": ["apps/api/src/assets"]
+            "assets": ["apps/api/src/assets"],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -25,6 +26,16 @@
               "extractLicenses": true,
               "inspect": false
             }
+          }
+        },
+        "package": {
+          "builder": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "nx build api",
+              "docker build -f ./apps/api/Dockerfile . -t caster-api"
+            ],
+            "parallel": false
           }
         },
         "serve": {
