@@ -32,6 +32,7 @@
           "builder": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
+              "nx run-many --target codegen --all --parallel",
               "nx build api",
               "docker build -f ./apps/api/Dockerfile . -t caster-api"
             ],
@@ -95,14 +96,14 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "cwd": "apps/api",
-            "command": "docker-compose up -d"
+            "command": "yarn docker:api up -d"
           }
         },
         "docker-down": {
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "cwd": "apps/api",
-            "command": "docker-compose down"
+            "command": "yarn docker:api down"
           }
         }
       }
