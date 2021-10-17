@@ -18,14 +18,17 @@ jobs:
       - run: echo "🚀 Automatically triggered by a ${{ github.event_name }}"
       - run: echo "🔎 Running on a ${{ runner.os }} server based on ${{ github.ref }}"
 
-      - uses: actions/checkout@v2
+      - name: Git Checkout
+        uses: actions/checkout@v2
+
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
           cache: yarn
 
-      - run: yarn --frozen-lockfile --prefer-offline
+      - run: yarn --frozen-lockfile --ignore-scripts --prefer-offline
+      - run: yarn nx codegen api # Generate Prisma first
       - run: yarn nx run-many --target codegen --all
       - run: yarn nx run-many --target test --all
       - run: yarn nx run-many --target lint --all
