@@ -36,7 +36,7 @@ jobs:
             cache-dist-${{ hashFiles('yarn.lock') }}-
 
       - run: yarn --frozen-lockfile --ignore-scripts --prefer-offline
-      - run: git fetch --no-tags --prune --depth=1 origin main
+      - run: git fetch --no-tags --prune --depth=5 origin main
       - run: yarn nx codegen api # Generate Prisma first
       - run: yarn nx run-many --target codegen --all
       - run: yarn nx affected --target test --base origin/main --parallel
