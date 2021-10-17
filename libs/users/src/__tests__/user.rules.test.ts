@@ -1,9 +1,8 @@
 import {Test} from '@nestjs/testing'
 import {AbilityBuilder, subject} from '@casl/ability'
 
-import {ProfileFactory} from '@caster/users/test/factories/profile.factory'
-import {UserFactory} from '@caster/users/test/factories/user.factory'
-
+import {ProfileFactory} from '../../test/factories/profile.factory'
+import {UserFactory} from '../../test/factories/user.factory'
 import {UserRules} from '../user.rules'
 import {UserWithProfile} from '../user.types'
 import {Action, AppAbility} from '../authz/authz.types'
