@@ -7,17 +7,14 @@ on:
   push:
     branches:
       - main
-      - releases/*
     paths-ignore:
       - '**.md'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🚀 Automatically triggered by a ${{ github.event_name }}"
-      - run: echo "🔎 Running on a ${{ runner.os }} server based on ${{ github.ref }}"
-
       - name: Git Checkout
         uses: actions/checkout@v2
         with:
@@ -28,15 +25,20 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
-          cache: yarn
 
-      - name: Cache Nx
+      - name: Cache node_modules
         uses: actions/cache@v2
         with:
-          path: node_modules/.cache/nx
-          key: cache-nx-${{ hashFiles('yarn.lock') }}-${{ github.sha }}
+          path: node_modules
+          key: cache-node-modules-${{ hashFiles('yarn.lock') }}
+
+      - name: Cache dist files
+        uses: actions/cache@v2
+        with:
+          path: dist
+          key: cache-dist-${{ hashFiles('yarn.lock') }}-${{ github.sha }}
           restore-keys: |
-            cache-nx-${{ hashFiles('yarn.lock') }}-
+            cache-dist-${{ hashFiles('yarn.lock') }}-
 
       - run: yarn --frozen-lockfile --ignore-scripts --prefer-offline
       - run: git fetch --no-tags --prune --depth=1 origin main
@@ -45,3 +47,31 @@ jobs:
       - run: yarn nx affected --target test --base origin/main --parallel
       - run: yarn nx affected --target lint --base origin/main --parallel
       - run: yarn nx affected --target build --base origin/main --prod --parallel
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: cache-node-modules-${{ hashFiles('yarn.lock') }}
+
+      - name: Cache dist files
+        uses: actions/cache@v2
+        with:
+          path: dist
+          key: cache-dist-${{ hashFiles('yarn.lock') }}-${{ github.sha }}
+          restore-keys: |
+            cache-dist-${{ hashFiles('yarn.lock') }}-
+
+      - run: yarn nx package api
