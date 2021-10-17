@@ -54,7 +54,8 @@
         "codegen": {
           "executor": "@nrwl/workspace:run-commands",
           "options": {
-            "command": "npx prisma generate --schema apps/api/prisma/schema.prisma"
+            "cwd": "apps/api",
+            "command": "npx prisma generate --schema prisma/schema.prisma"
           }
         },
         "test": {
@@ -172,7 +173,11 @@
         "codegen": {
           "executor": "@nrwl/workspace:run-commands",
           "options": {
-            "command": "npx graphql-codegen"
+            "commands": [
+              "yarn ts --project apps/api/tsconfig.json apps/api/scripts/codegen-schema.ts",
+              "npx graphql-codegen"
+            ],
+            "parallel": false
           }
         }
       }

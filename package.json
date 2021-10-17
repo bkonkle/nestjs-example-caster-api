@@ -35,6 +35,7 @@
     "start": "nx serve",
     "start:api": "nx serve api",
     "test": "nx run-many --target test --all",
+    "ts": "ts-node --transpile-only -r tsconfig-paths/register --compiler-options '{\"module\":\"CommonJS\"}'",
     "ts:check": "tsc -b ./apps/*/tsconfig.json --incremental",
     "update": "nx migrate latest",
     "workspace-generator": "nx workspace-generator"
