@@ -1,0 +1,28 @@
+name: build-test
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  push:
+    branches:
+      - main
+      - releases/*
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🚀 Automatically triggered by a ${{ github.event_name }}"
+      - run: echo "🔎 Running on a ${{ runner.os }} server based on ref ${{ github.ref }}"
+      - uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - run: yarn --frozen-lockfile --ignore-scripts --prefer-offline
+      - run: yarn nx-run-many --target=test --all
+      - run: yarn nx-run-many --target=lint --all
+      - run: yarn nx-run-many --target=build --all --prod

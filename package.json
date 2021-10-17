@@ -22,7 +22,7 @@
     "db:migrate": "nx db-migrate",
     "db:reset": "nx db-reset",
     "docker:api": "cd apps/api && docker-compose -f docker-compose.yml",
-    "docker:api-all": "cd apps/api && docker-compose -f docker-compose.yml -f docker-compose.app.yml",
+    "docker:api-app": "cd apps/api && docker-compose -f docker-compose.yml -f docker-compose.app.yml",
     "dep-graph": "nx dep-graph",
     "format": "nx format:write",
     "format:check": "nx format:check",
