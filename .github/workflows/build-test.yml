@@ -23,6 +23,6 @@ jobs:
         with:
           node-version: 14.x
       - run: yarn --frozen-lockfile --ignore-scripts --prefer-offline
-      - run: yarn nx-run-many --target=test --all
-      - run: yarn nx-run-many --target=lint --all
-      - run: yarn nx-run-many --target=build --all --prod
+      - run: yarn nx run-many --target=test --all
+      - run: yarn nx run-many --target=lint --all
+      - run: yarn nx run-many --target=build --all --prod
