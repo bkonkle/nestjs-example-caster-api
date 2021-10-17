@@ -30,6 +30,14 @@ jobs:
           node-version: 14.x
           cache: yarn
 
+      - name: Cache Nx
+        uses: actions/cache@v2
+        with:
+          path: node_modules/.cache/nx
+          key: cache-nx-${{ hashFiles('yarn.lock') }}-${{ github.sha }}
+          restore-keys: |
+            cache-nx-${{ hashFiles('yarn.lock') }}-
+
       - run: yarn --frozen-lockfile --ignore-scripts --prefer-offline
       - run: git fetch --no-tags --prune --depth=1 origin main
       - run: yarn nx codegen api # Generate Prisma first
