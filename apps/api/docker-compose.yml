@@ -1,14 +1,20 @@
 version: '3.1'
 
 services:
-  api:
-    image: caster-api
-    container_name: caster_api
-    depends_on:
-      - postgres
-      - redis
+  postgres:
+    image: postgres
+    container_name: caster_postgres
+    restart: always
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
     ports:
-      - 4000:4000
+      - ${DATABASE_PORT}:5432
     environment:
-      DATABASE_URL: postgresql://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@postgres:${DATABASE_PORT}/${DATABASE_NAME}
-      REDIS_URL: redis:6379
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+  redis:
+    image: redis
+    container_name: caster_redis
+    ports:
+      - 6379:6379
