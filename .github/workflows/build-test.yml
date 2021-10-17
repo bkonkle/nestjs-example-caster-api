@@ -25,6 +25,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
+          cache: yarn
 
       - name: Cache node_modules
         uses: actions/cache@v2
@@ -41,7 +42,7 @@ jobs:
             cache-dist-${{ hashFiles('yarn.lock') }}-
 
       - run: yarn --frozen-lockfile --ignore-scripts --prefer-offline
-      - run: git fetch --no-tags --prune --depth=1 origin main
+      - run: git fetch --no-tags --prune --depth=5 origin main
       - run: yarn nx codegen api # Generate Prisma first
       - run: yarn nx run-many --target codegen --all
       - run: yarn nx affected --target test --base origin/main --parallel
@@ -59,6 +60,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
+          cache: yarn
 
       - name: Cache node_modules
         uses: actions/cache@v2
