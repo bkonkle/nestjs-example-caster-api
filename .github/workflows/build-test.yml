@@ -20,6 +20,9 @@ jobs:
 
       - name: Git Checkout
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
@@ -27,9 +30,18 @@ jobs:
           node-version: 14.x
           cache: yarn
 
+      - name: Cache Nx
+        uses: actions/cache@v2
+        with:
+          path: node_modules/.cache/nx
+          key: cache-nx-${{ hashFiles('yarn.lock') }}-${{ github.sha }}
+          restore-keys: |
+            cache-nx-${{ hashFiles('yarn.lock') }}-
+
       - run: yarn --frozen-lockfile --ignore-scripts --prefer-offline
+      - run: git fetch --no-tags --prune --depth=1 origin main
       - run: yarn nx codegen api # Generate Prisma first
       - run: yarn nx run-many --target codegen --all
-      - run: yarn nx run-many --target test --all
-      - run: yarn nx run-many --target lint --all
-      - run: yarn nx run-many --target build --all --prod
+      - run: yarn nx affected --target test --base origin/main --parallel
+      - run: yarn nx affected --target lint --base origin/main --parallel
+      - run: yarn nx affected --target build --base origin/main --prod --parallel
