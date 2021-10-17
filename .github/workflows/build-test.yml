@@ -97,7 +97,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./apps/api
-          file: ./Dockerfile
+          file: ./apps/api/Dockerfile
           push: false
           tags: caster-api:latest
 
