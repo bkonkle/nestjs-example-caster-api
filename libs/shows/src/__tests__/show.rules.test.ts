@@ -8,12 +8,12 @@ import {RolesService} from '@caster/roles/roles.service'
 import {UserWithProfile} from '@caster/users/user.types'
 import {UserFactory} from '@caster/users/test/factories/user.factory'
 import {ProfileFactory} from '@caster/users/test/factories/profile.factory'
-import {ShowFactory} from '@caster/shows/test/factories/show.factory'
 import {RoleGrantFactory} from '@caster/roles/test/factories/role-grant.factory'
 
+import {ShowFactory} from '../../test/factories/show.factory'
+import {EpisodeFactory} from '../../test/factories/episodes.factory'
 import {Update, Delete, ManageEpisodes, ManageRoles} from '../show.roles'
 import {ShowRules} from '../show.rules'
-import {EpisodeFactory} from '@caster/shows/test/factories/episodes.factory'
 
 describe('ShowRules', () => {
   let rules: ShowRules
