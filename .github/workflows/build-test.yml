@@ -31,7 +31,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: cache-node-modules-${{ hashFiles('yarn.lock') }}
+          key: node-cache-${{ runner.os }}-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            node-cache-${{ runner.os }}-modules-
 
       - name: Cache dist files
         uses: actions/cache@v2
@@ -66,7 +68,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: cache-node-modules-${{ hashFiles('yarn.lock') }}
+          key: node-cache-${{ runner.os }}-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            node-cache-${{ runner.os }}-modules-
 
       - name: Cache dist files
         uses: actions/cache@v2
