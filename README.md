@@ -53,7 +53,7 @@ Either way, this should not be enabled in your Production environment. The passw
 
 Set the client id and secret to `OAUTH2_CLIENT_ID` and `OAUTH2_CLIENT_SECRET` in your `apps/api/.env`.
 
-Finally, create two test users to use with the integration tests. Save their credentials to `OAUTH2_TEST_USER`, `OAUTH2_TEST_PASS`, `OAUTH2_TEST_ALT_USER`, and `OAUTH2_TEST_ALT_PASS`. These credentials should _not_ be valid in Production.
+Finally, create two test users to use with the integration tests. Save their credentials to `TEST_USER`, `TEST_PASS`, `TEST_ALT_USER`, and `TEST_ALT_PASS`. These credentials should _not_ be valid in Production.
 
 ### DB Setup
 

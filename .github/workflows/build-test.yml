@@ -6,7 +6,7 @@ on:
       - '**.md'
   push:
     branches:
-      - main
+      - $default-branch
     paths-ignore:
       - '**.md'
   workflow_dispatch:
@@ -15,8 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Git Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
@@ -27,36 +26,21 @@ jobs:
           node-version: 14.x
           cache: yarn
 
-      - name: Cache node_modules
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: node-cache-${{ runner.os }}-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            node-cache-${{ runner.os }}-modules-
-
-      - name: Cache dist files
-        uses: actions/cache@v2
-        with:
-          path: dist
-          key: cache-dist-${{ hashFiles('yarn.lock') }}-${{ github.sha }}
-          restore-keys: |
-            cache-dist-${{ hashFiles('yarn.lock') }}-
+      - uses: ./.github/workflows/actions/cache-app.yml
 
       - run: yarn --frozen-lockfile --ignore-scripts --prefer-offline
-      - run: git fetch --no-tags --prune --depth=5 origin main
+      - run: git fetch --no-tags --prune --depth=5 origin $default-branch
       - run: yarn nx codegen api # Generate Prisma first
       - run: yarn nx run-many --target codegen --all
-      - run: yarn nx affected --target test --base origin/main --parallel
-      - run: yarn nx affected --target lint --base origin/main --parallel
+      - run: yarn nx affected --target test --base origin/$default-branch --parallel
+      - run: yarn nx affected --target lint --base origin/$default-branch --parallel
       - run: yarn nx run-many --target build --all --prod --parallel
 
   test:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
@@ -64,33 +48,8 @@ jobs:
           node-version: 14.x
           cache: yarn
 
-      - name: Cache node_modules
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: node-cache-${{ runner.os }}-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            node-cache-${{ runner.os }}-modules-
-
-      - name: Cache dist files
-        uses: actions/cache@v2
-        with:
-          path: dist
-          key: cache-dist-${{ hashFiles('yarn.lock') }}-${{ github.sha }}
-          restore-keys: |
-            cache-dist-${{ hashFiles('yarn.lock') }}-
-
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v1
+      - uses: ./.github/workflows/actions/cache-app.yml
+      - uses: ./.github/workflows/actions/setup-docker.yml
 
       - name: Run docker-compose
         run: yarn docker:api --env-file .env.ci up -d
@@ -101,36 +60,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v2
-
-      - name: Cache node_modules
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: node-cache-${{ runner.os }}-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            node-cache-${{ runner.os }}-modules-
-
-      - name: Cache dist files
-        uses: actions/cache@v2
-        with:
-          path: dist
-          key: cache-dist-${{ hashFiles('yarn.lock') }}-${{ github.sha }}
-          restore-keys: |
-            cache-dist-${{ hashFiles('yarn.lock') }}-
-
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v1
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/actions/cache-app.yml
+      - uses: ./.github/workflows/actions/setup-docker.yml
 
       - name: Docker build
         id: docker_build
