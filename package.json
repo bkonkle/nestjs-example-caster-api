@@ -18,7 +18,7 @@
     "affected:test": "nx affected:test",
     "build": "nx run-many --target build --all",
     "codegen": "nx run-many --target codegen --all --parallel",
-    "db:deploy": "nx db-deploy",
+    "db:deploy": "dotenv -e apps/api/.env.ci nx db-deploy",
     "db:migrate": "nx db-migrate",
     "db:reset": "nx db-reset",
     "docker:api": "cd apps/api && docker-compose -f docker-compose.yml",
