@@ -42,6 +42,7 @@ Thumbs.db
 # dotenv environment variable files
 .env*
 !.env.example
+!.env.ci
 
 # terraform files
 .terraform
