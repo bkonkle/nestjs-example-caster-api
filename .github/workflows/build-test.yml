@@ -26,7 +26,7 @@ jobs:
           node-version: 14.x
           cache: yarn
 
-      - uses: ./.github/workflows/actions/cache-app.yml
+      - uses: ./.github/workflows/actions/cache-app
 
       - run: yarn --frozen-lockfile --ignore-scripts --prefer-offline
       - run: git fetch --no-tags --prune --depth=5 origin $default-branch
@@ -48,8 +48,8 @@ jobs:
           node-version: 14.x
           cache: yarn
 
-      - uses: ./.github/workflows/actions/cache-app.yml
-      - uses: ./.github/workflows/actions/setup-docker.yml
+      - uses: ./.github/workflows/actions/cache-app
+      - uses: ./.github/workflows/actions/setup-docker
 
       - name: Run docker-compose
         run: yarn docker:api --env-file .env.ci up -d
@@ -61,8 +61,8 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/workflows/actions/cache-app.yml
-      - uses: ./.github/workflows/actions/setup-docker.yml
+      - uses: ./.github/workflows/actions/cache-app
+      - uses: ./.github/workflows/actions/setup-docker
 
       - name: Docker build
         id: docker_build
