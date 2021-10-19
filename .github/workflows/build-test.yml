@@ -54,6 +54,7 @@ jobs:
       - name: Run docker-compose
         run: yarn docker:api --env-file .env.ci up -d
 
+      - run: yarn db:deploy
       - run: yarn integration:ci
         env:
           OAUTH2_CLIENT_ID: ${{ secrets.OAUTH2_CLIENT_ID }}
