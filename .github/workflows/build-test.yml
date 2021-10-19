@@ -6,7 +6,7 @@ on:
       - '**.md'
   push:
     branches:
-      - $default-branch
+      - ${{ github.event.repository.default_branch }}
     paths-ignore:
       - '**.md'
   workflow_dispatch:
@@ -29,11 +29,11 @@ jobs:
       - uses: ./.github/workflows/actions/cache-app
 
       - run: yarn --frozen-lockfile --ignore-scripts --prefer-offline
-      - run: git fetch --no-tags --prune --depth=5 origin $default-branch
+      - run: git fetch --no-tags --prune --depth=5 origin ${{ github.event.repository.default_branch }}
       - run: yarn nx codegen api # Generate Prisma first
       - run: yarn nx run-many --target codegen --all
-      - run: yarn nx affected --target test --base origin/$default-branch --parallel
-      - run: yarn nx affected --target lint --base origin/$default-branch --parallel
+      - run: yarn nx affected --target test --base origin/${{ github.event.repository.default_branch }} --parallel
+      - run: yarn nx affected --target lint --base origin/${{ github.event.repository.default_branch }} --parallel
       - run: yarn nx run-many --target build --all --prod --parallel
 
   test:
