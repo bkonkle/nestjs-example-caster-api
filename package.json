@@ -29,7 +29,7 @@
     "format:write": "nx format:write",
     "help": "nx help",
     "integration": "nx run-many --target integration --all",
-    "integration:ci": "dotenv -e .env.ci yarn integration",
+    "integration:ci": "dotenv -e apps/api/.env.ci yarn integration",
     "lint": "nx workspace-lint && nx lint",
     "nx": "nx",
     "prepare": "husky install",
