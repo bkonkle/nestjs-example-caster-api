@@ -38,7 +38,7 @@ model RoleGrant {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   roleKey      String
-  profile      Profile  @relation(fields: [profileId], references: [id])
+  profile      Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId    String
   subjectTable String
   subjectId    String
@@ -59,7 +59,7 @@ model Episode {
   id        String    @id @default(dbgenerated("ulid_generate()"))
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  show      Show      @relation(fields: [showId], references: [id])
+  show      Show      @relation(fields: [showId], references: [id], onDelete: Cascade)
   showId    String
   title     String
   summary   String?
@@ -73,8 +73,8 @@ model Message {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   text      String
-  profile   Profile  @relation(fields: [profileId], references: [id])
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId String
-  episode   Episode  @relation(fields: [episodeId], references: [id])
+  episode   Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
   episodeId String
 }
