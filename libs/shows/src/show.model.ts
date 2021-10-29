@@ -7,7 +7,7 @@ export class Show {
   @Field(() => ID)
   id!: string
 
-  @Field(() => String)
+  @Field()
   title!: string
 
   @Field(() => String, {nullable: true})
