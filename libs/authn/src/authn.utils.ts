@@ -23,16 +23,16 @@ export const getRequest = (context: ExecutionContext): JwtRequest => {
 }
 
 /**
- * Return a boolean indicating whether a user is present on the request.
+ * Return a boolean indicating whether a jwt is present on the request.
  */
 export const isAuthenticated = (req: JwtRequest): boolean => Boolean(req.jwt)
 
 /**
- * Return the user parameter on requests if present.
+ * Return the jwt parameter on requests if present.
  */
 export const getJwt = (req: JwtRequest): JWT | undefined => req.jwt
 
 /**
- * Return the user sub parameter on requests if present.
+ * Return the jwt sub parameter on requests if present.
  */
 export const getUsername = (req: JwtRequest): string | undefined => req.jwt?.sub
