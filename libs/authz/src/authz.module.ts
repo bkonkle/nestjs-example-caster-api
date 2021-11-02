@@ -1,7 +1,8 @@
 import {DynamicModule, Module} from '@nestjs/common'
 import {Class} from 'type-fest'
 
-import {UsersModule} from '../users.module'
+import {UsersModule} from '@caster/users/users.module'
+
 import {AbilityFactory} from './ability.factory'
 import {Rules, RuleEnhancer} from './authz.types'
 

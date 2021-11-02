@@ -9,8 +9,8 @@ import {
 import {Reflector} from '@nestjs/core'
 
 import {getUsername} from '@caster/authn/authn.utils'
+import {UsersService} from '@caster/users/users.service'
 
-import {UsersService} from '../users.service'
 import {AbilityFactory} from './ability.factory'
 import {
   ALLOW_ANONYMOUS,

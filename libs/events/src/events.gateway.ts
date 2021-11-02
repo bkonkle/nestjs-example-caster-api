@@ -13,9 +13,9 @@ import {Logger, UseGuards} from '@nestjs/common'
 import {Socket} from 'socket.io'
 
 import {SocketJwtGuard} from '@caster/authn/socket-jwt.guard'
-import {Ability, Censor} from '@caster/users/authz/authz.decorators'
-import {SocketAuthzGuard} from '@caster/users/authz/socket-authz.guard'
-import {Action, AppAbility, CensorFields} from '@caster/users/authz/authz.types'
+import {Ability, Censor} from '@caster/authz/authz.decorators'
+import {SocketAuthzGuard} from '@caster/authz/socket-authz.guard'
+import {Action, AppAbility, CensorFields} from '@caster/authz/authz.types'
 import {RequestUser} from '@caster/users/user.decorators'
 import {UserWithProfile} from '@caster/users/user.types'
 

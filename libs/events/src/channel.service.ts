@@ -5,7 +5,7 @@ import {subject} from '@casl/ability'
 
 import {ProfilesService} from '@caster/users/profiles/profiles.service'
 import {fieldOptions} from '@caster/users/profiles/profile.utils'
-import {CensorFields} from '@caster/users/authz/authz.types'
+import {CensorFields} from '@caster/authz/authz.types'
 
 import {
   ChatMessage,

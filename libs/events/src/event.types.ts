@@ -1,7 +1,7 @@
 import {Redis} from 'ioredis'
 import {Socket} from 'socket.io'
 
-import {CensorFields} from '@caster/users/authz/authz.types'
+import {CensorFields} from '@caster/authz/authz.types'
 import {ProfileWithUser} from '@caster/users/profiles/profile.utils'
 import {InjectionToken} from '@caster/utils/injection'
 

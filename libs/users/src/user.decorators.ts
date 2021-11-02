@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 
-import {getRequest} from './authz/authz.utils'
+import {getRequest} from '@caster/authz/authz.utils'
 
 /**
  * Return the User object if present, optionally requiring it.

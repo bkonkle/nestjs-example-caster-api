@@ -3,10 +3,11 @@ import {subject} from '@casl/ability'
 import {Test} from '@nestjs/testing'
 import {mockFn, mockDeep} from 'jest-mock-extended'
 
+import {AppAbility, CensorFields} from '@caster/authz/authz.types'
+import {AuthzTestModule} from '@caster/authz/authz-test.module'
+
 import {UserFactory} from '../../../test/factories/user.factory'
 import {ProfileFactory} from '../../../test/factories/profile.factory'
-import {AppAbility, CensorFields} from '../../authz/authz.types'
-import {AuthzTestModule} from '../../authz/authz-test.module'
 import {UserWithProfile} from '../../user.types'
 import {
   CreateProfileInput,

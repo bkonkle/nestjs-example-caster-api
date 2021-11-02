@@ -3,9 +3,9 @@ import {Reflector} from '@nestjs/core'
 import {Test} from '@nestjs/testing'
 import {mockDeep} from 'jest-mock-extended'
 
-import {UserFactory} from '../../../test/factories/user.factory'
-import {UserWithProfile} from '../../user.types'
-import {UsersService} from '../../users.service'
+import {UserFactory} from '@caster/users/test/factories/user.factory'
+import {UserWithProfile} from '@caster/users/user.types'
+import {UsersService} from '@caster/users/users.service'
 
 import {AbilityFactory} from '../ability.factory'
 import {AuthzGuard} from '../authz.guard'

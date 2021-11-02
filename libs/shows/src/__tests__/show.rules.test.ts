@@ -3,7 +3,7 @@ import {Test} from '@nestjs/testing'
 import {AbilityBuilder, subject} from '@casl/ability'
 import {Episode, Show} from '@prisma/client'
 
-import {Action, AppAbility} from '@caster/users/authz/authz.types'
+import {Action, AppAbility} from '@caster/authz/authz.types'
 import {RolesService} from '@caster/roles/roles.service'
 import {UserWithProfile} from '@caster/users/user.types'
 import {UserFactory} from '@caster/users/test/factories/user.factory'

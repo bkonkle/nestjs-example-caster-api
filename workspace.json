@@ -132,6 +132,27 @@
         }
       }
     },
+    "authz": {
+      "root": "libs/authz",
+      "sourceRoot": "libs/authz/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/authz/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/authz"],
+          "options": {
+            "jestConfig": "libs/authz/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "events": {
       "root": "libs/events",
       "sourceRoot": "libs/events/src",

@@ -3,9 +3,10 @@ import {Test} from '@nestjs/testing'
 import {subject} from '@casl/ability'
 import {mockDeep} from 'jest-mock-extended'
 
-import {ProfileFactory} from '../../../test/factories/profile.factory'
-import {UserFactory} from '../../../test/factories/user.factory'
-import {UserWithProfile} from '../../user.types'
+import {ProfileFactory} from '@caster/users/test/factories/profile.factory'
+import {UserFactory} from '@caster/users/test/factories/user.factory'
+import {UserWithProfile} from '@caster/users/user.types'
+
 import {AbilityFactory} from '../ability.factory'
 import {Action, RuleEnhancer, Rules} from '../authz.types'
 

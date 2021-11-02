@@ -3,9 +3,9 @@ import {ForbiddenException, UseGuards} from '@nestjs/common'
 
 import {Username} from '@caster/authn/jwt.decorators'
 import {JwtGuard} from '@caster/authn/jwt.guard'
+import {AllowAnonymous} from '@caster/authz/authz.decorators'
+import {AuthzGuard} from '@caster/authz/authz.guard'
 
-import {AllowAnonymous} from './authz/authz.decorators'
-import {AuthzGuard} from './authz/authz.guard'
 import {User} from './user.model'
 import {
   CreateUserInput,

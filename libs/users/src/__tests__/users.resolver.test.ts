@@ -1,9 +1,10 @@
 import {Test} from '@nestjs/testing'
 import {mockDeep} from 'jest-mock-extended'
 
+import {AbilityFactory} from '@caster/authz/ability.factory'
+import {AppAbility} from '@caster/authz/authz.types'
+
 import {UserFactory} from '../../test/factories/user.factory'
-import {AbilityFactory} from '../authz/ability.factory'
-import {AppAbility} from '../authz/authz.types'
 import {UsersResolver} from '../users.resolver'
 import {UsersService} from '../users.service'
 import {UserWithProfile} from '../user.types'

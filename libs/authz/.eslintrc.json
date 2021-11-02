@@ -5,7 +5,7 @@
     "@nrwl/nx/enforce-module-boundaries": [
       "error",
       {
-        "allow": ["@caster/authz"]
+        "allow": ["@caster/users"]
       }
     ]
   },

@@ -1,7 +1,7 @@
 import {Prisma, Profile, User} from '@prisma/client'
 import {PermittedFieldsOptions} from '@casl/ability/extra'
 
-import {AppAbility} from '../authz/authz.types'
+import {AppAbility} from '@caster/authz/authz.types'
 import {ProfileCondition} from './profile-queries.model'
 import {UpdateProfileInput} from './profile-mutations.model'
 

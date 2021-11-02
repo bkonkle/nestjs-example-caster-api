@@ -25,6 +25,9 @@
     "authn": {
       "tags": []
     },
+    "authz": {
+      "tags": []
+    },
     "events": {
       "tags": []
     },

@@ -5,8 +5,7 @@ import {PrismaAbility, Subjects} from '@casl/prisma'
 
 import {InjectionToken} from '@caster/utils/injection'
 import {JwtContext, JwtRequest} from '@caster/authn/authn.types'
-
-import {UserWithProfile} from '../user.types'
+import {UserWithProfile} from '@caster/users/user.types'
 
 /**
  * Abilities for the App, based on Prisma Entities

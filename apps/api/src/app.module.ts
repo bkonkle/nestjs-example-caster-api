@@ -17,7 +17,7 @@ import {ShowRoles} from '@caster/shows/show.roles'
 import {EpisodesModule} from '@caster/shows/episodes/episodes.module'
 import {EpisodeRules} from '@caster/shows/episodes/episode.rules'
 import {EpisodeRoles} from '@caster/shows/episodes/episode.roles'
-import {AuthzModule} from '@caster/users/authz/authz.module'
+import {AuthzModule} from '@caster/authz/authz.module'
 import {RolesModule} from '@caster/roles/roles.module'
 import {EventsModule} from '@caster/events/events.module'
 
