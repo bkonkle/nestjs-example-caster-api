@@ -30,9 +30,13 @@ const isTest = env === 'test'
 @Module({
   imports: [
     AuthnModule,
+
     ConfigModule,
+
     HealthModule,
+
     ScheduleModule.forRoot(),
+
     PrismaModule.forRoot({
       isGlobal: true,
       prismaServiceOptions: {
@@ -40,25 +44,35 @@ const isTest = env === 'test'
         explicitConnect: true,
       },
     }),
+
     GraphQLModule.forRoot({
       debug: isDev,
       autoSchemaFile: join(process.cwd(), 'schema.graphql'),
       context: ({req}) => ({req}),
     }),
+
     EventsModule.forRoot(),
+
     AuthzModule.forRoot({
       rules: [UserRules, ProfileRules, ShowRules, EpisodeRules],
     }),
+
     RolesModule.forRoot({
       roles: [...ShowRoles.roles, ...EpisodeRoles.roles],
       permissions: [...ShowRoles.permissions, ...EpisodeRoles.permissions],
     }),
+
     UsersModule,
+
     ProfilesModule,
+
     ShowsModule,
+
     EpisodesModule,
   ],
+
   providers: [Logger],
+
   controllers: [AppController],
 })
 export class AppModule {}
