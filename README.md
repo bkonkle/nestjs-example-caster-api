@@ -8,7 +8,7 @@
 [<img alt="Socket.io" src="https://img.shields.io/github/package-json/dependency-version/bkonkle/nestjs-example-caster-api/socket.io?logo=socket.io&style=flat&color=25c2a0" />]()
 [<img alt="ioredis" src="https://img.shields.io/github/package-json/dependency-version/bkonkle/nestjs-example-caster-api/ioredis?logo=redis&style=flat&color=a51f17" />](https://github.com/luin/ioredis)
 
-This is an example app for the Nest.js Video Series by [Brandon Konkle](https://github.com/bkonkle). It implements a basic API to support a number of hypothetical frontends for the imaginary "Caster" app, a tool to help podcasters, broadcasters, and streamers coordinate show content with their co-hosts and guests. Limited to just the API to support the front end.
+This is an example app for the [Nest.js Video Series](https://www.youtube.com/playlist?list=PLPBbm-mOByrQSs8WWN-yxkxcbE33-r1Vx) by [Brandon Konkle](https://github.com/bkonkle). It implements a basic API to support a number of hypothetical frontends for the imaginary "Caster" app, a tool to help podcasters, broadcasters, and streamers coordinate show content with their co-hosts and guests. Limited to just the API to support the front end.
 
 ## API Features
 
