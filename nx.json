@@ -1,6 +1,7 @@
 {
+  "npmScope": "caster",
   "affected": {
-    "defaultBase": "develop"
+    "defaultBase": "main"
   },
   "cli": {
     "defaultCollection": "@nrwl/nest"
@@ -12,7 +13,6 @@
     },
     ".eslintrc.json": "*"
   },
-  "npmScope": "caster",
   "tasksRunnerOptions": {
     "default": {
       "runner": "@nrwl/workspace/tasks-runners/default",
@@ -20,5 +20,13 @@
         "cacheableOperations": ["build", "lint", "test", "e2e", "codegen"]
       }
     }
+  },
+  "targetDependencies": {
+    "build": [
+      {
+        "target": "build",
+        "projects": "dependencies"
+      }
+    ]
   }
 }

@@ -7,6 +7,7 @@
     "url": "git@github.com:bkonkle/nestjs-example-caster-api.git"
   },
   "author": "Brandon Konkle <brandon@konkle.us> (http://konkle.us)",
+  "private": true,
   "scripts": {
     "affected": "nx affected",
     "affected:apps": "nx affected:apps",
@@ -41,7 +42,6 @@
     "update": "nx migrate latest",
     "workspace-generator": "nx workspace-generator"
   },
-  "private": true,
   "dependencies": {
     "@casl/ability": "^5.4.3",
     "@casl/prisma": "^1.0.1",
@@ -67,7 +67,7 @@
     "date-fns-tz": "^1.1.6",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "graphql": "^16.2.0",
+    "graphql": "^15.8.0",
     "graphql-extensions": "^0.15.0",
     "graphql-type-json": "^0.3.2",
     "ioredis": "^4.28.0",
