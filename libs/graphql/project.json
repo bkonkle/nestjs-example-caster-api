@@ -1,0 +1,31 @@
+{
+  "root": "libs/graphql",
+  "sourceRoot": "libs/graphql/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/graphql/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/graphql"],
+      "options": {
+        "jestConfig": "libs/graphql/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "codegen": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": [
+          "yarn ts --project apps/api/tsconfig.json apps/api/scripts/codegen-schema.ts",
+          "npx graphql-codegen"
+        ],
+        "parallel": false
+      }
+    }
+  }
+}

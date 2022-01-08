@@ -1,13 +1,16 @@
 {
+  "affected": {
+    "defaultBase": "develop"
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/nest"
+  },
   "implicitDependencies": {
     "package.json": {
       "dependencies": "*",
       "devDependencies": "*"
     },
     ".eslintrc.json": "*"
-  },
-  "affected": {
-    "defaultBase": "develop"
   },
   "npmScope": "caster",
   "tasksRunnerOptions": {
@@ -16,35 +19,6 @@
       "options": {
         "cacheableOperations": ["build", "lint", "test", "e2e", "codegen"]
       }
-    }
-  },
-  "projects": {
-    "api": {
-      "tags": []
-    },
-    "authn": {
-      "tags": []
-    },
-    "authz": {
-      "tags": []
-    },
-    "events": {
-      "tags": []
-    },
-    "graphql": {
-      "tags": []
-    },
-    "roles": {
-      "tags": []
-    },
-    "shows": {
-      "tags": []
-    },
-    "users": {
-      "tags": []
-    },
-    "utils": {
-      "tags": []
     }
   }
 }

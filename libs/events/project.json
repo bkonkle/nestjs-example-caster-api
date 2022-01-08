@@ -1,0 +1,21 @@
+{
+  "root": "libs/events",
+  "sourceRoot": "libs/events/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/events/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/events"],
+      "options": {
+        "jestConfig": "libs/events/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  }
+}

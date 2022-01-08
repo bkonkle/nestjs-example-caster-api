@@ -1,0 +1,21 @@
+{
+  "root": "libs/shows",
+  "sourceRoot": "libs/shows/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/shows/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/shows"],
+      "options": {
+        "jestConfig": "libs/shows/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  }
+}

@@ -35,7 +35,7 @@ describe('UsersResolver', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    jest.clearAllMocks()
   })
 
   describe('getCurrentUser()', () => {
