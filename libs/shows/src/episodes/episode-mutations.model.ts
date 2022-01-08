@@ -16,7 +16,7 @@ export class CreateEpisodeInput {
   picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.InputJsonValue
+  content?: Prisma.JsonValue
 
   @Field()
   showId!: string
@@ -34,7 +34,7 @@ export class UpdateEpisodeInput {
   picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.InputJsonValue
+  content?: Prisma.JsonValue
 
   @Field({nullable: true})
   showId?: string

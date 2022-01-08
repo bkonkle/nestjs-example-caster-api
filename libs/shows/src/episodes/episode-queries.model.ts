@@ -44,7 +44,7 @@ export class EpisodeCondition {
   picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.InputJsonValue
+  content?: Prisma.JsonValue
 
   @Field({nullable: true})
   showId?: string

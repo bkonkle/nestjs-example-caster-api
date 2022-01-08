@@ -44,7 +44,7 @@ export class ShowCondition {
   picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.InputJsonValue
+  content?: Prisma.JsonValue
 
   @Field(() => Date, {nullable: true})
   createdAt?: Date

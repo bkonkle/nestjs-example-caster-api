@@ -7,6 +7,7 @@ import {
   ManyResponse,
   paginateResponse,
 } from '@caster/utils/pagination'
+import {toUndefinedProps} from '@caster/utils/types'
 
 import {CreateEpisodeInput, UpdateEpisodeInput} from './episode-mutations.model'
 import {fromEpisodeInput} from './episode.utils'
@@ -44,7 +45,7 @@ export class EpisodesService {
 
   async create(input: CreateEpisodeInput): Promise<Episode> {
     return this.prisma.episode.create({
-      data: input,
+      data: toUndefinedProps(input),
     })
   }
 

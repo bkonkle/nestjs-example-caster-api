@@ -7,6 +7,7 @@ import {
   ManyResponse,
   paginateResponse,
 } from '@caster/utils/pagination'
+import {toUndefinedProps} from '@caster/utils/types'
 
 import {CreateShowInput, UpdateShowInput} from './show-mutations.model'
 import {fromShowInput} from './show.utils'
@@ -44,7 +45,7 @@ export class ShowsService {
 
   async create(input: CreateShowInput): Promise<Show> {
     return this.prisma.show.create({
-      data: input,
+      data: toUndefinedProps(input),
     })
   }
 

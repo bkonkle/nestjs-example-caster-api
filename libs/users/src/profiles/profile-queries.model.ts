@@ -44,7 +44,7 @@ export class ProfileCondition {
   picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.InputJsonValue
+  content?: Prisma.JsonValue
 
   @Field(() => ID, {nullable: true})
   userId?: string

@@ -3,6 +3,7 @@ import {Prisma} from '@prisma/client'
 import {PrismaService} from 'nestjs-prisma'
 
 import {getOffset, paginateResponse} from '@caster/utils/pagination'
+import {toUndefinedProps} from '@caster/utils/types'
 
 import {CreateProfileInput, UpdateProfileInput} from './profile-mutations.model'
 import {fromProfileInput} from './profile.utils'
@@ -44,7 +45,7 @@ export class ProfilesService {
     return this.prisma.profile.create({
       include: {user: true},
       data: {
-        ...input,
+        ...toUndefinedProps(input),
         userId: undefined,
         user: {
           connect: {id: input.userId},

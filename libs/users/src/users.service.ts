@@ -1,6 +1,8 @@
 import {Injectable} from '@nestjs/common'
 import {PrismaService} from 'nestjs-prisma'
 
+import {toUndefinedProps} from '@caster/utils/types'
+
 import {CreateUserInput, UpdateUserInput} from './user-mutations.model'
 
 @Injectable()
@@ -28,7 +30,7 @@ export class UsersService {
         ...input,
         profile: input.profile
           ? {
-              create: input.profile,
+              create: toUndefinedProps(input.profile),
             }
           : undefined,
       },

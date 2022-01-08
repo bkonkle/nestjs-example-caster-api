@@ -16,7 +16,7 @@ export class CreateUserProfileInput {
   picture?: string
 
   @Field(() => GraphqlTypeJson, {nullable: true})
-  content?: Prisma.InputJsonValue
+  content?: Prisma.JsonValue
 }
 
 @InputType()

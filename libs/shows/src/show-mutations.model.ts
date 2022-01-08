@@ -16,7 +16,7 @@ export class CreateShowInput {
   picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.InputJsonValue
+  content?: Prisma.JsonValue
 }
 
 @InputType()
@@ -31,7 +31,7 @@ export class UpdateShowInput {
   picture?: string
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.InputJsonValue
+  content?: Prisma.JsonValue
 }
 
 @ObjectType()
