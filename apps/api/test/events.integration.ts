@@ -258,7 +258,7 @@ describe('Events', () => {
           args: [
             {
               episodeId: episode.id,
-              sender: reserialize(omit(profile, ['content'])),
+              sender: reserialize(profile),
               text: 'Test message',
             },
           ],
@@ -335,7 +335,7 @@ describe('Events', () => {
               episodeId: episode.id,
               sender: reserialize(
                 // With a censored user
-                omit(profile, ['email', 'user', 'userId', 'content'])
+                omit(profile, ['email', 'user', 'userId'])
               ),
               text: 'Test message',
             },
