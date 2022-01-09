@@ -6,7 +6,6 @@ import {omit, pick} from 'lodash'
 import {PrismaService} from 'nestjs-prisma'
 
 import {GraphQL} from '@caster/utils/test/graphql'
-import {Validation} from '@caster/utils/test/validation'
 import {OAuth2} from '@caster/utils/test/oauth2'
 import {CreateShowInput} from '@caster/shows/show-mutations.model'
 import {Admin} from '@caster/shows/show.roles'
@@ -119,7 +118,7 @@ describe('Shows', () => {
 
       const expected = {
         ...show,
-        id: expect.stringMatching(Validation.uuidRegex),
+        id: expect.any(String),
       }
 
       const {data} = await graphql.mutation<Pick<Mutation, 'createShow'>>(

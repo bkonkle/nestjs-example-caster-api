@@ -5,7 +5,6 @@ import {PrismaService} from 'nestjs-prisma'
 
 import {OAuth2} from '@caster/utils/test/oauth2'
 import {GraphQL} from '@caster/utils/test/graphql'
-import {Validation} from '@caster/utils/test/validation'
 import {UserFactory} from '@caster/users/test/factories/user.factory'
 import {Query, Mutation} from '@caster/graphql/schema'
 
@@ -203,7 +202,7 @@ describe('Users', () => {
       const variables = {input: {username, profile: {email}}}
 
       const expected = {
-        id: expect.stringMatching(Validation.uuidRegex),
+        id: expect.any(String),
         username,
         isActive: true,
       }

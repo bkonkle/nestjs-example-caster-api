@@ -7,7 +7,6 @@ import {PrismaService} from 'nestjs-prisma'
 
 import {OAuth2} from '@caster/utils/test/oauth2'
 import {GraphQL} from '@caster/utils/test/graphql'
-import {Validation} from '@caster/utils/test/validation'
 import {CreateProfileInput} from '@caster/users/profiles/profile-mutations.model'
 import {ProfileFactory} from '@caster/users/test/factories/profile.factory'
 import {Query, Mutation} from '@caster/graphql/schema'
@@ -107,7 +106,7 @@ describe('Profiles', () => {
 
       const expected = {
         ...profile,
-        id: expect.stringMatching(Validation.uuidRegex),
+        id: expect.any(String),
       }
 
       const {data} = await graphql.mutation<Pick<Mutation, 'createProfile'>>(

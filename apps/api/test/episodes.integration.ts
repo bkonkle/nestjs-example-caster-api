@@ -7,7 +7,6 @@ import {PrismaService} from 'nestjs-prisma'
 
 import {OAuth2} from '@caster/utils/test/oauth2'
 import {GraphQL} from '@caster/utils/test/graphql'
-import {Validation} from '@caster/utils/test/validation'
 import {CreateEpisodeInput} from '@caster/shows/episodes/episode-mutations.model'
 import {Admin, Manager} from '@caster/shows/show.roles'
 import {ShowFactory} from '@caster/shows/test/factories/show.factory'
@@ -160,7 +159,7 @@ describe('Episodes', () => {
 
       const expected = {
         ...episode,
-        id: expect.stringMatching(Validation.uuidRegex),
+        id: expect.any(String),
       }
 
       const {data} = await graphql.mutation<Pick<Mutation, 'createEpisode'>>(
@@ -241,7 +240,7 @@ describe('Episodes', () => {
 
       const expected = {
         ...episode,
-        id: expect.stringMatching(Validation.uuidRegex),
+        id: expect.any(String),
       }
 
       const {data} = await graphql.mutation<Pick<Mutation, 'createEpisode'>>(
