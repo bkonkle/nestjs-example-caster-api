@@ -20,7 +20,6 @@ import {fromOrderByInput} from '@caster/utils/prisma'
 import {Show as ShowModel} from './show.model'
 import {ShowsService} from './shows.service'
 import {Admin} from './show.roles'
-import {fromShowCondition} from './show.utils'
 import {ShowCondition, ShowsOrderBy, ShowsPage} from './show-queries.model'
 import {
   CreateShowInput,
@@ -58,7 +57,7 @@ export class ShowsResolver {
     @Args('page', {type: () => Int, nullable: true}) page?: number
   ): Promise<ShowsPage> {
     return this.service.getMany({
-      where: fromShowCondition(where),
+      where,
       orderBy: fromOrderByInput(orderBy),
       pageSize,
       page,

@@ -14,6 +14,7 @@ import {ShowFactory} from '@caster/shows/test/factories/show.factory'
 import {EpisodeFactory} from '@caster/shows/test/factories/episodes.factory'
 import {Query, Mutation} from '@caster/graphql/schema'
 import {ProfileFactory} from '@caster/users/test/factories/profile.factory'
+import {fixJsonInput} from '@caster/utils/types'
 
 import {AppModule} from '../src/app.module'
 
@@ -46,13 +47,17 @@ describe('Episodes', () => {
 
   const createEpisode = (input: CreateEpisodeInput) =>
     prisma.episode.create({
-      data: {
-        ...input,
-        showId: undefined,
-        show: {
-          connect: {id: show.id},
+      data: omit(
+        {
+          ...input,
+          show: {
+            connect: {id: show.id},
+          },
+          // Fix the Json input, because it can be either DbNull or JsonNull
+          content: input.content === null ? 'DbNull' : input.content,
         },
-      },
+        'showId'
+      ),
     })
 
   const deleteEpisode = (id: string) => prisma.episode.delete({where: {id}})
@@ -86,11 +91,11 @@ describe('Episodes', () => {
 
     profile = await prisma.profile.create({
       include: {user: true},
-      data: ProfileFactory.makeCreateInput({userId: user.id}),
+      data: fixJsonInput(ProfileFactory.makeCreateInput({userId: user.id})),
     })
 
     show = await prisma.show.create({
-      data: ShowFactory.makeCreateInput(),
+      data: fixJsonInput(ShowFactory.makeCreateInput()),
     })
   })
 
@@ -105,7 +110,9 @@ describe('Episodes', () => {
 
     _otherProfile = await prisma.profile.create({
       include: {user: true},
-      data: ProfileFactory.makeCreateInput({userId: otherUser.id}),
+      data: fixJsonInput(
+        ProfileFactory.makeCreateInput({userId: otherUser.id})
+      ),
     })
   })
 

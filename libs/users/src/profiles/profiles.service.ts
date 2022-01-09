@@ -3,10 +3,10 @@ import {Prisma} from '@prisma/client'
 import {PrismaService} from 'nestjs-prisma'
 
 import {getOffset, paginateResponse} from '@caster/utils/pagination'
-import {toUndefinedProps} from '@caster/utils/types'
+import {fixJsonInput, toUndefinedProps} from '@caster/utils/types'
 
 import {CreateProfileInput, UpdateProfileInput} from './profile-mutations.model'
-import {fromProfileInput} from './profile.utils'
+import {omit} from 'lodash'
 
 @Injectable()
 export class ProfilesService {
@@ -56,18 +56,21 @@ export class ProfilesService {
 
   async update(id: string, input: UpdateProfileInput) {
     const data = input.userId
-      ? {
-          ...input,
-          user: {
-            connect: {id: input.userId},
+      ? omit(
+          {
+            ...input,
+            user: {
+              connect: {id: input.userId},
+            },
           },
-        }
+          ['userId']
+        )
       : input
 
     return this.prisma.profile.update({
       include: {user: true},
       where: {id},
-      data: fromProfileInput(data),
+      data: fixJsonInput(data),
     })
   }
 

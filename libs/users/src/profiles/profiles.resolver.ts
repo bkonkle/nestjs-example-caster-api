@@ -11,7 +11,7 @@ import {AuthzGuard} from '@caster/authz/authz.guard'
 
 import {Profile as ProfileModel} from './profile.model'
 import {ProfilesService} from './profiles.service'
-import {fieldOptions, fromProfileCondition} from './profile.utils'
+import {fieldOptions} from './profile.utils'
 import {
   ProfileCondition,
   ProfilesOrderBy,
@@ -54,7 +54,7 @@ export class ProfilesResolver {
     @Args('page', {type: () => Int, nullable: true}) page?: number
   ): Promise<ProfilesPage> {
     const {data, ...rest} = await this.service.getMany({
-      where: fromProfileCondition(where),
+      where,
       orderBy: fromOrderByInput(orderBy),
       pageSize,
       page,

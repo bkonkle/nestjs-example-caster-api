@@ -20,7 +20,7 @@ export class Profile {
   picture?: string | null
 
   @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.JsonValue | null
+  content?: Prisma.JsonValue
 
   @Field(() => String, {nullable: true})
   city?: string | null

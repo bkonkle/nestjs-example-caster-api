@@ -18,7 +18,6 @@ import {fromOrderByInput} from '@caster/utils/prisma'
 
 import {Episode as EpisodeModel} from './episode.model'
 import {EpisodesService} from './episodes.service'
-import {fromEpisodeCondition} from './episode.utils'
 import {
   EpisodeCondition,
   EpisodesOrderBy,
@@ -57,7 +56,7 @@ export class EpisodesResolver {
     @Args('page', {type: () => Int, nullable: true}) page?: number
   ): Promise<EpisodesPage> {
     return this.service.getMany({
-      where: fromEpisodeCondition(where),
+      where,
       orderBy: fromOrderByInput(orderBy),
       pageSize,
       page,

@@ -13,6 +13,7 @@ import {Admin} from '@caster/shows/show.roles'
 import {ShowFactory} from '@caster/shows/test/factories/show.factory'
 import {ProfileFactory} from '@caster/users/test/factories/profile.factory'
 import {Query, Mutation} from '@caster/graphql/schema'
+import {fixJsonInput} from '@caster/utils/types'
 
 import {AppModule} from '../src/app.module'
 
@@ -38,7 +39,7 @@ describe('Shows', () => {
 
   const createShow = (input: CreateShowInput) =>
     prisma.show.create({
-      data: input,
+      data: fixJsonInput(input),
     })
 
   const deleteShow = (id: string) => prisma.show.delete({where: {id}})
@@ -71,7 +72,7 @@ describe('Shows', () => {
 
     profile = await prisma.profile.create({
       include: {user: true},
-      data: ProfileFactory.makeCreateInput({userId: user.id}),
+      data: fixJsonInput(ProfileFactory.makeCreateInput({userId: user.id})),
     })
   })
 
@@ -86,7 +87,9 @@ describe('Shows', () => {
 
     _otherProfile = await prisma.profile.create({
       include: {user: true},
-      data: ProfileFactory.makeCreateInput({userId: otherUser.id}),
+      data: fixJsonInput(
+        ProfileFactory.makeCreateInput({userId: otherUser.id})
+      ),
     })
   })
 

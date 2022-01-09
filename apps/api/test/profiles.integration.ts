@@ -11,6 +11,7 @@ import {Validation} from '@caster/utils/test/validation'
 import {CreateProfileInput} from '@caster/users/profiles/profile-mutations.model'
 import {ProfileFactory} from '@caster/users/test/factories/profile.factory'
 import {Query, Mutation} from '@caster/graphql/schema'
+import {fixJsonInput} from '@caster/utils/types'
 
 import {AppModule} from '../src/app.module'
 
@@ -28,8 +29,8 @@ describe('Profiles', () => {
     prisma.profile.upsert({
       include: {user: true},
       where: {userId: input.userId},
-      create: input,
-      update: input,
+      create: fixJsonInput(input),
+      update: fixJsonInput(input),
     })
 
   const deleteProfile = (id: string) => prisma.profile.delete({where: {id}})

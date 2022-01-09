@@ -7,10 +7,9 @@ import {
   ManyResponse,
   paginateResponse,
 } from '@caster/utils/pagination'
-import {toUndefinedProps} from '@caster/utils/types'
+import {fixJsonInput, toUndefinedProps} from '@caster/utils/types'
 
 import {CreateShowInput, UpdateShowInput} from './show-mutations.model'
-import {fromShowInput} from './show.utils'
 
 @Injectable()
 export class ShowsService {
@@ -52,7 +51,7 @@ export class ShowsService {
   async update(id: string, input: UpdateShowInput): Promise<Show> {
     return this.prisma.show.update({
       where: {id},
-      data: fromShowInput(input),
+      data: fixJsonInput(input),
     })
   }
 

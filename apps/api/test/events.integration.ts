@@ -18,6 +18,7 @@ import {Guest, Reader} from '@caster/shows/episodes/episode.roles'
 import {ShowFactory} from '@caster/shows/test/factories/show.factory'
 import {EpisodeFactory} from '@caster/shows/test/factories/episodes.factory'
 import {ProfileFactory} from '@caster/users/test/factories/profile.factory'
+import {fixJsonInput} from '@caster/utils/types'
 
 import {AppModule} from '../src/app.module'
 
@@ -111,15 +112,15 @@ describe('Events', () => {
 
     profile = await prisma.profile.create({
       include: {user: true},
-      data: ProfileFactory.makeCreateInput({userId: user.id}),
+      data: fixJsonInput(ProfileFactory.makeCreateInput({userId: user.id})),
     })
 
     show = await prisma.show.create({
-      data: ShowFactory.makeCreateInput(),
+      data: fixJsonInput(ShowFactory.makeCreateInput()),
     })
 
     episode = await prisma.episode.create({
-      data: EpisodeFactory.makeCreateInput({showId: show.id}),
+      data: fixJsonInput(EpisodeFactory.makeCreateInput({showId: show.id})),
     })
 
     // Give the primary profile the Guest role
@@ -144,7 +145,9 @@ describe('Events', () => {
 
     otherProfile = await prisma.profile.create({
       include: {user: true},
-      data: ProfileFactory.makeCreateInput({userId: otherUser.id}),
+      data: fixJsonInput(
+        ProfileFactory.makeCreateInput({userId: otherUser.id})
+      ),
     })
   })
 

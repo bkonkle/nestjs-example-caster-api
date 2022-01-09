@@ -1,4 +1,3 @@
-import GraphQLTypeJson from 'graphql-type-json'
 import {
   Field,
   ID,
@@ -7,7 +6,6 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql'
-import {Prisma} from '@prisma/client'
 
 import {Profile} from './profile.model'
 
@@ -42,9 +40,6 @@ export class ProfileCondition {
 
   @Field({nullable: true})
   picture?: string
-
-  @Field(() => GraphQLTypeJson, {nullable: true})
-  content?: Prisma.JsonValue
 
   @Field(() => ID, {nullable: true})
   userId?: string
