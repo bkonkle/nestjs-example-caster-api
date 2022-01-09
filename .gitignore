@@ -33,7 +33,6 @@ yarn-debug.log
 yarn-error.log
 testem.log
 /typings
-apps/*/tmp/db
 
 # System Files
 .DS_Store

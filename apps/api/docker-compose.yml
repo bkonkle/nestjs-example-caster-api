@@ -6,7 +6,7 @@ services:
     container_name: caster_postgres
     restart: always
     volumes:
-      - ./tmp/db:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - ${DATABASE_PORT}:5432
     environment:
@@ -18,3 +18,6 @@ services:
     container_name: caster_redis
     ports:
       - 6379:6379
+
+volumes:
+  postgres_data:
