@@ -18,6 +18,7 @@ import {ShowRules} from '../show.rules'
 describe('ShowRules', () => {
   let rules: ShowRules
 
+  const builder = new AbilityBuilder(AppAbility)
   const roles = mockDeep<RolesService>()
 
   const profile = ProfileFactory.make()
@@ -40,8 +41,6 @@ describe('ShowRules', () => {
 
   describe('forUser()', () => {
     it('allows everyone to read', async () => {
-      const builder = new AbilityBuilder(AppAbility)
-
       await rules.forUser(undefined, builder)
 
       expect(roles.getPermissionsForTable).not.toBeCalled()
@@ -52,8 +51,6 @@ describe('ShowRules', () => {
     })
 
     it('allows authenticated users to create', async () => {
-      const builder = new AbilityBuilder(AppAbility)
-
       roles.getPermissionsForTable.mockResolvedValueOnce({})
 
       await rules.forUser(user, builder)
@@ -67,8 +64,6 @@ describe('ShowRules', () => {
     })
 
     it('supports the Admin role', async () => {
-      const builder = new AbilityBuilder(AppAbility)
-
       const showId = 'test-show-id'
       const show = ShowFactory.make({id: showId}) as Show
       const episode = EpisodeFactory.make({showId}) as Episode
@@ -98,8 +93,6 @@ describe('ShowRules', () => {
     })
 
     it('allows users with a profile to manage episodes they are authorized to', async () => {
-      const builder = new AbilityBuilder(AppAbility)
-
       const showId = 'test-show-id'
       const show = ShowFactory.make({id: showId}) as Show
       const episode = EpisodeFactory.make({showId}) as Episode

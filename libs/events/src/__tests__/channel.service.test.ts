@@ -1,3 +1,4 @@
+import faker from 'faker'
 import {Test} from '@nestjs/testing'
 import {mockDeep, mockFn} from 'jest-mock-extended'
 import {Redis} from 'ioredis'
@@ -11,6 +12,7 @@ import {UserFactory} from '@caster/users/test/factories/user.factory'
 import {
   makeClientRegisterEvent,
   makeMessageReceive,
+  makeMessageSend,
 } from '../../test/factories/events.factory'
 import {ChannelService} from '../channel.service'
 import {EventTypes, Publisher, Subscriber} from '../event.types'
@@ -66,6 +68,21 @@ describe('ChannelService', () => {
     })
   })
 
+  describe('sendMessage()', () => {
+    it('sends a message from the Websocket client', async () => {
+      const event = makeMessageSend()
+      const profileId = faker.datatype.uuid()
+
+      await service.sendMessage(event, profileId)
+
+      expect(publisher.publish).toBeCalledTimes(1)
+      expect(publisher.publish).toBeCalledWith(
+        `ep:${event.episodeId}`,
+        JSON.stringify({sender: {profileId}, text: event.text})
+      )
+    })
+  })
+
   describe('handleMessage()', () => {
     it('handles Redis events for the Websocket client', async () => {
       const event = makeClientRegisterEvent()
@@ -88,6 +105,7 @@ describe('ChannelService', () => {
       })
 
       profiles.get.mockResolvedValueOnce(profile)
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       censor.mockReturnValueOnce(profile as any as AppSubjects)
 
