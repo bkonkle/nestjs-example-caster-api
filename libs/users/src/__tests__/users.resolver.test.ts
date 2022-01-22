@@ -48,13 +48,7 @@ describe('UsersResolver', () => {
 
   describe('getOrCreateCurrentUser()', () => {
     it('uses the RequestUsers decorator to get a User if one is found for the given username', async () => {
-      const input = {username}
-
-      const result = await resolver.getOrCreateCurrentUser(
-        input,
-        username,
-        user
-      )
+      const result = await resolver.getOrCreateCurrentUser({}, username, user)
 
       expect(service.create).not.toBeCalled()
 
@@ -62,14 +56,12 @@ describe('UsersResolver', () => {
     })
 
     it('uses the UsersService to create a User if none is found for the given username', async () => {
-      const input = {username}
-
       service.create.mockResolvedValueOnce(user)
 
-      await resolver.getOrCreateCurrentUser(input, username)
+      await resolver.getOrCreateCurrentUser({}, username)
 
       expect(service.create).toBeCalledTimes(1)
-      expect(service.create).toBeCalledWith(input)
+      expect(service.create).toBeCalledWith({username})
     })
   })
 

@@ -7,11 +7,11 @@ export const makeCreateInput = (
   overrides?: Partial<Omit<CreateUserInput, 'profile'>>
 ): Omit<CreateUserInput, 'profile'> => ({
   ...overrides,
-  username: faker.random.alphaNumeric(10),
 })
 
 export const make = (overrides?: Partial<User>): User => ({
   id: faker.datatype.uuid(),
+  username: faker.random.alphaNumeric(10),
   createdAt: faker.date.recent(),
   updatedAt: faker.date.recent(),
   isActive: true,

@@ -1,5 +1,5 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql'
-import {ForbiddenException, UseGuards} from '@nestjs/common'
+import {UseGuards} from '@nestjs/common'
 
 import {Username} from '@caster/authn/jwt.decorators'
 import {JwtGuard} from '@caster/authn/jwt.guard'
@@ -36,15 +36,11 @@ export class UsersResolver {
     @Username({require: true}) username: string,
     @RequestUser() existing?: User
   ) {
-    if (input.username !== username) {
-      throw new ForbiddenException()
-    }
-
     if (existing) {
       return {user: existing}
     }
 
-    const user = await this.service.create(input)
+    const user = await this.service.create({...input, username})
 
     return {user}
   }

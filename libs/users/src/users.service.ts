@@ -23,7 +23,7 @@ export class UsersService {
     })
   }
 
-  async create(input: CreateUserInput) {
+  async create(input: CreateUserInput & {username: string}) {
     return this.prisma.user.create({
       include: {profile: true},
       data: {

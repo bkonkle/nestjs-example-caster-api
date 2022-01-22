@@ -21,9 +21,6 @@ export class CreateUserProfileInput {
 
 @InputType()
 export class CreateUserInput {
-  @Field()
-  username!: string
-
   @Field(() => CreateUserProfileInput, {nullable: true})
   profile?: CreateUserProfileInput
 }

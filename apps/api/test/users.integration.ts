@@ -5,7 +5,6 @@ import {PrismaService} from 'nestjs-prisma'
 
 import {OAuth2} from '@caster/utils/test/oauth2'
 import {GraphQL} from '@caster/utils/test/graphql'
-import {UserFactory} from '@caster/users/test/factories/user.factory'
 import {Query, Mutation} from '@caster/graphql/schema'
 
 import {AppModule} from '../src/app.module'
@@ -180,7 +179,7 @@ describe('Users', () => {
 
     it('retrieves the currently authenticated user', async () => {
       const {token, username} = credentials
-      const variables = {input: {username, profile: {email}}}
+      const variables = {input: {profile: {email}}}
 
       const {data} = await graphql.mutation<
         Pick<Mutation, 'getOrCreateCurrentUser'>
@@ -199,7 +198,7 @@ describe('Users', () => {
 
     it('uses the input to create one when no user is found', async () => {
       const {token, username} = credentials
-      const variables = {input: {username, profile: {email}}}
+      const variables = {input: {profile: {email}}}
 
       const expected = {
         id: expect.any(String),
@@ -246,28 +245,8 @@ describe('Users', () => {
       user = await createUser(userInput)
     })
 
-    it('requires a username', async () => {
-      const {token} = credentials
-      const variables = {input: {profile: {email}}}
-
-      const body = await graphql.mutation(mutation, variables, {
-        token,
-        statusCode: 400,
-        warn: false,
-      })
-
-      expect(body).toHaveProperty('errors', [
-        expect.objectContaining({
-          message: expect.stringContaining(
-            'Field "username" of required type "String!" was not provided.'
-          ),
-        }),
-      ])
-    })
-
     it('requires authentication', async () => {
-      const {username} = credentials
-      const variables = {input: {username, profile: {email}}}
+      const variables = {input: {profile: {email}}}
 
       const body = await graphql.mutation(mutation, variables, {warn: false})
 
@@ -277,30 +256,6 @@ describe('Users', () => {
           extensions: {
             code: 'UNAUTHENTICATED',
             response: {message: 'Unauthorized', statusCode: 401},
-          },
-        }),
-      ])
-    })
-
-    it('requires authorization', async () => {
-      const {token} = credentials
-      const otherUser = UserFactory.make()
-
-      const variables = {
-        input: {username: otherUser.username, profile: {email}},
-      }
-
-      const body = await graphql.mutation(mutation, variables, {
-        token,
-        warn: false,
-      })
-
-      expect(body).toHaveProperty('errors', [
-        expect.objectContaining({
-          message: 'Forbidden',
-          extensions: {
-            code: 'FORBIDDEN',
-            response: {message: 'Forbidden', statusCode: 403},
           },
         }),
       ])

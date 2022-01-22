@@ -6,6 +6,8 @@ import {UserFactory} from '../../test/factories/user.factory'
 import {CreateUserInput, UpdateUserInput} from '../user-mutations.model'
 import {UsersService} from '../users.service'
 
+type Input = CreateUserInput & {username: string}
+
 describe('UsersService', () => {
   let service: UsersService
 
@@ -64,7 +66,7 @@ describe('UsersService', () => {
     it('uses Prisma to create a new User', async () => {
       prisma.user.create.mockResolvedValueOnce(user)
 
-      const input: CreateUserInput = {username}
+      const input: Input = {username}
 
       const result = await service.create(input)
 
@@ -81,7 +83,7 @@ describe('UsersService', () => {
     it('creates the Profile inline if input is provided', async () => {
       prisma.user.create.mockResolvedValueOnce(user)
 
-      const input: CreateUserInput = {
+      const input: Input = {
         username,
         profile: {email: 'test@email.com'},
       }
