@@ -113,6 +113,8 @@ yarn test
 
 To integration test, you need to have the Docker Compose stack with Postgres and Redis running locally, or within your CI pipeline.
 
+NOTE: This is destructive, and will wipe out data within your local database. See below for how to use an alternate test database locally.
+
 To run a single integration suite:
 
 ```sh
@@ -123,4 +125,18 @@ To run all of the integration tests together:
 
 ```sh
 yarn integration
+```
+
+#### Using an Alternate Test Database
+
+Running integration tests is destructive. If you want to preserve your local data, use an alternate database for local integration testing. Create an `apps/api/.env.test` file and customize the `DATABASE_URL`:
+
+```ini
+DATABASE_URL=postgresql://caster:caster@localhost:1701/caster_test
+```
+
+Then run the command to reset the test database:
+
+```sh
+yarn db:reset:test
 ```
