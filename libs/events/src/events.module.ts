@@ -18,13 +18,17 @@ export interface EventsOptions {
   url?: string
 }
 
+export interface RedisSettings {
+  publisher?: boolean
+}
+
 /**
  * A Redis factory provider that can act as either a Cubscriber or a Publisher
  */
 const redisProvider = (
   options: EventsOptions = {},
-  settings: {publisher?: boolean} = {}
-): FactoryProvider => ({
+  settings: RedisSettings = {}
+): FactoryProvider<Redis.Redis> => ({
   provide: settings.publisher ? Publisher : Subscriber,
   useFactory: (config: Config) =>
     new Redis(options.url || config.get('redis.url')),
