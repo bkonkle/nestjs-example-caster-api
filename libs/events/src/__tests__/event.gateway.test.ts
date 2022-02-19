@@ -59,7 +59,7 @@ describe('EventsGateway', () => {
   })
 
   describe('clientRegister()', () => {
-    it('TODO', async () => {
+    it('registers a new subscriber to the Redis channel for the given Episode', async () => {
       const event = makeClientRegisterEvent()
 
       await gateway.clientRegister(event, ability, censor, socket)
