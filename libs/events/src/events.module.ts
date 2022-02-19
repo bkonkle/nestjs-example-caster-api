@@ -1,4 +1,10 @@
-import {ConsoleLogger, DynamicModule, Logger, Module} from '@nestjs/common'
+import {
+  ConsoleLogger,
+  DynamicModule,
+  FactoryProvider,
+  Logger,
+  Module,
+} from '@nestjs/common'
 import Redis from 'ioredis'
 
 import {ProfilesModule} from '@caster/users/profiles/profiles.module'
@@ -12,6 +18,22 @@ export interface EventsOptions {
   url?: string
 }
 
+/**
+ * A Redis factory provider that can act as either a Cubscriber or a Publisher
+ */
+const redisProvider = (
+  options: EventsOptions = {},
+  settings: {publisher?: boolean} = {}
+): FactoryProvider => ({
+  provide: settings.publisher ? Publisher : Subscriber,
+  useFactory: (config: Config) =>
+    new Redis(options.url || config.get('redis.url')),
+  inject: [Config],
+})
+
+/**
+ * WebSocket event handling via the EventsGateway
+ */
 @Module({
   imports: [ProfilesModule],
   providers: [
@@ -25,24 +47,8 @@ export class EventsModule {
     return {
       module: EventsModule,
       providers: [
-        {
-          provide: Subscriber,
-          useFactory: (config: Config) => {
-            const url = options.url || config.get('redis.url')
-
-            return new Redis(url)
-          },
-          inject: [Config],
-        },
-        {
-          provide: Publisher,
-          useFactory: (config: Config) => {
-            const url = options.url || config.get('redis.url')
-
-            return new Redis(url)
-          },
-          inject: [Config],
-        },
+        redisProvider(options),
+        redisProvider(options, {publisher: true}),
       ],
     }
   }
