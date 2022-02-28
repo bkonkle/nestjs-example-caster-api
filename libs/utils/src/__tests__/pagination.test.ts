@@ -55,6 +55,23 @@ describe('@caster/utils/pagination', () => {
       })
     })
 
+    it('handles total input when the total is 0', async () => {
+      const data: unknown[] = []
+      const result = paginateResponse(data, {
+        total: 0,
+        page: 1,
+        pageSize: 500,
+      })
+
+      expect(result).toEqual({
+        data,
+        count: 0,
+        total: 0,
+        page: 1,
+        pageCount: 1,
+      })
+    })
+
     it('handles page & pageSize input', async () => {
       const data = [faker.datatype.uuid()]
       const result = paginateResponse(data, {page: 4, pageSize: 20})

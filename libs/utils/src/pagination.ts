@@ -14,27 +14,29 @@ export interface PaginationOptions {
 
 export const paginateResponse = <Entity>(
   data?: Entity[],
-  options: PaginationOptions = {}
+  opts: PaginationOptions = {}
 ): ManyResponse<Entity> => {
-  const {pageSize, page: pageOpt, total: totalOpt} = options
+  const skip =
+    (opts.page && opts.pageSize && Math.floor(opts.page - 1 * opts.pageSize)) ??
+    0
 
-  const skip = (pageOpt && pageSize && Math.floor(pageOpt - 1 * pageSize)) || 0
-
-  const count = data?.length || 0
-  const pageCount = pageSize && totalOpt && Math.ceil(totalOpt / pageSize)
+  const count = data?.length ?? 0
+  const pageCount =
+    opts.pageSize && opts.total && Math.ceil(opts.total / opts.pageSize)
 
   const page =
-    pageOpt || (skip && pageSize && Math.floor(skip / pageSize) + 1) || 1
+    opts.page ??
+    ((skip && opts.pageSize && Math.floor(skip / opts.pageSize) + 1) || 1)
 
   const total =
-    totalOpt ||
-    count +
-      (pageCount || Math.ceil(Math.abs(skip / (pageSize || count)))) *
-        (pageSize || count) ||
-    count
+    opts.total ??
+    (count +
+      (pageCount ?? Math.ceil(Math.abs(skip / (opts.pageSize ?? count)))) *
+        (opts.pageSize ?? count) ||
+      count)
 
   return {
-    data: data || [],
+    data: data ?? [],
     count,
     total,
     page,
