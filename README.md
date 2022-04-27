@@ -41,7 +41,7 @@ Then, follow the example in [.env.example](apps/api/.env.example) to create your
 
 ### Authentication Setup
 
-Authentication uses a standard OAuth2 JWKS setup that relies on an external identity server to issue and validate tokens. To start off you'll need an OAuth2 endpoint, something like https://my-app.us.auth0.com (if you're using Auth0) or https://mydomain.auth.us-east-1.amazoncognito.com (if you're using AWS Cognito). Set this as the `OAUTH2_URL` variable in your `apps/api/.env`.
+Authentication uses a standard OAuth2 JWKS setup that relies on an external identity server to issue and validate tokens. To start off you'll need an OAuth2 endpoint, something like `https://my-app.us.auth0.com` (if you're using Auth0) or `https://mydomain.auth.us-east-1.amazoncognito.com` (if you're using AWS Cognito). Set this as the `OAUTH2_URL` variable in your `apps/api/.env`.
 
 Then, set the `OAUTH2_AUDIENCE` to `localhost`, or whatever your authentication provider prefers.
 
