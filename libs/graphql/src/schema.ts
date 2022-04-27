@@ -56,7 +56,6 @@ export type CreateShowInput = {
 
 export type CreateUserInput = {
   profile?: InputMaybe<CreateUserProfileInput>
-  username: Scalars['String']
 }
 
 export type CreateUserProfileInput = {
@@ -80,7 +79,6 @@ export type Episode = {
 }
 
 export type EpisodeCondition = {
-  content?: InputMaybe<Scalars['JSON']>
   createdAt?: InputMaybe<Scalars['DateTime']>
   id?: InputMaybe<Scalars['ID']>
   picture?: InputMaybe<Scalars['String']>
@@ -210,7 +208,6 @@ export type Profile = {
 }
 
 export type ProfileCondition = {
-  content?: InputMaybe<Scalars['JSON']>
   createdAt?: InputMaybe<Scalars['DateTime']>
   displayName?: InputMaybe<Scalars['String']>
   email?: InputMaybe<Scalars['String']>
@@ -298,7 +295,6 @@ export type Show = {
 }
 
 export type ShowCondition = {
-  content?: InputMaybe<Scalars['JSON']>
   createdAt?: InputMaybe<Scalars['DateTime']>
   id?: InputMaybe<Scalars['ID']>
   picture?: InputMaybe<Scalars['String']>
